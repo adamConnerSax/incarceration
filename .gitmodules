@@ -1,0 +1,3 @@
+[submodule "trends-data"]
+	path = trends-data
+	url = https://github.com/vera-institute/incarceration_trends
