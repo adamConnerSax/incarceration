@@ -67,8 +67,8 @@ foldYear y frame =
   in FL.purely P.fold toRec $ frame P.>-> P.filter ((== y) . L.view year)
 
 --foldAll :: F.MonadSafe m => P.Producer (F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm]) m () -> m (M.Map (Text,Int) (F.Record '[TotalPop, IndexCrime, TotalPrisonAdm]))
-ratesByStateYear :: FL.Fold (F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm]) (M.Map (Text,Int) (F.Record '[CrimeRate, IncarcerationRate]))
-ratesByStateYear =
+ratesByStateAndYear :: FL.Fold (F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm]) (M.Map (Text,Int) (F.Record '[CrimeRate, IncarcerationRate]))
+ratesByStateAndYear =
   let getKey r = (r ^. state, r ^. year)
       getSubset :: F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm] -> F.Record '[TotalPop, IndexCrime, TotalPrisonAdm]
       getSubset = F.rcast
@@ -83,5 +83,5 @@ main = do
       trendsData = (F.readTableMaybe $ trendsCsv config) {- P.>-> P.filter (stateFilter "NY") -}
       selectMaybe :: MaybeRow -> Maybe (F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm])
       selectMaybe = F.recMaybe . F.rcast
-  res <- F.runSafeEffect $ FL.purely P.fold ratesByStateYear $ (trendsData P.>-> P.map selectMaybe P.>-> P.filter isJust P.>-> P.map fromJust)
+  res <- F.runSafeEffect $ FL.purely P.fold ratesByStateAndYear $ (trendsData P.>-> P.map selectMaybe P.>-> P.filter isJust P.>-> P.map fromJust)
   mapM_ (putStrLn . show) $ M.toList res
