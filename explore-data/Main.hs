@@ -17,7 +17,7 @@ import qualified Control.Lens       as L
 --import           Control.Monad.Identity (Identity)
 import qualified Data.List          as L
 import qualified Data.Map           as M
-import           Data.Maybe         (fromJust, isJust)
+import           Data.Maybe         (fromJust, fromMaybe, isJust)
 import           Data.Text          (Text)
 import qualified Data.Text          as T
 import qualified Data.Vinyl         as V
@@ -37,13 +37,18 @@ data Config = Config
 
 instance D.Interpret Config
 
-
-
 type Row = IncarcerationTrends
 type MaybeRow = F.Rec (Maybe F.:. F.ElField) (F.RecordColumns Row)
 
 F.declareColumn "IncarcerationRate" ''Double
 F.declareColumn "CrimeRate" ''Double
+
+aggregateToMap :: Ord k => (record -> k) -> (record -> a) -> (a -> b -> b) -> b -> M.Map k b -> record -> M.Map k b
+aggregateToMap getKey getSubset addSubset initial m r =
+  let key = getKey r
+      subset = getSubset r
+      newVal = addSubset subset $ fromMaybe initial $ M.lookup key m
+  in M.insert key newVal m -- we can probably do this more efficiently with alter or something.
 
 maybeTest :: (a -> Bool) -> Maybe a -> Bool
 maybeTest t = maybe False t
@@ -61,14 +66,22 @@ foldYear y frame =
       toRec = ((\p ic pa -> p &: ic &: pa &: V.RNil) <$> totalF totalPop <*> totalF indexCrime <*> totalF totalPrisonAdm)
   in FL.purely P.fold toRec $ frame P.>-> P.filter ((== y) . L.view year)
 
--- Get data for a given county over time.  LEARNING!
+--foldAll :: F.MonadSafe m => P.Producer (F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm]) m () -> m (M.Map (Text,Int) (F.Record '[TotalPop, IndexCrime, TotalPrisonAdm]))
+ratesByStateYear :: FL.Fold (F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm]) (M.Map (Text,Int) (F.Record '[CrimeRate, IncarcerationRate]))
+ratesByStateYear =
+  let getKey r = (r ^. state, r ^. year)
+      getSubset :: F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm] -> F.Record '[TotalPop, IndexCrime, TotalPrisonAdm]
+      getSubset = F.rcast
+      addSubset s soFar = ((soFar ^. totalPop) + (s ^. totalPop)) &: ((soFar ^. indexCrime) + (s ^. indexCrime)) &: ((soFar ^. totalPrisonAdm) + (s ^. totalPrisonAdm)) &: V.RNil
+      emptyRow = 0 &: 0 &: 0 &: V.RNil
+  in FL.Fold (aggregateToMap getKey getSubset addSubset emptyRow) M.empty (fmap rates)
 
 main :: IO ()
 main = do
   config <- D.input D.auto "./config/explore-data.dhall"
   let trendsData :: F.MonadSafe m => P.Producer MaybeRow m ()
-      trendsData = (F.readTableMaybe $ trendsCsv config) P.>-> P.filter (stateFilter "NY")
-      selectMaybe :: MaybeRow -> Maybe (F.Record '[Year, TotalPop, IndexCrime, TotalPrisonAdm])
+      trendsData = (F.readTableMaybe $ trendsCsv config) {- P.>-> P.filter (stateFilter "NY") -}
+      selectMaybe :: MaybeRow -> Maybe (F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm])
       selectMaybe = F.recMaybe . F.rcast
-  res <- fmap rates . F.runSafeEffect $ foldYear 1989 $ (trendsData P.>-> P.map selectMaybe P.>-> P.filter isJust P.>-> P.map fromJust)
-  print res
+  res <- F.runSafeEffect $ FL.purely P.fold ratesByStateYear $ (trendsData P.>-> P.map selectMaybe P.>-> P.filter isJust P.>-> P.map fromJust)
+  mapM_ (putStrLn . show) $ M.toList res
