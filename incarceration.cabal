@@ -20,7 +20,7 @@ library
   -- exposed-modules:
   -- other-modules:
   -- other-extensions:
-  build-depends:       base ^>=4.11.1.0
+  build-depends:       base >=4.11.1.0
                      , dhall
                      , foldl
                      , Frames
@@ -35,10 +35,11 @@ executable explore-data
   main-is:             Main.hs
   other-modules:       TrendsDataTypes
   -- other-extensions:
-  build-depends:       base ^>=4.11.1.0
+  build-depends:       base >=4.11.1.0
                      , containers
                      , dhall
                      , foldl
+                     , inline-r
                      , Frames
                      , lens
                      , pipes

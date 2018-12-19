@@ -7,9 +7,13 @@
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE QuasiQuotes #-}
 module Main where
 
 import           TrendsDataTypes
+
+import qualified Language.R.Instance as R
+import Language.R.QQ
 
 import qualified Control.Foldl        as FL
 import           Control.Lens         ((^.))
@@ -33,6 +37,7 @@ import qualified Pipes                as P
 import qualified Pipes.Prelude        as P
 import Control.Arrow (second)
 import Data.Proxy (Proxy(..))
+import qualified Data.Foldable as Fold
 
 data Config = Config
   {
@@ -48,6 +53,7 @@ type MaybeRow = F.Rec (Maybe F.:. F.ElField) (F.RecordColumns Row)
 F.declareColumn "IncarcerationRate" ''Double
 F.declareColumn "CrimeRate" ''Double
 
+-- Utils.  Should get their own lib
 aggregateToMap :: Ord k => (a -> k) -> (a -> b -> b) -> b -> M.Map k b -> a -> M.Map k b
 aggregateToMap getKey combine initial m r =
   let key = getKey r
@@ -56,9 +62,8 @@ aggregateToMap getKey combine initial m r =
  
 aggregateFiltered :: Ord k => (c -> Maybe a) -> (a -> k) -> (a -> b -> b) -> b -> M.Map k b -> c -> M.Map k b
 aggregateFiltered decode getKey combine initial m x = maybe m (aggregateToMap getKey combine initial m) $ decode x
+--
 
-mapToRecords :: Ord k => (k -> (F.Record ks)) -> M.Map k (F.Record cs) -> [F.Record (ks V.++ cs)]
-mapToRecords keyToRec = fmap (\(k,dr) -> V.rappend (keyToRec k) dr) . M.toList 
 
 rates :: F.Record [TotalPop, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, IncarcerationRate]
 rates r = ((fromIntegral $ r ^. indexCrime) / (fromIntegral $ r ^. totalPop)) &: ((fromIntegral $ r ^. totalPrisonAdm) / (fromIntegral $ r ^. indexCrime)) &: V.RNil
@@ -94,6 +99,20 @@ main = do
   (rBySY, rByU) <- F.runSafeEffect $ FL.purely P.fold analyses $ trendsData
   F.writeCSV "data/ratesByStateAndYear.csv" rBySY
   F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
+
+--frameToRDataFrame :: R.MonadR m => F.FrameRec rs -> m  
+
+
+plotUrbanicity :: F.FrameRec '[Urbanicity, Year, CrimeRate, IncarcerationRate] -> IO ()
+plotUrbanicity f = do
+  let rural :: F.FrameRec '[Year, IncarcerationRate] =  fmap F.rcast $ F.filterFrame (\r -> r ^. urbanicity == "rural") f
+      xv :: [Int] = Fold.toList $ fmap (L.view year) rural
+      yv :: [Double] =  Fold.toList $ fmap (L.view incarcerationRate) rural
+  _ <- R.withEmbeddedR R.defaultConfig $ R.runRegion $ [r| |]
+  return ()  
+
+        
+
 
 {-  
 aggregateRecordsFold :: forall as rs ks ds os fs.(Ord (F.Record ks), F.RecVec (ks V.++ fs), as F.⊆ rs, ks F.⊆ as, ds F.⊆ as)
@@ -132,4 +151,8 @@ maybeTest t = maybe False t
 fipsFilter x = maybeTest (== x) . V.toHKD . F.rget @Fips -- use F.rgetField?
 stateFilter s = maybeTest (== s) . V.toHKD . F.rget @State
 yearFilter y = maybeTest (== y) . V.toHKD . F.rget @Year
+
+mapToRecords :: Ord k => (k -> (F.Record ks)) -> M.Map k (F.Record cs) -> [F.Record (ks V.++ cs)]
+mapToRecords keyToRec = fmap (\(k,dr) -> V.rappend (keyToRec k) dr) . M.toList 
+
 ---
