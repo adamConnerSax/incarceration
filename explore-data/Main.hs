@@ -88,25 +88,25 @@ aggregateFiltered = aggregateGeneral
 --
 
 rates :: F.Record [TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, ImprisonedPerCrimeRate]
-rates = V.runcurryX (\p ic pa -> (fromIntegral ic / fromIntegral p) &: ((fromIntegral pa) * 1.0e-7 / fromIntegral ic) &: V.RNil)
+rates = V.runcurryX (\p ic pa -> (fromIntegral ic / fromIntegral p) &: (fromIntegral pa / fromIntegral ic) &: V.RNil)
 
 -- NB: right now we are choosing to drop any rows which are missing the fields we use.
 ratesByStateAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Year, State, CrimeRate, ImprisonedPerCrimeRate])
 ratesByStateAndYear =
   let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
-      getKey :: F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record '[Year, State] = F.rcast --r = (r ^. state, r ^. year)
+      getKey :: F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record '[Year, State] = F.rcast 
       emptyRow = 0 &: 0 &: 0 &: V.RNil
   in FL.Fold (aggregateFiltered selectMaybe getKey (V.recAdd . F.rcast) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second rates) . M.toList) 
 
 ratesByUrbanicityAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Urbanicity, Year, CrimeRate, ImprisonedPerCrimeRate])
 ratesByUrbanicityAndYear =
   let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
-      getKey :: F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record '[Urbanicity, Year] = F.rcast --r = (r ^. state, r ^. year)
+      getKey :: F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record '[Urbanicity, Year] = F.rcast
       emptyRow = 0 &: 0 &: 0 &: V.RNil
   in FL.Fold (aggregateFiltered selectMaybe getKey (V.recAdd . F.rcast) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second rates) . M.toList) 
 
 gRates :: F.Record '["pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double] -> F.Record '[IncarcerationRate, PrisonAdmRate]
-gRates = V.runcurryX (\a p j -> j * 1.0e-7/(fromIntegral p) F.&: (fromIntegral a * 1.0e-7/fromIntegral p) F.&: V.RNil)
+gRates = V.runcurryX (\p a j -> j /(fromIntegral p) F.&: (fromIntegral a/fromIntegral p) F.&: V.RNil)
 
 ratesByGenderAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Gender, Year, IncarcerationRate, PrisonAdmRate])
 ratesByGenderAndYear =
