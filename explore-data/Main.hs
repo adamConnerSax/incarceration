@@ -8,6 +8,9 @@
 {-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeOperators       #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE TypeFamilies #-}
 module Main where
 
 import           TrendsDataTypes
@@ -18,26 +21,31 @@ import Language.R.QQ
 import qualified Control.Foldl        as FL
 import           Control.Lens         ((^.))
 import qualified Control.Lens         as L
+import Control.Applicative (liftA2)
 import qualified Data.List            as L
 import qualified Data.Map             as M
 import           Data.Maybe           (fromJust, fromMaybe, isJust)
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Vinyl           as V
+import qualified Data.Vinyl.Curry           as V
 import qualified Data.Vinyl.Functor   as V
 import qualified Data.Vinyl.TypeLevel as V
 import qualified Data.Vinyl.XRec      as V
-import qualified Data.Vinyl.TypeLevel as V
+import qualified Data.Vinyl.Core as V
+import qualified Data.Vinyl.Class.Method as V
 import qualified Dhall                as D
 import           Frames               ((:.), (&:))
 import qualified Frames               as F
 import qualified Frames.CSV           as F
+import qualified Frames.ShowCSV           as F
 import qualified Frames.InCore        as F
 import qualified Pipes                as P
 import qualified Pipes.Prelude        as P
 import Control.Arrow (second)
 import Data.Proxy (Proxy(..))
 import qualified Data.Foldable as Fold
+import qualified Data.Vector as V
 
 data Config = Config
   {
@@ -48,10 +56,19 @@ data Config = Config
 instance D.Interpret Config
 
 type Row = IncarcerationTrends
-type MaybeRow = F.Rec (Maybe F.:. F.ElField) (F.RecordColumns Row)
+type MaybeRow r = F.Rec (Maybe F.:. F.ElField) (F.RecordColumns r)
+type MaybeITrends = MaybeRow IncarcerationTrends
 
-F.declareColumn "IncarcerationRate" ''Double
+data GenderT = Male | Female deriving (Show,Enum,Bounded,Ord, Eq) -- we ought to have NonBinary here as well, but the data doesn't.
+type instance F.VectorFor GenderT = V.Vector
+instance F.ShowCSV GenderT where
+  showCSV = T.pack . show
+
+F.declareColumn "ImprisonedPerCrimeRate" ''Double
 F.declareColumn "CrimeRate" ''Double
+F.declareColumn "IncarcerationRate" ''Double
+F.declareColumn "PrisonAdmRate" '' Double
+F.declareColumn "Gender" ''GenderT
 
 -- Utils.  Should get their own lib
 aggregateToMap :: Ord k => (a -> k) -> (a -> b -> b) -> b -> M.Map k b -> a -> M.Map k b
@@ -59,50 +76,83 @@ aggregateToMap getKey combine initial m r =
   let key = getKey r
       newVal = Just . combine r . fromMaybe initial 
   in M.alter newVal key m --M.insert key newVal m 
- 
+
+aggregateGeneral :: (Ord k, Foldable f) => (c -> f a) -> (a -> k) -> (a -> b -> b) -> b -> M.Map k b -> c -> M.Map k b
+aggregateGeneral unpack getKey combine initial m x =
+  let aggregate = FL.Fold (aggregateToMap getKey combine initial) m id
+  in FL.fold aggregate (unpack x)
+
+-- Maybe is delightfully foldable  
 aggregateFiltered :: Ord k => (c -> Maybe a) -> (a -> k) -> (a -> b -> b) -> b -> M.Map k b -> c -> M.Map k b
-aggregateFiltered decode getKey combine initial m x = maybe m (aggregateToMap getKey combine initial m) $ decode x
+aggregateFiltered = aggregateGeneral
 --
 
-
-rates :: F.Record [TotalPop, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, IncarcerationRate]
-rates r = ((fromIntegral $ r ^. indexCrime) / (fromIntegral $ r ^. totalPop)) &: ((fromIntegral $ r ^. totalPrisonAdm) / (fromIntegral $ r ^. indexCrime)) &: V.RNil
+rates :: F.Record [TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, ImprisonedPerCrimeRate]
+rates = V.runcurryX (\p ic pa -> (fromIntegral ic / fromIntegral p) &: ((fromIntegral pa) * 1.0e-7 / fromIntegral ic) &: V.RNil)
 
 -- NB: right now we are choosing to drop any rows which are missing the fields we use.
-ratesByStateAndYear :: FL.Fold MaybeRow (F.FrameRec '[Year, State, CrimeRate, IncarcerationRate])
+ratesByStateAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Year, State, CrimeRate, ImprisonedPerCrimeRate])
 ratesByStateAndYear =
-  let selectMaybe :: MaybeRow -> Maybe (F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
-      getKey :: F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm] -> F.Record '[Year, State] = F.rcast --r = (r ^. state, r ^. year)
-      getSubset :: F.Record '[Year, State, TotalPop, IndexCrime, TotalPrisonAdm] -> F.Record '[TotalPop, IndexCrime, TotalPrisonAdm]
-      getSubset = F.rcast
-      addSubset s soFar = ((soFar ^. totalPop) + (s ^. totalPop)) &: ((soFar ^. indexCrime) + (s ^. indexCrime)) &: ((soFar ^. totalPrisonAdm) + (s ^. totalPrisonAdm)) &: V.RNil
+  let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
+      getKey :: F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record '[Year, State] = F.rcast --r = (r ^. state, r ^. year)
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FL.Fold (aggregateFiltered selectMaybe getKey (addSubset . getSubset) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second rates) . M.toList) --mapToRecords id . fmap rates)
+  in FL.Fold (aggregateFiltered selectMaybe getKey (V.recAdd . F.rcast) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second rates) . M.toList) 
 
-ratesByUrbanicityAndYear :: FL.Fold MaybeRow (F.FrameRec '[Urbanicity, Year, CrimeRate, IncarcerationRate])
+ratesByUrbanicityAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Urbanicity, Year, CrimeRate, ImprisonedPerCrimeRate])
 ratesByUrbanicityAndYear =
-  let selectMaybe :: MaybeRow -> Maybe (F.Record '[Urbanicity, Year, TotalPop, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
-      getKey :: F.Record '[Urbanicity, Year, TotalPop, IndexCrime, TotalPrisonAdm] -> F.Record '[Urbanicity, Year] = F.rcast --r = (r ^. state, r ^. year)
-      getSubset :: F.Record '[Urbanicity, Year, TotalPop, IndexCrime, TotalPrisonAdm] -> F.Record '[TotalPop, IndexCrime, TotalPrisonAdm]
-      getSubset = F.rcast
-      addSubset s soFar = ((soFar ^. totalPop) + (s ^. totalPop)) &: ((soFar ^. indexCrime) + (s ^. indexCrime)) &: ((soFar ^. totalPrisonAdm) + (s ^. totalPrisonAdm)) &: V.RNil
+  let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
+      getKey :: F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record '[Urbanicity, Year] = F.rcast --r = (r ^. state, r ^. year)
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FL.Fold (aggregateFiltered selectMaybe getKey (addSubset . getSubset) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second rates) . M.toList) --mapToRecords id . fmap rates)
+  in FL.Fold (aggregateFiltered selectMaybe getKey (V.recAdd . F.rcast) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second rates) . M.toList) 
+
+gRates :: F.Record '["pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double] -> F.Record '[IncarcerationRate, PrisonAdmRate]
+gRates = V.runcurryX (\a p j -> j * 1.0e-7/(fromIntegral p) F.&: (fromIntegral a * 1.0e-7/fromIntegral p) F.&: V.RNil)
+
+ratesByGenderAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Gender, Year, IncarcerationRate, PrisonAdmRate])
+ratesByGenderAndYear =
+  let genders = [Female F.&: V.RNil, Male F.&: V.RNil] 
+      selectMaybe :: MaybeITrends -> Maybe (F.Record '[Year, FemalePop15to64, MalePop15to64, FemalePrisonAdm, MalePrisonAdm, FemaleJailPop, MaleJailPop])
+      selectMaybe = F.recMaybe . F.rcast
+      getKey :: F.Record '[Gender, Year, "pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double] -> F.Record '[Gender, Year]
+      getKey = F.rcast
+      processRow :: F.Record '[Year, FemalePop15to64, MalePop15to64, FemalePrisonAdm, MalePrisonAdm, FemaleJailPop, MaleJailPop]
+                 -> F.Record '[Gender]
+                 -> F.Record '[Gender, Year, "pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double]
+      processRow r g = case (g ^. gender) of
+                         Female -> Female F.&: (r ^. year) F.&: (r ^. femalePop15to64) F.&: (r ^. femalePrisonAdm) F.&: (r ^. femaleJailPop) F.&: V.RNil
+                         Male ->  Male F.&: (r ^. year) F.&: (r ^. malePop15to64) F.&: (r ^. malePrisonAdm) F.&: (r ^. maleJailPop) F.&: V.RNil
+      newRows r = fmap (processRow r) genders
+      emptyRow = 0 &: 0 &: 0 &: V.RNil
+  in FL.Fold (aggregateGeneral (fromMaybe [] . fmap newRows . selectMaybe) getKey (V.recAdd . F.rcast) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second gRates) . M.toList)
+
 
 main :: IO ()
 main = do
   config <- D.input D.auto "./config/explore-data.dhall"
   let trendsData = F.readTableMaybe $ trendsCsv config
-      analyses = (,)
+      analyses = (,,)
                  <$> ratesByStateAndYear
                  <*> ratesByUrbanicityAndYear
-  (rBySY, rByU) <- F.runSafeEffect $ FL.purely P.fold analyses $ trendsData
+                 <*> ratesByGenderAndYear
+  (rBySY, rByU, rByG) <- F.runSafeEffect $ FL.purely P.fold analyses $ trendsData
   F.writeCSV "data/ratesByStateAndYear.csv" rBySY
   F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
+  F.writeCSV "data/ratesByGenderAndYear.csv" rByG
 
+{-
+reshapeRowSimple :: forall ss ts cs ds. (ss F.⊆ ts)
+                 => Proxy ss -- id columns
+                 -> [F.Record cs] -- list of classifier values
+                 -> (F.Record cs -> F.Record ts -> F.Record ds)
+                 -> F.Record ts
+                 -> [F.Record (ss V.++ cs V.++ ds)]                
+reshapeRowSimple _ classifiers newDataF r = 
+  let ids = F.rcast r :: F.Record ss
+  in flip fmap classifiers $ \c -> (ids F.<+> c) F.<+> newDataF c r  
+-}
+
+{-
 --frameToRDataFrame :: R.MonadR m => F.FrameRec rs -> m  
-
-
 plotUrbanicity :: F.FrameRec '[Urbanicity, Year, CrimeRate, IncarcerationRate] -> IO ()
 plotUrbanicity f = do
   let rural :: F.FrameRec '[Year, IncarcerationRate] =  fmap F.rcast $ F.filterFrame (\r -> r ^. urbanicity == "rural") f
@@ -110,7 +160,7 @@ plotUrbanicity f = do
       yv :: [Double] =  Fold.toList $ fmap (L.view incarcerationRate) rural
   _ <- R.withEmbeddedR R.defaultConfig $ R.runRegion $ [r| |]
   return ()  
-
+-}
         
 
 
@@ -136,10 +186,10 @@ aggregateRecordsFold fieldsProxy keyProxy combine initial extract =
 
 ratesByStateAndYear' :: FL.Fold MaybeRow (F.FrameRec '[State, Year, CrimeRate, IncarcerationRate])
 ratesByStateAndYear' =
-  let combine :: F.Record [TotalPop,IndexCrime,TotalPrisonAdm] -> F.Record [TotalPop,IndexCrime,TotalPrisonAdm] -> F.Record [TotalPop,IndexCrime,TotalPrisonAdm] 
+  let combine :: F.Record [TotalPop15to64,IndexCrime,TotalPrisonAdm] -> F.Record [TotalPop15to64,IndexCrime,TotalPrisonAdm] -> F.Record [TotalPop15to64,IndexCrime,TotalPrisonAdm] 
       combine s soFar = ((soFar ^. totalPop) + (s ^. totalPop)) &: ((soFar ^. indexCrime) + (s ^. indexCrime)) &: ((soFar ^. totalPrisonAdm) + (s ^. totalPrisonAdm)) &: V.RNil
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in aggregateRecordsFold (Proxy @[State,Year,TotalPop,IndexCrime,TotalPrisonAdm]) (Proxy @[State, Year]) combine emptyRow rates
+  in aggregateRecordsFold (Proxy @[State,Year,TotalPop15to64,IndexCrime,TotalPrisonAdm]) (Proxy @[State, Year]) combine emptyRow rates
 -}
 
 pFilterMaybe :: Monad m => (a -> Maybe b) -> P.Pipe a b m ()
