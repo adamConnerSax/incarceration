@@ -77,14 +77,28 @@ aggregateToMap getKey combine initial m r =
       newVal = Just . combine r . fromMaybe initial 
   in M.alter newVal key m --M.insert key newVal m 
 
+-- fold over c.  But c may become zero or many a (bad data, or melting rows). So we process c, then fold over the result.
 aggregateGeneral :: (Ord k, Foldable f) => (c -> f a) -> (a -> k) -> (a -> b -> b) -> b -> M.Map k b -> c -> M.Map k b
 aggregateGeneral unpack getKey combine initial m x =
   let aggregate = FL.Fold (aggregateToMap getKey combine initial) m id
   in FL.fold aggregate (unpack x)
 
--- Maybe is delightfully foldable  
+-- Maybe is delightfully foldable!  
 aggregateFiltered :: Ord k => (c -> Maybe a) -> (a -> k) -> (a -> b -> b) -> b -> M.Map k b -> c -> M.Map k b
 aggregateFiltered = aggregateGeneral
+
+-- specific version for our record folds via Control.Foldl
+aggregateF :: forall rs ks as bs cs f g. (ks F.⊆ as, Ord (F.Record ks), F.RecVec (ks V.++ cs), Foldable f)
+           => Proxy ks
+           -> (F.Rec g rs -> f (F.Record as))
+           -> (F.Record as -> F.Record bs -> F.Record bs)
+           -> F.Record bs
+           -> (F.Record bs -> F.Record cs)
+           -> FL.Fold (F.Rec g rs) (F.FrameRec (ks V.++ cs))
+aggregateF _ unpack process initial extract =
+  let getKey :: F.Record as -> F.Record ks
+      getKey = F.rcast
+  in FL.Fold (aggregateGeneral unpack getKey process initial) M.empty (F.toFrame . fmap (uncurry V.rappend . second extract) . M.toList) 
 --
 
 rates :: F.Record [TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, ImprisonedPerCrimeRate]
@@ -94,37 +108,31 @@ rates = V.runcurryX (\p ic pa -> (fromIntegral ic / fromIntegral p) &: (fromInte
 ratesByStateAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Year, State, CrimeRate, ImprisonedPerCrimeRate])
 ratesByStateAndYear =
   let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
-      getKey :: F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record '[Year, State] = F.rcast 
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FL.Fold (aggregateFiltered selectMaybe getKey (V.recAdd . F.rcast) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second rates) . M.toList) 
+  in aggregateF (Proxy @[Year, State]) selectMaybe (V.recAdd . F.rcast) emptyRow rates
 
 ratesByUrbanicityAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Urbanicity, Year, CrimeRate, ImprisonedPerCrimeRate])
 ratesByUrbanicityAndYear =
   let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
-      getKey :: F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record '[Urbanicity, Year] = F.rcast
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FL.Fold (aggregateFiltered selectMaybe getKey (V.recAdd . F.rcast) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second rates) . M.toList) 
+  in aggregateF (Proxy @[Urbanicity, Year]) selectMaybe (V.recAdd . F.rcast) emptyRow rates
 
 gRates :: F.Record '["pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double] -> F.Record '[IncarcerationRate, PrisonAdmRate]
 gRates = V.runcurryX (\p a j -> j /(fromIntegral p) F.&: (fromIntegral a/fromIntegral p) F.&: V.RNil)
 
-ratesByGenderAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Gender, Year, IncarcerationRate, PrisonAdmRate])
+ratesByGenderAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Year, Gender, IncarcerationRate, PrisonAdmRate])
 ratesByGenderAndYear =
-  let genders = [Female F.&: V.RNil, Male F.&: V.RNil] 
+  let genders = [Female F.&: V.RNil, Male F.&: V.RNil]
+      processRow g r = case (g ^. gender) of
+                         Female -> (r ^. femalePop15to64) F.&: (r ^. femalePrisonAdm) F.&: (r ^. femaleJailPop) F.&: V.RNil
+                         Male ->  (r ^. malePop15to64) F.&: (r ^. malePrisonAdm) F.&: (r ^. maleJailPop) F.&: V.RNil
+      newRows = reshapeRowSimple ([F.pr1|Year|]) genders processRow
       selectMaybe :: MaybeITrends -> Maybe (F.Record '[Year, FemalePop15to64, MalePop15to64, FemalePrisonAdm, MalePrisonAdm, FemaleJailPop, MaleJailPop])
       selectMaybe = F.recMaybe . F.rcast
-      getKey :: F.Record '[Gender, Year, "pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double] -> F.Record '[Gender, Year]
-      getKey = F.rcast
-      processRow :: F.Record '[Year, FemalePop15to64, MalePop15to64, FemalePrisonAdm, MalePrisonAdm, FemaleJailPop, MaleJailPop]
-                 -> F.Record '[Gender]
-                 -> F.Record '[Gender, Year, "pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double]
-      processRow r g = case (g ^. gender) of
-                         Female -> Female F.&: (r ^. year) F.&: (r ^. femalePop15to64) F.&: (r ^. femalePrisonAdm) F.&: (r ^. femaleJailPop) F.&: V.RNil
-                         Male ->  Male F.&: (r ^. year) F.&: (r ^. malePop15to64) F.&: (r ^. malePrisonAdm) F.&: (r ^. maleJailPop) F.&: V.RNil
-      newRows r = fmap (processRow r) genders
+      unpack :: MaybeITrends -> [F.Record '[Year, Gender, "pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double]]
+      unpack = fromMaybe [] . fmap newRows . selectMaybe
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FL.Fold (aggregateGeneral (fromMaybe [] . fmap newRows . selectMaybe) getKey (V.recAdd . F.rcast) emptyRow) M.empty (F.toFrame . fmap (uncurry V.rappend . second gRates) . M.toList)
-
+  in aggregateF (Proxy @[Year, Gender]) unpack (V.recAdd . F.rcast) emptyRow gRates
 
 main :: IO ()
 main = do
@@ -139,7 +147,7 @@ main = do
   F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
   F.writeCSV "data/ratesByGenderAndYear.csv" rByG
 
-{-
+
 reshapeRowSimple :: forall ss ts cs ds. (ss F.⊆ ts)
                  => Proxy ss -- id columns
                  -> [F.Record cs] -- list of classifier values
@@ -149,7 +157,7 @@ reshapeRowSimple :: forall ss ts cs ds. (ss F.⊆ ts)
 reshapeRowSimple _ classifiers newDataF r = 
   let ids = F.rcast r :: F.Record ss
   in flip fmap classifiers $ \c -> (ids F.<+> c) F.<+> newDataF c r  
--}
+
 
 {-
 --frameToRDataFrame :: R.MonadR m => F.FrameRec rs -> m  
