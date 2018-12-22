@@ -15,9 +15,6 @@ module Main where
 
 import           TrendsDataTypes
 
-import qualified Language.R.Instance as R
-import Language.R.QQ
-
 import qualified Control.Foldl        as FL
 import           Control.Lens         ((^.))
 import qualified Control.Lens         as L
@@ -95,7 +92,7 @@ aggregateF :: forall rs ks as bs cs f g. (ks F.⊆ as, Ord (F.Record ks), F.RecV
            -> F.Record bs
            -> (F.Record bs -> F.Record cs)
            -> FL.Fold (F.Rec g rs) (F.FrameRec (ks V.++ cs))
-aggregateF _ unpack process initial extract =
+finaggregateF _ unpack process initial extract =
   let getKey :: F.Record as -> F.Record ks
       getKey = F.rcast
   in FL.Fold (aggregateGeneral unpack getKey process initial) M.empty (F.toFrame . fmap (uncurry V.rappend . second extract) . M.toList) 
@@ -147,7 +144,6 @@ main = do
   F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
   F.writeCSV "data/ratesByGenderAndYear.csv" rByG
 
-
 reshapeRowSimple :: forall ss ts cs ds. (ss F.⊆ ts)
                  => Proxy ss -- id columns
                  -> [F.Record cs] -- list of classifier values
@@ -158,48 +154,7 @@ reshapeRowSimple _ classifiers newDataF r =
   let ids = F.rcast r :: F.Record ss
   in flip fmap classifiers $ \c -> (ids F.<+> c) F.<+> newDataF c r  
 
-
-{-
---frameToRDataFrame :: R.MonadR m => F.FrameRec rs -> m  
-plotUrbanicity :: F.FrameRec '[Urbanicity, Year, CrimeRate, IncarcerationRate] -> IO ()
-plotUrbanicity f = do
-  let rural :: F.FrameRec '[Year, IncarcerationRate] =  fmap F.rcast $ F.filterFrame (\r -> r ^. urbanicity == "rural") f
-      xv :: [Int] = Fold.toList $ fmap (L.view year) rural
-      yv :: [Double] =  Fold.toList $ fmap (L.view incarcerationRate) rural
-  _ <- R.withEmbeddedR R.defaultConfig $ R.runRegion $ [r| |]
-  return ()  
--}
-        
-
-
-{-  
-aggregateRecordsFold :: forall as rs ks ds os fs.(Ord (F.Record ks), F.RecVec (ks V.++ fs), as F.⊆ rs, ks F.⊆ as, ds F.⊆ as)
-                     => Proxy as
-                     -> Proxy ks
-                     -> (F.Record ds -> F.Record os -> F.Record os)
-                     -> F.Record os
-                     -> (F.Record os -> F.Record fs)
-                     -> FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (F.FrameRec (ks V.++ fs))
-aggregateRecordsFold fieldsProxy keyProxy combine initial extract =
-  let selMaybe :: F.Rec (Maybe F.:. F.ElField) rs -> Maybe (F.Record as)
-      selMaybe = F.recMaybe . F.rcast
-      getKey :: F.Record as -> F.Record ks
-      getKey = F.rcast
-      getData :: F.Record as -> F.Record ds
-      getData = F.rcast
-      recombine :: (F.Record ks, F.Record fs) -> F.Record (ks V.++ fs) 
-      recombine (x,y) = V.rappend x y
-  in FL.Fold (aggregateFiltered selMaybe getKey (combine . getData) initial) M.empty (F.toFrame . fmap (recombine . second extract) . M.toList)
-
-
-ratesByStateAndYear' :: FL.Fold MaybeRow (F.FrameRec '[State, Year, CrimeRate, IncarcerationRate])
-ratesByStateAndYear' =
-  let combine :: F.Record [TotalPop15to64,IndexCrime,TotalPrisonAdm] -> F.Record [TotalPop15to64,IndexCrime,TotalPrisonAdm] -> F.Record [TotalPop15to64,IndexCrime,TotalPrisonAdm] 
-      combine s soFar = ((soFar ^. totalPop) + (s ^. totalPop)) &: ((soFar ^. indexCrime) + (s ^. indexCrime)) &: ((soFar ^. totalPrisonAdm) + (s ^. totalPrisonAdm)) &: V.RNil
-      emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in aggregateRecordsFold (Proxy @[State,Year,TotalPop15to64,IndexCrime,TotalPrisonAdm]) (Proxy @[State, Year]) combine emptyRow rates
--}
-
+--
 pFilterMaybe :: Monad m => (a -> Maybe b) -> P.Pipe a b m ()
 pFilterMaybe f =  P.map f P.>-> P.filter isJust P.>-> P.map fromJust  
 

@@ -1,0 +1,21 @@
+---
+title: "Vera Incarceration Trends notes"
+author: "Adam Conner-Sax"
+output: github_document
+---
+
+```{r setup, echo = FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+library(tidyverse)
+library(here)
+```
+
+Aggregated crime rate and imprisoned per crime by urbanicity: 
+
+
+```{r urbanicity, echo=FALSE}
+urbanicity <- read_csv(here("../../data/","ratesByUrbanicityAndYear.csv"))
+ggplot(urbanicity,mapping=aes(color=urbanicity)) + geom_line(mapping=aes(x=year,y=CrimeRate)) + geom_point(mapping=aes(x=year,y=ImprisonedPerCrimeRate)) + facet_grid(rows=vars(urbanicity)) + scale_y_continuous(labels=scales::percent) + labs(x="Year",y="Rate",title="Crime and Prison Admission/Crime by Urbanicity",subtitle="Line is Crime and points are Prison Admission/Crime", caption="Data from Vera Institute of Justice")
+```
+
