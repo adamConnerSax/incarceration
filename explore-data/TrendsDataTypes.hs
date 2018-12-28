@@ -9,3 +9,4 @@ import           Data.Text (Text)
 
 F.tableTypes "IncarcerationTrends" "trends-data/incarceration_trends.csv"
 
+F.tableTypes "SAIPE" "external-data/medianHIByCounty.csv"

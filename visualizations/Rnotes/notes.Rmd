@@ -4,6 +4,8 @@ author: "Adam Conner-Sax"
 output: github_document
 ---
 
+Data was processed from the Vera incarceration trends data-set (https://github.com/vera-institute/incarceration_trends) and processed (aggregations, filtering, dropping of missing values) byt the author ()
+
 ```{r setup, echo = FALSE, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(message = FALSE)
@@ -18,4 +20,22 @@ Aggregated crime rate and imprisoned per crime by urbanicity:
 urbanicity <- read_csv(here("../../data/","ratesByUrbanicityAndYear.csv"))
 ggplot(urbanicity,mapping=aes(color=urbanicity)) + geom_line(mapping=aes(x=year,y=CrimeRate)) + geom_point(mapping=aes(x=year,y=ImprisonedPerCrimeRate)) + facet_grid(rows=vars(urbanicity)) + scale_y_continuous(labels=scales::percent) + labs(x="Year",y="Rate",title="Crime and Prison Admission/Crime by Urbanicity",subtitle="Line is Crime and points are Prison Admission/Crime", caption="Data from Vera Institute of Justice")
 ```
+
+
+Combo with poverty/income data
+
+```{r income scatter, echo=TRUE}
+trendsWithIncome <- read_csv(here("../../data/", "trendsWithPoverty.csv"))
+trends1995 = filter(trendsWithIncome,year==1995)
+ggplot(trends1995,mapping=aes(x=medianHI,y=IncarcerationRate)) + geom_point()
+```
+
+
+# From call
+Bail reform, CO
+have data from open records requests (What data? Just CO?)
+clickable map of CO counties
+census
+cdc
+reform policy by location
 

@@ -18,10 +18,11 @@ import           TrendsDataTypes
 import qualified Control.Foldl        as FL
 import           Control.Lens         ((^.))
 import qualified Control.Lens         as L
-import Control.Applicative (liftA2)
+import Control.Monad.IO.Class (MonadIO, liftIO)
+import           Control.Applicative (liftA2)
 import qualified Data.List            as L
 import qualified Data.Map             as M
-import           Data.Maybe           (fromJust, fromMaybe, isJust)
+import           Data.Maybe           (fromJust, fromMaybe, isJust, catMaybes)
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Vinyl           as V
@@ -36,7 +37,7 @@ import           Frames               ((:.), (&:))
 import qualified Frames               as F
 import qualified Frames.CSV           as F
 import qualified Frames.ShowCSV           as F
-import qualified Frames.InCore        as F
+import qualified Frames.InCore        as FI
 import qualified Pipes                as P
 import qualified Pipes.Prelude        as P
 import Control.Arrow (second)
@@ -47,7 +48,7 @@ import qualified Data.Vector as V
 data Config = Config
   {
     trendsCsv :: FilePath
-  , fipsCode  :: Integer
+  , povertyCsv :: FilePath
   } deriving (D.Generic)
 
 instance D.Interpret Config
@@ -57,7 +58,7 @@ type MaybeRow r = F.Rec (Maybe F.:. F.ElField) (F.RecordColumns r)
 type MaybeITrends = MaybeRow IncarcerationTrends
 
 data GenderT = Male | Female deriving (Show,Enum,Bounded,Ord, Eq) -- we ought to have NonBinary here as well, but the data doesn't.
-type instance F.VectorFor GenderT = V.Vector
+type instance FI.VectorFor GenderT = V.Vector
 instance F.ShowCSV GenderT where
   showCSV = T.pack . show
 
@@ -85,14 +86,14 @@ aggregateFiltered :: Ord k => (c -> Maybe a) -> (a -> k) -> (a -> b -> b) -> b -
 aggregateFiltered = aggregateGeneral
 
 -- specific version for our record folds via Control.Foldl
-aggregateF :: forall rs ks as bs cs f g. (ks F.⊆ as, Ord (F.Record ks), F.RecVec (ks V.++ cs), Foldable f)
+aggregateF :: forall rs ks as bs cs f g. (ks F.⊆ as, Ord (F.Record ks), FI.RecVec (ks V.++ cs), Foldable f)
            => Proxy ks
            -> (F.Rec g rs -> f (F.Record as))
            -> (F.Record as -> F.Record bs -> F.Record bs)
            -> F.Record bs
            -> (F.Record bs -> F.Record cs)
            -> FL.Fold (F.Rec g rs) (F.FrameRec (ks V.++ cs))
-finaggregateF _ unpack process initial extract =
+aggregateF _ unpack process initial extract =
   let getKey :: F.Record as -> F.Record ks
       getKey = F.rcast
   in FL.Fold (aggregateGeneral unpack getKey process initial) M.empty (F.toFrame . fmap (uncurry V.rappend . second extract) . M.toList) 
@@ -131,19 +132,44 @@ ratesByGenderAndYear =
       emptyRow = 0 &: 0 &: 0 &: V.RNil
   in aggregateF (Proxy @[Year, Gender]) unpack (V.recAdd . F.rcast) emptyRow gRates
 
+type TrendsPovRow = '[Year, Fips, State, CountyName, CrimeRate, IncarcerationRate, ImprisonedPerCrimeRate]
+--TotalPop, TotalPop15To64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]
+
+trendsRowForPovertyAnalysis :: Monad m => P.Pipe MaybeITrends (F.Rec F.ElField TrendsPovRow) m ()
+trendsRowForPovertyAnalysis = do
+  r <- P.await
+  let dataWeNeedM :: Maybe (F.Rec F.ElField '[Year, Fips, State, CountyName, TotalPop, TotalPop15to64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]) = F.recMaybe $ F.rcast r
+  case dataWeNeedM of
+    Nothing -> trendsRowForPovertyAnalysis
+    Just x -> do
+      let newRow = V.runcurryX (\y f s c tp tp' tpp tpa ic -> y &: f &: s &: c &: (fromIntegral ic/fromIntegral tp) &: (fromIntegral tpp/fromIntegral tp) &: (fromIntegral tpa/fromIntegral ic) &: V.RNil) x  
+      P.yield newRow >> trendsRowForPovertyAnalysis
+
 main :: IO ()
 main = do
   config <- D.input D.auto "./config/explore-data.dhall"
   let trendsData = F.readTableMaybe $ trendsCsv config
-      analyses = (,,)
+      povertyData = F.readTable $ povertyCsv config -- no missing data here
+--  aggregationAnalyses trendsData
+  trendsForPovFrame <- F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
+  povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
+  let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
+  F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF    
+
+aggregationAnalyses :: P.Producer (F.Rec (Maybe :. F.ElField) (F.RecordColumns IncarcerationTrends)) (P.Effect (F.SafeT IO)) () -> IO ()
+aggregationAnalyses trendsData = do
+  let analyses = (,,)
                  <$> ratesByStateAndYear
                  <*> ratesByUrbanicityAndYear
                  <*> ratesByGenderAndYear
   (rBySY, rByU, rByG) <- F.runSafeEffect $ FL.purely P.fold analyses $ trendsData
-  F.writeCSV "data/ratesByStateAndYear.csv" rBySY
-  F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
-  F.writeCSV "data/ratesByGenderAndYear.csv" rByG
+  liftIO $ F.writeCSV "data/ratesByStateAndYear.csv" rBySY
+  liftIO $ F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
+  liftIO $ F.writeCSV "data/ratesByGenderAndYear.csv" rByG
 
+
+-- This is the anamorphic step.  Is it a co-algebra of []?
+-- You could also use meltRow here.  That is also (Record as -> [Record bs])
 reshapeRowSimple :: forall ss ts cs ds. (ss F.⊆ ts)
                  => Proxy ss -- id columns
                  -> [F.Record cs] -- list of classifier values
