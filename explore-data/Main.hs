@@ -149,12 +149,9 @@ main :: IO ()
 main = do
   config <- D.input D.auto "./config/explore-data.dhall"
   let trendsData = F.readTableMaybe $ trendsCsv config
-      povertyData = F.readTable $ povertyCsv config -- no missing data here
---  aggregationAnalyses trendsData
-  trendsForPovFrame <- F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
-  povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
-  let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
-  F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF    
+    --aggregationAnalyses trendsData
+  let povertyData = F.readTable $ povertyCsv config -- no missing data here
+  incomePovertyJoinData trendsData povertyData
 
 aggregationAnalyses :: P.Producer (F.Rec (Maybe :. F.ElField) (F.RecordColumns IncarcerationTrends)) (P.Effect (F.SafeT IO)) () -> IO ()
 aggregationAnalyses trendsData = do
@@ -166,8 +163,13 @@ aggregationAnalyses trendsData = do
   liftIO $ F.writeCSV "data/ratesByStateAndYear.csv" rBySY
   liftIO $ F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
   liftIO $ F.writeCSV "data/ratesByGenderAndYear.csv" rByG
-
-
+  
+incomePovertyJoinData trendsData povertyData = do
+  trendsForPovFrame <- F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
+  povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
+  let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
+  F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF    
+ 
 -- This is the anamorphic step.  Is it a co-algebra of []?
 -- You could also use meltRow here.  That is also (Record as -> [Record bs])
 reshapeRowSimple :: forall ss ts cs ds. (ss F.⊆ ts)
