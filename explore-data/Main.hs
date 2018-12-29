@@ -20,7 +20,7 @@ import           Control.Lens         ((^.))
 import qualified Control.Lens         as L
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import           Control.Applicative (liftA2)
-import qualified Data.List            as L
+import qualified Data.List            as List
 import qualified Data.Map             as M
 import           Data.Maybe           (fromJust, fromMaybe, isJust, catMaybes)
 import           Data.Text            (Text)
@@ -37,6 +37,7 @@ import           Frames               ((:.), (&:))
 import qualified Frames               as F
 import qualified Frames.CSV           as F
 import qualified Frames.ShowCSV           as F
+import qualified Frames.Melt           as F
 import qualified Frames.InCore        as FI
 import qualified Pipes                as P
 import qualified Pipes.Prelude        as P
@@ -44,6 +45,8 @@ import Control.Arrow (second)
 import Data.Proxy (Proxy(..))
 import qualified Data.Foldable as Fold
 import qualified Data.Vector as V
+import GHC.TypeLits (KnownSymbol)
+
 
 data Config = Config
   {
@@ -86,18 +89,43 @@ aggregateFiltered :: Ord k => (c -> Maybe a) -> (a -> k) -> (a -> b -> b) -> b -
 aggregateFiltered = aggregateGeneral
 
 -- specific version for our record folds via Control.Foldl
-aggregateF :: forall rs ks as bs cs f g. (ks F.⊆ as, Ord (F.Record ks), FI.RecVec (ks V.++ cs), Foldable f)
+aggregateF :: forall rs ks as b cs f g. (ks F.⊆ as, Ord (F.Record ks), FI.RecVec (ks V.++ cs), Foldable f)
            => Proxy ks
            -> (F.Rec g rs -> f (F.Record as))
-           -> (F.Record as -> F.Record bs -> F.Record bs)
-           -> F.Record bs
-           -> (F.Record bs -> F.Record cs)
+           -> (F.Record as -> b -> b)
+           -> b
+           -> (b -> F.Record cs)
            -> FL.Fold (F.Rec g rs) (F.FrameRec (ks V.++ cs))
 aggregateF _ unpack process initial extract =
   let getKey :: F.Record as -> F.Record ks
       getKey = F.rcast
   in FL.Fold (aggregateGeneral unpack getKey process initial) M.empty (F.toFrame . fmap (uncurry V.rappend . second extract) . M.toList) 
 --
+
+--data BinType a = EqualSpaceBin | EqualWeightBin (Num b => a -> b)    
+binField :: forall rs ks f w fl ft wl wt. (KnownSymbol wl, KnownSymbol fl, Ord ft, Integral wt, Num wt,
+                                           Ord (F.Record ks), ks F.⊆ rs, F.ElemOf rs f, F.ElemOf rs w, f ~ (fl F.:-> ft), w ~ (wl F.:-> wt))
+         => Int -> Proxy ks -> Proxy f -> Proxy w -> FL.Fold (F.Record rs) (M.Map (F.Record ks) [ft])
+binField n kProxy fProxy wProxy  =
+  let getKey :: F.Record rs -> F.Record ks = F.rcast
+      getFW :: F.Record rs -> F.Record '[f,w] = F.rcast
+      process :: F.Record rs -> [(ft,wt)] -> [(ft,wt)]
+      process r l = V.runcurryX (\f w -> (f,w) : l) $ getFW r
+      extract :: Num wt => [(ft,wt)] -> [ft]
+      extract l =
+        let compFst (x,_) (x',_) = compare x x'
+            (totalWeight, listWithSummedWeights) = List.mapAccumL (\sw (f,w) -> (sw+w, (f,w,sw+w))) 0 $ List.sortBy compFst l
+            weightPerBin :: Double = fromIntegral totalWeight/fromIntegral n
+            lowerBounds :: Num wt => [(b,wt,wt)] -> [b] -> [b]
+            lowerBounds x bs = case List.null x of
+              True -> bs
+              False ->
+                let nextLB = (\(x,_,_) -> x) . head $ x
+                    newX = List.dropWhile (\(_,_,sw) -> (fromIntegral sw) < weightPerBin * (fromIntegral $ List.length bs + 1)) x
+                    newBS = bs ++ [nextLB]
+                in lowerBounds newX newBS
+        in lowerBounds listWithSummedWeights []
+  in FL.Fold (aggregateGeneral V.Identity getKey process []) M.empty (fmap extract)
 
 rates :: F.Record [TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, ImprisonedPerCrimeRate]
 rates = V.runcurryX (\p ic pa -> (fromIntegral ic / fromIntegral p) &: (fromIntegral pa / fromIntegral ic) &: V.RNil)
@@ -132,7 +160,7 @@ ratesByGenderAndYear =
       emptyRow = 0 &: 0 &: 0 &: V.RNil
   in aggregateF (Proxy @[Year, Gender]) unpack (V.recAdd . F.rcast) emptyRow gRates
 
-type TrendsPovRow = '[Year, Fips, State, CountyName, CrimeRate, IncarcerationRate, ImprisonedPerCrimeRate]
+type TrendsPovRow = '[Year, Fips, State, CountyName, TotalPop, CrimeRate, IncarcerationRate, ImprisonedPerCrimeRate]
 --TotalPop, TotalPop15To64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]
 
 trendsRowForPovertyAnalysis :: Monad m => P.Pipe MaybeITrends (F.Rec F.ElField TrendsPovRow) m ()
@@ -142,7 +170,7 @@ trendsRowForPovertyAnalysis = do
   case dataWeNeedM of
     Nothing -> trendsRowForPovertyAnalysis
     Just x -> do
-      let newRow = V.runcurryX (\y f s c tp tp' tpp tpa ic -> y &: f &: s &: c &: (fromIntegral ic/fromIntegral tp) &: (fromIntegral tpp/fromIntegral tp) &: (fromIntegral tpa/fromIntegral ic) &: V.RNil) x  
+      let newRow = V.runcurryX (\y f s c tp tp' tpp tpa ic -> y &: f &: s &: c &: tp &: (fromIntegral ic/fromIntegral tp) &: (fromIntegral tpp/fromIntegral tp) &: (fromIntegral tpa/fromIntegral ic) &: V.RNil) x  
       P.yield newRow >> trendsRowForPovertyAnalysis
 
 main :: IO ()
@@ -168,6 +196,9 @@ incomePovertyJoinData trendsData povertyData = do
   trendsForPovFrame <- F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
   povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
+      binIncomeFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy MedianHI) (Proxy :: Proxy TotalPop)
+      incomeBins = FL.fold binIncomeFold trendsWithPovertyF
+  putStrLn $ show incomeBins
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF    
  
 -- This is the anamorphic step.  Is it a co-algebra of []?
