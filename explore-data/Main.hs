@@ -197,8 +197,15 @@ incomePovertyJoinData trendsData povertyData = do
   povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
       binIncomeFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy MedianHI) (Proxy :: Proxy TotalPop)
-      incomeBins = FL.fold binIncomeFold trendsWithPovertyF
-  putStrLn $ show incomeBins
+      binCrimeRateFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy CrimeRate) (Proxy :: Proxy TotalPop)
+      binIncarcerationRateFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy IncarcerationRate) (Proxy :: Proxy TotalPop)
+      binImprisonedPerCrimeRateFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy ImprisonedPerCrimeRate) (Proxy :: Proxy TotalPop)
+      (incomeBins, crimeRateBins, incarcerationRateBins, imprisonedPerCrimeRateBins)
+        = FL.fold ((,,,) <$> binIncomeFold <*> binCrimeRateFold <*> binIncarcerationRateFold <*> binImprisonedPerCrimeRateFold) trendsWithPovertyF
+  putStrLn $ "income bins: " ++ show incomeBins
+  putStrLn $ "crime rate bins: " ++ show crimeRateBins
+  putStrLn $ "incarcerationRate bins: " ++show incarcerationRateBins
+  putStrLn $ "imprisonedPerCrimeRate bins: " ++ show imprisonedPerCrimeRateBins
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF    
  
 -- This is the anamorphic step.  Is it a co-algebra of []?
