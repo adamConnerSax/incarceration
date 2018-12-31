@@ -11,6 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(message = FALSE)
 library(tidyverse)
 library(here)
+library(hexbin)
+library(maps)
+library(ggmap)
+data(county.fips)
 ```
 
 Aggregated crime rate and imprisoned per crime by urbanicity: 
@@ -27,7 +31,7 @@ Combo with poverty/income data
 ```{r income scatter, echo=TRUE}
 trendsWithIncome <- read_csv(here("../../data/", "trendsWithPoverty.csv"))
 trends1995 = filter(trendsWithIncome,year==1995)
-ggplot(trends1995,mapping=aes(x=medianHI,y=IncarcerationRate)) + geom_point()
+ggplot(trends1995,mapping=aes(x=medianHI,y=IncarcerationRate)) + geom_hex()
 ```
 
 

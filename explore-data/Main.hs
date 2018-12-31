@@ -170,8 +170,33 @@ trendsRowForPovertyAnalysis = do
   case dataWeNeedM of
     Nothing -> trendsRowForPovertyAnalysis
     Just x -> do
-      let newRow = V.runcurryX (\y f s c tp tp' tpp tpa ic -> y &: f &: s &: c &: tp &: (fromIntegral ic/fromIntegral tp) &: (fromIntegral tpp/fromIntegral tp) &: (fromIntegral tpa/fromIntegral ic) &: V.RNil) x  
+      let newRow = V.runcurryX (\y f s c tp tp' tpp tpa ic -> y &: f &: s &: c &: tp &: (fromIntegral ic/fromIntegral tp) &: (fromIntegral tpp/fromIntegral tp) &: (if ic == 0 then 0 :: Double else (fromIntegral tpa/fromIntegral ic)) &: V.RNil) x  
       P.yield newRow >> trendsRowForPovertyAnalysis
+
+{-
+listToBinLookup :: Ord a => [a] - > (a -> Int)
+listToBinLookup = sortedListToBinLookup . List.sort
+
+data BinData a = BinData { val :: a, bin :: Int }
+instance Ord a => Ord (BinData a) where
+  compare = compare . val
+  
+data BinLookupTree a = Leaf | Node (BinLookupTree a) (BinData a) (BinLookupTree a) 
+
+sortedListToBinLookup :: Ord a => [a] -> a -> Int
+sortedListToBinLookup as a =
+  let tree xs = case List.length of
+        0 -> Leaf
+        l -> let (left,right) = List.splitAt (l `quot` 2) xs in Node (tree left) (head right) (tree $ tail right)
+      searchTree = tree $ fmap (\(a,n) -> BinData a n) $ List.zip as [1..]
+      findBin :: Int -> a -> BinLookupTree a -> Int
+      findBin n a Leaf = n
+      findBin n a (Node l (BinData a' m) r) = if (a > a') then findBin m a r else findBin n a l
+  in findBin 0 a searchTree
+-}
+-- NB: a can't be less than the 0th element because we build it that way.  So we drop it
+sortedListToBinLookup' :: Ord a => [a] -> a -> Int
+sortedListToBinLookup' as a = let xs = tail as in 1 + (fromMaybe (List.length xs) $ List.findIndex (>a) xs)
 
 main :: IO ()
 main = do
@@ -207,7 +232,35 @@ incomePovertyJoinData trendsData povertyData = do
   putStrLn $ "incarcerationRate bins: " ++show incarcerationRateBins
   putStrLn $ "imprisonedPerCrimeRate bins: " ++ show imprisonedPerCrimeRateBins
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF    
- 
+
+
+type Bins = "bins" F.:-> (Int, Int) 
+
+scatterMergeIR :: forall x y w xl xt yl yt wl wt rs k.
+                  (F.ElemOf rs x, KnownSymbol xl, x ~ (xl F.:-> xt), Fractional xt,
+                   F.ElemOf rs y, KnownSymbol yl, y ~ (yl F.:-> yt), Fractional yt,
+                   F.ElemOf rs w, KnownSymbol wl, w ~ (wl F.:-> wt), Num wt)
+               => Proxy k -> [xt] -> [yt] -> Proxy w -> FL.Fold (F.Record rs) (F.FrameRec '[k,Bins,x,y,w])
+scatterMergeIR _ xBins yBins _ =
+  let xBinF = sortedListToBinLookup' xBins
+      yBinF = sortedListToBinLookup' yBins
+      trimRow :: F.Record rs -> F.Record '[x,y,w] = F.rcast
+      binRow :: F.Record '[x,y,w] -> F.Record '[x,y,w,Bins]
+      binRow r = 
+        let xBin = xBinF $ F.rgetField @x r
+            yBin = yBinF $ F.rgetField @y r
+        in V.rappend r ((xBin, yBin) &: V.RNil)
+      wgtdSum :: (xt, yt, wt) -> F.Record '[x,y,w,Bins] -> (xt, yt, wt)
+      wgtdSum (wX, wY, totW) r =
+        let wgt = F.rgetField @w r
+            xVal = F.rgetField @x r
+            yVal = F.rgetField @y r
+        in (wX + (wgt * xVal), wY + (wgt * yVal), totW + wgt)
+      extract :: [F.Record '[x,y,w,Bins]] -> F.Record '[x,y,w]  
+      extract = FL.fold (FL.Fold wgtdSum (0,0,0) (\(wX, wY, totW) -> wX/totW &:  wY/totW &: totW &: V.RNil))  
+  in aggregateF (Proxy @[k,Bins]) (V.Identity . binRow . trimRow) (:) [] extract 
+      
+  
 -- This is the anamorphic step.  Is it a co-algebra of []?
 -- You could also use meltRow here.  That is also (Record as -> [Record bs])
 reshapeRowSimple :: forall ss ts cs ds. (ss F.⊆ ts)
