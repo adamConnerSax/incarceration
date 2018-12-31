@@ -26,12 +26,13 @@ import           Data.Maybe           (fromJust, fromMaybe, isJust, catMaybes)
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Vinyl           as V
-import qualified Data.Vinyl.Curry           as V
+import qualified Data.Vinyl.Curry     as V
 import qualified Data.Vinyl.Functor   as V
 import qualified Data.Vinyl.TypeLevel as V
 import qualified Data.Vinyl.XRec      as V
 import qualified Data.Vinyl.Core as V
 import qualified Data.Vinyl.Class.Method as V
+import Data.Vinyl.Lens (type (∈))
 import qualified Dhall                as D
 import           Frames               ((:.), (&:))
 import qualified Frames               as F
@@ -65,11 +66,17 @@ type instance FI.VectorFor GenderT = V.Vector
 instance F.ShowCSV GenderT where
   showCSV = T.pack . show
 
+data Bin2DT = Bin2D (Int, Int) deriving (Show, Eq, Ord)
+type instance FI.VectorFor Bin2DT = V.Vector
+instance F.ShowCSV Bin2DT where
+  showCSV = T.pack . show
+
 F.declareColumn "ImprisonedPerCrimeRate" ''Double
 F.declareColumn "CrimeRate" ''Double
 F.declareColumn "IncarcerationRate" ''Double
 F.declareColumn "PrisonAdmRate" '' Double
 F.declareColumn "Gender" ''GenderT
+F.declareColumn "Bin2D" ''Bin2DT
 
 -- Utils.  Should get their own lib
 aggregateToMap :: Ord k => (a -> k) -> (a -> b -> b) -> b -> M.Map k b -> a -> M.Map k b
@@ -227,37 +234,39 @@ incomePovertyJoinData trendsData povertyData = do
       binImprisonedPerCrimeRateFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy ImprisonedPerCrimeRate) (Proxy :: Proxy TotalPop)
       (incomeBins, crimeRateBins, incarcerationRateBins, imprisonedPerCrimeRateBins)
         = FL.fold ((,,,) <$> binIncomeFold <*> binCrimeRateFold <*> binIncarcerationRateFold <*> binImprisonedPerCrimeRateFold) trendsWithPovertyF
+      scatterMergeFrame = FL.fold (scatterMerge (Proxy @[Year,MedianHI,IncarcerationRate,TotalPop]) incomeBins incarcerationRateBins) trendsWithPovertyF
   putStrLn $ "income bins: " ++ show incomeBins
   putStrLn $ "crime rate bins: " ++ show crimeRateBins
   putStrLn $ "incarcerationRate bins: " ++show incarcerationRateBins
   putStrLn $ "imprisonedPerCrimeRate bins: " ++ show imprisonedPerCrimeRateBins
-  F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF    
+  F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
+  F.writeCSV "data/scatterMergeTest.cs" scatterMergeFrame
 
 
-type Bins = "bins" F.:-> (Int, Int) 
+type Bins =  "bins" F.:-> (Int, Int) 
 
-scatterMergeIR :: forall x y w xl xt yl yt wl wt rs k.
-                  (F.ElemOf rs x, KnownSymbol xl, x ~ (xl F.:-> xt), Fractional xt,
-                   F.ElemOf rs y, KnownSymbol yl, y ~ (yl F.:-> yt), Fractional yt,
-                   F.ElemOf rs w, KnownSymbol wl, w ~ (wl F.:-> wt), Num wt)
-               => Proxy k -> [xt] -> [yt] -> Proxy w -> FL.Fold (F.Record rs) (F.FrameRec '[k,Bins,x,y,w])
-scatterMergeIR _ xBins yBins _ =
-  let xBinF = sortedListToBinLookup' xBins
-      yBinF = sortedListToBinLookup' yBins
-      trimRow :: F.Record rs -> F.Record '[x,y,w] = F.rcast
-      binRow :: F.Record '[x,y,w] -> F.Record '[x,y,w,Bins]
-      binRow r = 
-        let xBin = xBinF $ F.rgetField @x r
-            yBin = yBinF $ F.rgetField @y r
-        in V.rappend r ((xBin, yBin) &: V.RNil)
-      wgtdSum :: (xt, yt, wt) -> F.Record '[x,y,w,Bins] -> (xt, yt, wt)
-      wgtdSum (wX, wY, totW) r =
-        let wgt = F.rgetField @w r
-            xVal = F.rgetField @x r
-            yVal = F.rgetField @y r
-        in (wX + (wgt * xVal), wY + (wgt * yVal), totW + wgt)
-      extract :: [F.Record '[x,y,w,Bins]] -> F.Record '[x,y,w]  
-      extract = FL.fold (FL.Fold wgtdSum (0,0,0) (\(wX, wY, totW) -> wX/totW &:  wY/totW &: totW &: V.RNil))  
+scatterMerge :: forall k kl kt x y w xl yl wl rs a b as.
+                  (k ∈ rs, k ~ (kl F.:-> kt), KnownSymbol kl, Ord kt, FI.RecVec as, RealFloat a, Num b, Integral b,
+                   x ∈ rs, x ~ (xl F.:-> a), KnownSymbol xl,
+                   y ∈ rs, y ~ (yl F.:-> a), KnownSymbol yl,
+                   w ∈ rs, w ~ (wl F.:-> b), KnownSymbol wl,
+                   as ~ '[k,Bins,x,y,w], Bins ∈ as)
+               => Proxy '[k,x,y,w] -> M.Map (F.Record '[k]) [a] -> M.Map (F.Record '[k]) [a] -> FL.Fold (F.Record rs) (F.FrameRec as)
+scatterMerge _ xBins yBins =
+  let xBinF = sortedListToBinLookup' <$> xBins
+      yBinF = sortedListToBinLookup' <$> yBins
+      trimRow :: F.Record rs -> F.Record '[k,x,y,w] = F.rcast
+      binRow :: F.Record '[k,x,y,w] -> F.Record as -- '[k,Bins,x,y,w]
+      binRow =
+        V.runcurryX (\k' x' y' w' ->
+                       let keyR = k' &: V.RNil
+                           xBF = fromMaybe (const 0) $ M.lookup keyR xBinF
+                           yBF = fromMaybe (const 0) $ M.lookup keyR yBinF
+                       in k' &: (xBF x', yBF y') &: x' &: y' &: w'  &: V.RNil)
+      wgtdSum :: (a, a, b) -> F.Record '[k,Bins,x,y,w] -> (a, a, b)
+      wgtdSum (wX, wY, totW) = V.runcurryX (\_ _ x y w -> (wX + (fromIntegral w * x), wY + (fromIntegral w * y), totW + w)) 
+      extract :: [F.Record '[k,Bins,x,y,w]] -> F.Record '[x,y,w]  
+      extract = FL.fold (FL.Fold wgtdSum (0 :: a,0 :: a, 0 :: b) (\(wX, wY, totW) -> wX/(fromIntegral totW) &:  wY/(fromIntegral totW) &: totW &: V.RNil))  
   in aggregateF (Proxy @[k,Bins]) (V.Identity . binRow . trimRow) (:) [] extract 
       
   
