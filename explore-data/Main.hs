@@ -11,6 +11,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 module Main where
 
 import           TrendsDataTypes
@@ -234,40 +235,46 @@ incomePovertyJoinData trendsData povertyData = do
       binImprisonedPerCrimeRateFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy ImprisonedPerCrimeRate) (Proxy :: Proxy TotalPop)
       (incomeBins, crimeRateBins, incarcerationRateBins, imprisonedPerCrimeRateBins)
         = FL.fold ((,,,) <$> binIncomeFold <*> binCrimeRateFold <*> binIncarcerationRateFold <*> binImprisonedPerCrimeRateFold) trendsWithPovertyF
-      scatterMergeFrame = FL.fold (scatterMerge (Proxy @[Year,MedianHI,IncarcerationRate,TotalPop]) incomeBins incarcerationRateBins) trendsWithPovertyF
-  putStrLn $ "income bins: " ++ show incomeBins
-  putStrLn $ "crime rate bins: " ++ show crimeRateBins
-  putStrLn $ "incarcerationRate bins: " ++show incarcerationRateBins
-  putStrLn $ "imprisonedPerCrimeRate bins: " ++ show imprisonedPerCrimeRateBins
+      scatterMergeFold = scatterMerge (Proxy @[Year,MedianHI,IncarcerationRate,TotalPop]) round id incomeBins incarcerationRateBins
+      scatterMergeFrame :: F.FrameRec '[Year, MedianHI, IncarcerationRate, TotalPop] = F.rcast <$> FL.fold scatterMergeFold trendsWithPovertyF 
+--  putStrLn $ "income bins: " ++ show incomeBins
+--  putStrLn $ "crime rate bins: " ++ show crimeRateBins
+--  putStrLn $ "incarcerationRate bins: " ++show incarcerationRateBins
+--  putStrLn $ "imprisonedPerCrimeRate bins: " ++ show imprisonedPerCrimeRateBins
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
-  F.writeCSV "data/scatterMergeTest.cs" scatterMergeFrame
+  F.writeCSV "data/scatterMergeTest.csv" scatterMergeFrame
 
 
-type Bins =  "bins" F.:-> (Int, Int) 
+--type Bins =  "bins" F.:-> (Int, Int) 
 
-scatterMerge :: forall k kl kt x y w xl yl wl rs a b as.
-                  (k ∈ rs, k ~ (kl F.:-> kt), KnownSymbol kl, Ord kt, FI.RecVec as, RealFloat a, Num b, Integral b,
-                   x ∈ rs, x ~ (xl F.:-> a), KnownSymbol xl,
-                   y ∈ rs, y ~ (yl F.:-> a), KnownSymbol yl,
-                   w ∈ rs, w ~ (wl F.:-> b), KnownSymbol wl,
-                   as ~ '[k,Bins,x,y,w], Bins ∈ as)
-               => Proxy '[k,x,y,w] -> M.Map (F.Record '[k]) [a] -> M.Map (F.Record '[k]) [a] -> FL.Fold (F.Record rs) (F.FrameRec as)
-scatterMerge _ xBins yBins =
+scatterMerge :: forall k kl kt x y w xl yl wl wt rs as a b.
+                  (k ∈ rs, k ~ (kl F.:-> kt), KnownSymbol kl, Ord kt, FI.RecVec as,  Real wt, 
+                   x ∈ rs, x ~ (xl F.:-> a), KnownSymbol xl, Real a,
+                   y ∈ rs, y ~ (yl F.:-> b), KnownSymbol yl, Real b,
+                   w ∈ rs, w ~ (wl F.:-> wt), KnownSymbol wl,
+                   as ~ '[k, Bin2D, x, y, w], Bin2D ∈ as)
+             => Proxy '[k,x,y,w]
+             -> (Double -> a) -- when we put the averaged data back in the record with original types we need to convert back
+             -> (Double -> b)
+             -> M.Map (F.Record '[k]) [a]
+             -> M.Map (F.Record '[k]) [b]
+             -> FL.Fold (F.Record rs) (F.FrameRec '[k, Bin2D, x, y, w])
+scatterMerge _ toX toY xBins yBins =
   let xBinF = sortedListToBinLookup' <$> xBins
       yBinF = sortedListToBinLookup' <$> yBins
       trimRow :: F.Record rs -> F.Record '[k,x,y,w] = F.rcast
       binRow :: F.Record '[k,x,y,w] -> F.Record as -- '[k,Bins,x,y,w]
       binRow =
-        V.runcurryX (\k' x' y' w' ->
-                       let keyR = k' &: V.RNil
+        V.runcurryX (\k x y w ->
+                       let keyR = k &: V.RNil
                            xBF = fromMaybe (const 0) $ M.lookup keyR xBinF
                            yBF = fromMaybe (const 0) $ M.lookup keyR yBinF
-                       in k' &: (xBF x', yBF y') &: x' &: y' &: w'  &: V.RNil)
-      wgtdSum :: (a, a, b) -> F.Record '[k,Bins,x,y,w] -> (a, a, b)
-      wgtdSum (wX, wY, totW) = V.runcurryX (\_ _ x y w -> (wX + (fromIntegral w * x), wY + (fromIntegral w * y), totW + w)) 
-      extract :: [F.Record '[k,Bins,x,y,w]] -> F.Record '[x,y,w]  
-      extract = FL.fold (FL.Fold wgtdSum (0 :: a,0 :: a, 0 :: b) (\(wX, wY, totW) -> wX/(fromIntegral totW) &:  wY/(fromIntegral totW) &: totW &: V.RNil))  
-  in aggregateF (Proxy @[k,Bins]) (V.Identity . binRow . trimRow) (:) [] extract 
+                       in k &: Bin2D (xBF x, yBF y) &: x &: y &: w  &: V.RNil)
+      wgtdSum :: (Double, Double, wt) -> F.Record '[k,Bin2D,x,y,w] -> (Double, Double, wt)
+      wgtdSum (wX, wY, totW) = V.runcurryX (\_ _ x y w -> let w' = realToFrac w in (wX + (w' * realToFrac x), wY + (w' * realToFrac y), totW + w)) 
+      extract :: [F.Record '[k,Bin2D,x,y,w]] -> F.Record '[x,y,w]  
+      extract = FL.fold (FL.Fold wgtdSum (0, 0, 0) (\(wX, wY, totW) -> let totW' = realToFrac totW in toX (wX/totW') &:  toY (wY/totW') &: totW &: V.RNil))
+  in aggregateF (Proxy @[k,Bin2D]) (V.Identity . binRow . trimRow) (:) [] extract 
       
   
 -- This is the anamorphic step.  Is it a co-algebra of []?

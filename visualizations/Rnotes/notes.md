@@ -11,12 +11,20 @@ Aggregated crime rate and imprisoned per crime by urbanicity:
 Combo with poverty/income data
 
 ``` r
-trendsWithIncome <- read_csv(here("../../data/", "trendsWithPoverty.csv"))
-trends1995 = filter(trendsWithIncome,year==1995)
-ggplot(trends1995,mapping=aes(x=medianHI,y=IncarcerationRate)) + geom_hex()
+trendsWithIncome <- read_csv(here("../../data/", "scatterMergeTest.csv"))
+#trends1995 = filter(trendsWithIncome,year==2013)
+ggplot(trendsWithIncome,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + geom_point() + facet_wrap(~year,ncol=3) + scale_y_continuous(limits=c(NA,0.012), labels = scales::percent)
 ```
 
+    ## Warning: Removed 20 rows containing missing values (geom_point).
+
 ![](notes_files/figure-markdown_github/income%20scatter-1.png)
+
+``` r
+ggsave("incarcerationRateAndIncome.pdf",width=8,height=11)
+```
+
+    ## Warning: Removed 20 rows containing missing values (geom_point).
 
 From call
 =========
