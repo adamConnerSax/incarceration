@@ -113,8 +113,8 @@ aggregateF _ unpack process initial extract =
 --data BinType a = EqualSpaceBin | EqualWeightBin (Num b => a -> b)    
 binField :: forall rs ks f w fl ft wl wt. (KnownSymbol wl, KnownSymbol fl, Ord ft, Integral wt, Num wt,
                                            Ord (F.Record ks), ks F.⊆ rs, F.ElemOf rs f, F.ElemOf rs w, f ~ (fl F.:-> ft), w ~ (wl F.:-> wt))
-         => Int -> Proxy ks -> Proxy f -> Proxy w -> FL.Fold (F.Record rs) (M.Map (F.Record ks) [ft])
-binField n kProxy fProxy wProxy  =
+         => Int -> Proxy ks -> Proxy '[f,w] -> FL.Fold (F.Record rs) (M.Map (F.Record ks) [ft])
+binField n _ _  =
   let getKey :: F.Record rs -> F.Record ks = F.rcast
       getFW :: F.Record rs -> F.Record '[f,w] = F.rcast
       process :: F.Record rs -> [(ft,wt)] -> [(ft,wt)]
@@ -229,20 +229,14 @@ incomePovertyJoinData trendsData povertyData = do
   trendsForPovFrame <- F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
   povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
-      binIncomeFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy MedianHI) (Proxy :: Proxy TotalPop)
-      binCrimeRateFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy CrimeRate) (Proxy :: Proxy TotalPop)
-      binIncarcerationRateFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy IncarcerationRate) (Proxy :: Proxy TotalPop)
-      binImprisonedPerCrimeRateFold = binField 10 [F.pr1|Year|] (Proxy :: Proxy ImprisonedPerCrimeRate) (Proxy :: Proxy TotalPop)
-      (incomeBins, crimeRateBins, incarcerationRateBins, imprisonedPerCrimeRateBins)
-        = FL.fold ((,,,) <$> binIncomeFold <*> binCrimeRateFold <*> binIncarcerationRateFold <*> binImprisonedPerCrimeRateFold) trendsWithPovertyF
-      scatterMergeFold = scatterMerge (Proxy @[Year, State, MedianHI, IncarcerationRate, TotalPop]) round id incomeBins incarcerationRateBins
+      binIncomeFold = binField 10 (Proxy @[Year,State]) (Proxy @[MedianHI, TotalPop]) 
+      binIncarcerationRateFold = binField 10 (Proxy @[Year,State]) (Proxy @[IncarcerationRate, TotalPop]) 
+      (incomeBins, incarcerationRateBins)
+        = FL.fold ((,) <$> binIncomeFold <*> binIncarcerationRateFold) trendsWithPovertyF
+      scatterMergeFold = scatterMerge (Proxy @[Year, State]) (Proxy @[MedianHI, IncarcerationRate, TotalPop]) round id incomeBins incarcerationRateBins
       scatterMergeFrame :: F.FrameRec '[Year, State, MedianHI, IncarcerationRate, TotalPop] = F.rcast <$> FL.fold scatterMergeFold trendsWithPovertyF 
---  putStrLn $ "income bins: " ++ show incomeBins
---  putStrLn $ "crime rate bins: " ++ show crimeRateBins
---  putStrLn $ "incarcerationRate bins: " ++show incarcerationRateBins
---  putStrLn $ "imprisonedPerCrimeRate bins: " ++ show imprisonedPerCrimeRateBins
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
-  F.writeCSV "data/scatterMergeMedianHIvsIncarcerationRate.csv" scatterMergeFrame
+  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByStateAndYear.csv" scatterMergeFrame
 
 
 --type Bins =  "bins" F.:-> (Int, Int) 
@@ -256,13 +250,14 @@ scatterMerge :: forall ks useCols outKeyCols x y w xl yl wl wt rs binnedCols a b
                    useCols ~ (ks V.++ '[x,y,w]), useCols F.⊆ rs, ks F.⊆ useCols, x ∈ useCols, y ∈ useCols, w ∈ useCols,
                    outKeyCols ~ (ks V.++ '[Bin2D]), outKeyCols F.⊆ binnedCols, Ord (F.Record outKeyCols),
                    (outKeyCols V.++ '[x,y,w]) ~ binnedCols)
-             => Proxy useCols
+             => Proxy ks
+             -> Proxy '[x,y,w]
              -> (Double -> a) -- when we put the averaged data back in the record with original types we need to convert back
              -> (Double -> b)
              -> M.Map (F.Record ks) [a]
              -> M.Map (F.Record ks) [b]
              -> FL.Fold (F.Record rs) (F.FrameRec binnedCols)
-scatterMerge _ toX toY xBins yBins =
+scatterMerge _ _ toX toY xBins yBins =
   let xBinF = sortedListToBinLookup' <$> xBins
       yBinF = sortedListToBinLookup' <$> yBins
       trimRow :: F.Record rs -> F.Record useCols = F.rcast
