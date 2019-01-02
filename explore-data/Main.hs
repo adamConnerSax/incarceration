@@ -168,17 +168,17 @@ ratesByGenderAndYear =
       emptyRow = 0 &: 0 &: 0 &: V.RNil
   in aggregateF (Proxy @[Year, Gender]) unpack (V.recAdd . F.rcast) emptyRow gRates
 
-type TrendsPovRow = '[Year, Fips, State, CountyName, TotalPop, CrimeRate, IncarcerationRate, ImprisonedPerCrimeRate]
+type TrendsPovRow = '[Year, Fips, State, CountyName, Urbanicity, TotalPop, CrimeRate, IncarcerationRate, ImprisonedPerCrimeRate]
 --TotalPop, TotalPop15To64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]
 
 trendsRowForPovertyAnalysis :: Monad m => P.Pipe MaybeITrends (F.Rec F.ElField TrendsPovRow) m ()
 trendsRowForPovertyAnalysis = do
   r <- P.await
-  let dataWeNeedM :: Maybe (F.Rec F.ElField '[Year, Fips, State, CountyName, TotalPop, TotalPop15to64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]) = F.recMaybe $ F.rcast r
+  let dataWeNeedM :: Maybe (F.Rec F.ElField '[Year, Fips, State, CountyName, Urbanicity, TotalPop, TotalPop15to64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]) = F.recMaybe $ F.rcast r
   case dataWeNeedM of
     Nothing -> trendsRowForPovertyAnalysis
     Just x -> do
-      let newRow = V.runcurryX (\y f s c tp tp' tpp tpa ic -> y &: f &: s &: c &: tp &: (fromIntegral ic/fromIntegral tp) &: (fromIntegral tpp/fromIntegral tp) &: (if ic == 0 then 0 :: Double else (fromIntegral tpa/fromIntegral ic)) &: V.RNil) x  
+      let newRow = V.runcurryX (\y f s c u tp tp' tpp tpa ic -> y &: f &: s &: c &: u &: tp &: (fromIntegral ic/fromIntegral tp) &: (fromIntegral tpp/fromIntegral tp) &: (if ic == 0 then 0 :: Double else (fromIntegral tpa/fromIntegral ic)) &: V.RNil) x  
       P.yield newRow >> trendsRowForPovertyAnalysis
 
 {-
@@ -229,14 +229,14 @@ incomePovertyJoinData trendsData povertyData = do
   trendsForPovFrame <- F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
   povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
-      binIncomeFold = binField 10 (Proxy @[Year,State]) (Proxy @[MedianHI, TotalPop]) 
-      binIncarcerationRateFold = binField 10 (Proxy @[Year,State]) (Proxy @[IncarcerationRate, TotalPop]) 
+      binIncomeFold = binField 10 (Proxy @[Year,Urbanicity]) (Proxy @[MedianHI, TotalPop]) 
+      binIncarcerationRateFold = binField 10 (Proxy @[Year,Urbanicity]) (Proxy @[IncarcerationRate, TotalPop]) 
       (incomeBins, incarcerationRateBins)
         = FL.fold ((,) <$> binIncomeFold <*> binIncarcerationRateFold) trendsWithPovertyF
-      scatterMergeFold = scatterMerge (Proxy @[Year, State]) (Proxy @[MedianHI, IncarcerationRate, TotalPop]) round id incomeBins incarcerationRateBins
-      scatterMergeFrame :: F.FrameRec '[Year, State, MedianHI, IncarcerationRate, TotalPop] = F.rcast <$> FL.fold scatterMergeFold trendsWithPovertyF 
+      scatterMergeFold = scatterMerge (Proxy @[Year, Urbanicity]) (Proxy @[MedianHI, IncarcerationRate, TotalPop]) round id incomeBins incarcerationRateBins
+      scatterMergeFrame :: F.FrameRec '[Year, Urbanicity, MedianHI, IncarcerationRate, TotalPop] = F.rcast <$> FL.fold scatterMergeFold trendsWithPovertyF 
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
-  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByStateAndYear.csv" scatterMergeFrame
+  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" scatterMergeFrame
 
 
 --type Bins =  "bins" F.:-> (Int, Int) 
@@ -268,7 +268,7 @@ scatterMerge _ _ toX toY xBins yBins =
             xBF = fromMaybe (const 0) $ M.lookup key xBinF
             yBF = fromMaybe (const 0) $ M.lookup key yBinF
             bin :: F.Record '[Bin2D] = V.runcurryX (\x y _ -> (Bin2D (xBF x, yBF y) &: V.RNil)) xyw
-        in key V.<+> bin V.<+> xyw -- x &: y &: w  &: V.RNil)) xyw 
+        in key V.<+> bin V.<+> xyw 
       wgtdSum :: (Double, Double, wt) -> F.Record binnedCols -> (Double, Double, wt)
       wgtdSum (wX, wY, totW) r =
         let xyw :: F.Record '[x,y,w] = F.rcast r

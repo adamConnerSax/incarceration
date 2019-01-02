@@ -41,6 +41,22 @@ ggsave("incarcerationRateAndIncomeCO.pdf",width=8,height=11)
 
     ## Warning: Removed 1 rows containing missing values (geom_point).
 
+``` r
+trendsWithIncomeByUrbanicity_SM <- read_csv(here("../../data/", "scatterMergeIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv"))  %>% mutate (urbanicity = factor(urbanicity))
+data2014 <- filter(trendsWithIncomeByUrbanicity_SM,year=="2014") 
+ggplot(data2014,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + geom_point() + facet_wrap(vars(urbanicity),ncol=2) + scale_y_continuous(limits=c(NA,0.012), labels = scales::percent) + labs(title = "Incarceration Rate vs. Median Income (2014)")
+```
+
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
+![](notes_files/figure-markdown_github/income%20scatter-3.png)
+
+``` r
+ggsave("incarcerationRateAndIncome2014.pdf",width=8,height=11)
+```
+
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
 From call
 =========
 
