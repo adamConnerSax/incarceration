@@ -39,7 +39,7 @@ executable explore-data
                      , containers
                      , dhall
                      , foldl
-                     , inline-r
+--                     , inline-r
                      , Frames
                      , lens
                      , pipes

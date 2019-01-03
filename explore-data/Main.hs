@@ -12,6 +12,8 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE PartialTypeSignatures #-}
+{-# LANGUAGE ConstraintKinds #-}
 module Main where
 
 import           TrendsDataTypes
@@ -109,19 +111,44 @@ aggregateF _ unpack process initial extract =
       getKey = F.rcast
   in FL.Fold (aggregateGeneral unpack getKey process initial) M.empty (F.toFrame . fmap (uncurry V.rappend . second extract) . M.toList) 
 --
+-- We use a GADT here so that each constructor can carry the proofs of numerical type.  We don't want RescaleNone to require RealFloat. 
+data RescaleType a where
+  RescaleNone :: RescaleType a
+  RescaleMean :: RealFloat a => RescaleType a
+  RescaleMedian :: (Ord a, Real a) => RescaleType a
+  RescaleNormalize :: RealFloat a => RescaleType a
+  RescaleGiven :: (a, Double) -> RescaleType a
 
---data BinType a = EqualSpaceBin | EqualWeightBin (Num b => a -> b)    
-binField :: forall rs ks f w fl ft wl wt. (KnownSymbol wl, KnownSymbol fl, Ord ft, Integral wt, Num wt,
+-- NB: Bins are unscaled; scaling function to be applied after binning  
+data BinsWithRescale a = BinsWithRescale { bins :: [a],  shift :: a, scale :: Double} -- left in a form where a need not be a type that supports division 
+
+rescale :: (Num a, Foldable f) => RescaleType a -> f a -> (a, Double)
+rescale RescaleNone _ = (0,1)
+rescale (RescaleGiven x) _ = x
+rescale RescaleMean fa = (0, realToFrac $ FL.fold FL.mean fa)
+rescale RescaleNormalize fa =
+  let (shift, scale) = FL.fold ((,) <$> FL.mean <*> FL.std) fa
+  in (shift, realToFrac scale)
+rescale RescaleMedian fa =
+  let l = List.sort $ FL.fold FL.list fa
+      n = List.length l
+      s =  case n of
+        0 -> 1
+        _ -> let m = n `div` 2 in if (odd n) then realToFrac (l !! m) else realToFrac (l List.!! m + l List.!! (m - 1))/2.0
+  in (0,s/100)
+
+binField :: forall rs ks f w fl ft wl wt. (KnownSymbol wl, KnownSymbol fl, Num ft, Ord ft, Integral wt, Num wt,
                                            Ord (F.Record ks), ks F.⊆ rs, F.ElemOf rs f, F.ElemOf rs w, f ~ (fl F.:-> ft), w ~ (wl F.:-> wt))
-         => Int -> Proxy ks -> Proxy '[f,w] -> FL.Fold (F.Record rs) (M.Map (F.Record ks) [ft])
-binField n _ _  =
+         => Int -> Proxy ks -> Proxy '[f,w] -> RescaleType ft -> FL.Fold (F.Record rs) (M.Map (F.Record ks) (BinsWithRescale ft))
+binField n _ _ rt =
   let getKey :: F.Record rs -> F.Record ks = F.rcast
       getFW :: F.Record rs -> F.Record '[f,w] = F.rcast
       process :: F.Record rs -> [(ft,wt)] -> [(ft,wt)]
       process r l = V.runcurryX (\f w -> (f,w) : l) $ getFW r
-      extract :: Num wt => [(ft,wt)] -> [ft]
-      extract l =
+      extract :: RescaleType ft -> [(ft,wt)] -> BinsWithRescale ft
+      extract rt l =
         let compFst (x,_) (x',_) = compare x x'
+            scaleInfo = rescale rt (fst <$> l)
             (totalWeight, listWithSummedWeights) = List.mapAccumL (\sw (f,w) -> (sw+w, (f,w,sw+w))) 0 $ List.sortBy compFst l
             weightPerBin :: Double = fromIntegral totalWeight/fromIntegral n
             lowerBounds :: Num wt => [(b,wt,wt)] -> [b] -> [b]
@@ -132,8 +159,8 @@ binField n _ _  =
                     newX = List.dropWhile (\(_,_,sw) -> (fromIntegral sw) < weightPerBin * (fromIntegral $ List.length bs + 1)) x
                     newBS = bs ++ [nextLB]
                 in lowerBounds newX newBS
-        in lowerBounds listWithSummedWeights []
-  in FL.Fold (aggregateGeneral V.Identity getKey process []) M.empty (fmap extract)
+        in BinsWithRescale (lowerBounds listWithSummedWeights []) (fst scaleInfo) (snd scaleInfo)
+  in FL.Fold (aggregateGeneral V.Identity getKey process []) M.empty (fmap $ extract rt)
 
 rates :: F.Record [TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, ImprisonedPerCrimeRate]
 rates = V.runcurryX (\p ic pa -> (fromIntegral ic / fromIntegral p) &: (fromIntegral pa / fromIntegral ic) &: V.RNil)
@@ -224,55 +251,84 @@ aggregationAnalyses trendsData = do
   liftIO $ F.writeCSV "data/ratesByStateAndYear.csv" rBySY
   liftIO $ F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
   liftIO $ F.writeCSV "data/ratesByGenderAndYear.csv" rByG
+
+{-
+doScatterMerge :: forall keys rs f. (Foldable f, (keys V.++ '[Bin2D] V.++ '[MedianHI,IncarcerationRate,TotalPop]) ~ (keys V.++ '[Bin2D,MedianHI,IncarcerationRate,TotalPop]))
+               => Proxy keys -> f (F.Record rs) -> FilePath -> IO ()
+doScatterMerge _ trendsWithPovertyF path = do
+  let binIncomeFold = binField 10 (Proxy @keys) (Proxy @[MedianHI, TotalPop]) RescaleMedian 
+      binIncarcerationRateFold = binField 10 (Proxy @keys) (Proxy @[IncarcerationRate, TotalPop]) RescaleNone 
+      (incomeBins, incarcerationRateBins)
+        = FL.fold ((,) <$> binIncomeFold <*> binIncarcerationRateFold) trendsWithPovertyF
+      scatterMergeFold = scatterMerge (Proxy @keys) (Proxy @[MedianHI, IncarcerationRate, TotalPop]) round id incomeBins incarcerationRateBins
+      scatterMergeFrame :: F.FrameRec (keys V.++ '[MedianHI, IncarcerationRate, TotalPop]) = F.rcast <$> FL.fold scatterMergeFold trendsWithPovertyF 
+  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" scatterMergeFrame
+-}
   
 incomePovertyJoinData trendsData povertyData = do
   trendsForPovFrame <- F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
   povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
-      binIncomeFold = binField 10 (Proxy @[Year,Urbanicity]) (Proxy @[MedianHI, TotalPop]) 
-      binIncarcerationRateFold = binField 10 (Proxy @[Year,Urbanicity]) (Proxy @[IncarcerationRate, TotalPop]) 
-      (incomeBins, incarcerationRateBins)
-        = FL.fold ((,) <$> binIncomeFold <*> binIncarcerationRateFold) trendsWithPovertyF
-      scatterMergeFold = scatterMerge (Proxy @[Year, Urbanicity]) (Proxy @[MedianHI, IncarcerationRate, TotalPop]) round id incomeBins incarcerationRateBins
-      scatterMergeFrame :: F.FrameRec '[Year, Urbanicity, MedianHI, IncarcerationRate, TotalPop] = F.rcast <$> FL.fold scatterMergeFold trendsWithPovertyF 
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
-  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" scatterMergeFrame
+  let binIYrFold = binField 10 [F.pr1|Year|] (Proxy @[MedianHI, TotalPop]) RescaleMedian 
+      binIRYrFold = binField 10 [F.pr1|Year|] (Proxy @[IncarcerationRate, TotalPop]) RescaleNone
+      binIStateYrFold = binField 10 (Proxy @[State,Year]) (Proxy @[MedianHI, TotalPop]) RescaleMedian 
+      binIRStateYrFold = binField 10 (Proxy @[State,Year]) (Proxy @[IncarcerationRate, TotalPop]) RescaleNone
+      binIUrbYrFold = binField 10 (Proxy @[Urbanicity,Year]) (Proxy @[MedianHI, TotalPop]) RescaleMedian 
+      binIRUrbYrFold = binField 10 (Proxy @[Urbanicity,Year]) (Proxy @[IncarcerationRate, TotalPop]) RescaleNone
+      
+      (iBinsYr, iRBinsYr, iBinsStateYr, iRBinsStateYr, iBinsUrbYr, iRBinsUrbYr)
+        = FL.fold ((,,,,,) <$> binIYrFold <*> binIRYrFold <*> binIStateYrFold <*> binIRStateYrFold <*> binIUrbYrFold <*> binIRUrbYrFold) trendsWithPovertyF
+      scatterMergeYrFold = scatterMerge [F.pr1|Year|] (Proxy @[MedianHI, IncarcerationRate, TotalPop]) round id iBinsYr iRBinsYr
+      scatterMergeStateYrFold = scatterMerge (Proxy @[State,Year]) (Proxy @[MedianHI, IncarcerationRate, TotalPop]) round id iBinsStateYr iRBinsStateYr
+      scatterMergeUrbYrFold = scatterMerge (Proxy @[Urbanicity,Year]) (Proxy @[MedianHI, IncarcerationRate, TotalPop]) round id iBinsUrbYr iRBinsUrbYr
+      (smYr, smStateYr, smUrbYr) = FL.fold ((,,) <$> scatterMergeYrFold <*> scatterMergeStateYrFold <*> scatterMergeUrbYrFold) trendsWithPovertyF
+      smYearF :: F.FrameRec '[Year, MedianHI, IncarcerationRate, TotalPop] = F.rcast <$> smYr
+      smStateYearF :: F.FrameRec '[State, Year, MedianHI, IncarcerationRate, TotalPop] = F.rcast <$> smStateYr
+      smUrbYearF :: F.FrameRec '[Urbanicity, Year, MedianHI, IncarcerationRate, TotalPop] = F.rcast <$> smUrbYr
+  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByYear.csv" smYearF
+  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByStateAndYear.csv" smStateYearF
+  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" smUrbYearF
 
+type X = "x" F.:-> Double
+type Y = "y" F.:-> Double
 
---type Bins =  "bins" F.:-> (Int, Int) 
+--type ScatterMergable ks x y w = (
 
 scatterMerge :: forall ks useCols outKeyCols x y w xl yl wl wt rs binnedCols a b.
-                  (ks F.⊆ rs, Ord (F.Record ks), FI.RecVec binnedCols,  FI.RecVec binnedCols ,Real wt, 
+                  (ks F.⊆ rs, Ord (F.Record ks), FI.RecVec (ks V.++ '[Bin2D,x,y,w]) ,Real wt, 
                    x ∈ rs, x ~ (xl F.:-> a), KnownSymbol xl, Real a,
                    y ∈ rs, y ~ (yl F.:-> b), KnownSymbol yl, Real b,
                    w ∈ rs, w ~ (wl F.:-> wt), KnownSymbol wl,
-                   binnedCols ~ (ks V.++ '[Bin2D, x, y, w]), Bin2D ∈ binnedCols, x ∈ binnedCols, y ∈ binnedCols, w ∈ binnedCols,
+                   binnedCols ~ (ks V.++ '[Bin2D, X, Y, w]), Bin2D ∈ binnedCols, X ∈ binnedCols, Y ∈ binnedCols, w ∈ binnedCols,
                    useCols ~ (ks V.++ '[x,y,w]), useCols F.⊆ rs, ks F.⊆ useCols, x ∈ useCols, y ∈ useCols, w ∈ useCols,
                    outKeyCols ~ (ks V.++ '[Bin2D]), outKeyCols F.⊆ binnedCols, Ord (F.Record outKeyCols),
-                   (outKeyCols V.++ '[x,y,w]) ~ binnedCols)
+                   (outKeyCols V.++ '[x,y,w]) ~ (ks V.++ '[Bin2D,x,y,w]))
              => Proxy ks
              -> Proxy '[x,y,w]
              -> (Double -> a) -- when we put the averaged data back in the record with original types we need to convert back
              -> (Double -> b)
-             -> M.Map (F.Record ks) [a]
-             -> M.Map (F.Record ks) [b]
-             -> FL.Fold (F.Record rs) (F.FrameRec binnedCols)
+             -> M.Map (F.Record ks) (BinsWithRescale a)
+             -> M.Map (F.Record ks) (BinsWithRescale b)
+             -> FL.Fold (F.Record rs) (F.FrameRec (ks V.++ '[Bin2D,x,y,w]))
 scatterMerge _ _ toX toY xBins yBins =
-  let xBinF = sortedListToBinLookup' <$> xBins
-      yBinF = sortedListToBinLookup' <$> yBins
+  let binningInfo :: Real c => BinsWithRescale c -> (c -> Int, c -> Double)
+      binningInfo (BinsWithRescale bs shift scale) = (sortedListToBinLookup' bs, (\x -> realToFrac (x - shift)/scale))
+      xBinF = binningInfo <$> xBins
+      yBinF = binningInfo <$> yBins
       trimRow :: F.Record rs -> F.Record useCols = F.rcast
-      binRow :: F.Record useCols -> F.Record binnedCols -- 'ks ++ [Bin2D,x,y,w]
+      binRow :: F.Record useCols -> F.Record binnedCols -- 'ks ++ [Bin2D,X,Y,w]
       binRow r =
         let key :: F.Record ks = F.rcast r
             xyw :: F.Record '[x,y,w] = F.rcast r
-            xBF = fromMaybe (const 0) $ M.lookup key xBinF
-            yBF = fromMaybe (const 0) $ M.lookup key yBinF
-            bin :: F.Record '[Bin2D] = V.runcurryX (\x y _ -> (Bin2D (xBF x, yBF y) &: V.RNil)) xyw
-        in key V.<+> bin V.<+> xyw 
+            (xBF, xSF) = fromMaybe (const 0, realToFrac) $ M.lookup key xBinF
+            (yBF, ySF) = fromMaybe (const 0, realToFrac) $ M.lookup key yBinF
+            binnedAndScaled :: F.Record '[Bin2D, X, Y, w] = V.runcurryX (\x y w -> Bin2D (xBF x, yBF y) &: xSF x &: ySF y &: w &: V.RNil) xyw
+        in key V.<+> binnedAndScaled 
       wgtdSum :: (Double, Double, wt) -> F.Record binnedCols -> (Double, Double, wt)
       wgtdSum (wX, wY, totW) r =
-        let xyw :: F.Record '[x,y,w] = F.rcast r
-        in  V.runcurryX (\x y w -> let w' = realToFrac w in (wX + (w' * realToFrac x), wY + (w' * realToFrac y), totW + w)) xyw
+        let xyw :: F.Record '[X,Y,w] = F.rcast r
+        in  V.runcurryX (\x y w -> let w' = realToFrac w in (wX + (w' * x), wY + (w' * y), totW + w)) xyw
       extract :: [F.Record binnedCols] -> F.Record '[x,y,w]  
       extract = FL.fold (FL.Fold wgtdSum (0, 0, 0) (\(wX, wY, totW) -> let totW' = realToFrac totW in toX (wX/totW') &:  toY (wY/totW') &: totW &: V.RNil))
   in aggregateF (Proxy @outKeyCols) (V.Identity . binRow . trimRow) (:) [] extract 
