@@ -293,17 +293,22 @@ incomePovertyJoinData trendsData povertyData = do
 type X = "x" F.:-> Double
 type Y = "y" F.:-> Double
 
+type UseCols ks x y w = ks V.++ '[x,y,w]
+type OutKeyCols ks = ks V.++ '[Bin2D]
+type BinnedDblCols ks w = ks V.++ '[Bin2D, X, Y, w]
+type BinnedCols ks x y w = ks V.++ '[Bin2D, x, y, w]
+type FieldOfType x a = (x ~ (V.Fst x F.:-> a), KnownSymbol (V.Fst x)) 
 --type ScatterMergable ks x y w = (
 
-scatterMerge :: forall ks useCols outKeyCols x y w xl yl wl wt rs binnedCols a b.
-                  (ks F.⊆ rs, Ord (F.Record ks), FI.RecVec (ks V.++ '[Bin2D,x,y,w]) ,Real wt, 
-                   x ∈ rs, x ~ (xl F.:-> a), KnownSymbol xl, Real a,
-                   y ∈ rs, y ~ (yl F.:-> b), KnownSymbol yl, Real b,
-                   w ∈ rs, w ~ (wl F.:-> wt), KnownSymbol wl,
-                   binnedCols ~ (ks V.++ '[Bin2D, X, Y, w]), Bin2D ∈ binnedCols, X ∈ binnedCols, Y ∈ binnedCols, w ∈ binnedCols,
-                   useCols ~ (ks V.++ '[x,y,w]), useCols F.⊆ rs, ks F.⊆ useCols, x ∈ useCols, y ∈ useCols, w ∈ useCols,
-                   outKeyCols ~ (ks V.++ '[Bin2D]), outKeyCols F.⊆ binnedCols, Ord (F.Record outKeyCols),
-                   (outKeyCols V.++ '[x,y,w]) ~ (ks V.++ '[Bin2D,x,y,w]))
+scatterMerge :: forall rs ks x y w a b wt.
+                  (ks F.⊆ rs, Ord (F.Record ks), FI.RecVec (ks V.++ '[Bin2D,x,y,w]),
+                   x ∈ rs, FieldOfType x a, Real a,
+                   y ∈ rs, FieldOfType y b, Real b,
+                   w ∈ rs, FieldOfType w wt, Real wt
+                   Bin2D ∈ BinnedDblCols ks w, X ∈ BinnedDblCols ks w, Y ∈ BinnedDblCols ks w, w ∈ BinnedDblCols ks w,
+                   UseCols ks x y w F.⊆ rs, ks F.⊆ UseCols ks x y w, x ∈ UseCols ks x y w, y ∈ UseCols ks x y w, w ∈ UseCols ks x y w,
+                   OutKeyCols ks F.⊆ BinnedDblCols ks w, Ord (F.Record (OutKeyCols ks)),
+                   ((OutKeyCols ks) V.++ '[x,y,w]) ~ (ks V.++ '[Bin2D,x,y,w]))
              => Proxy ks
              -> Proxy '[x,y,w]
              -> (Double -> a) -- when we put the averaged data back in the record with original types we need to convert back
@@ -316,8 +321,8 @@ scatterMerge _ _ toX toY xBins yBins =
       binningInfo (BinsWithRescale bs shift scale) = (sortedListToBinLookup' bs, (\x -> realToFrac (x - shift)/scale))
       xBinF = binningInfo <$> xBins
       yBinF = binningInfo <$> yBins
-      trimRow :: F.Record rs -> F.Record useCols = F.rcast
-      binRow :: F.Record useCols -> F.Record binnedCols -- 'ks ++ [Bin2D,X,Y,w]
+      trimRow :: F.Record rs -> F.Record (UseCols ks x y w) = F.rcast
+      binRow :: F.Record (UseCols ks x y w) -> F.Record (BinnedDblCols ks w) -- 'ks ++ [Bin2D,X,Y,w]
       binRow r =
         let key :: F.Record ks = F.rcast r
             xyw :: F.Record '[x,y,w] = F.rcast r
@@ -325,13 +330,13 @@ scatterMerge _ _ toX toY xBins yBins =
             (yBF, ySF) = fromMaybe (const 0, realToFrac) $ M.lookup key yBinF
             binnedAndScaled :: F.Record '[Bin2D, X, Y, w] = V.runcurryX (\x y w -> Bin2D (xBF x, yBF y) &: xSF x &: ySF y &: w &: V.RNil) xyw
         in key V.<+> binnedAndScaled 
-      wgtdSum :: (Double, Double, wt) -> F.Record binnedCols -> (Double, Double, wt)
+      wgtdSum :: (Double, Double, wt) -> F.Record (BinnedDblCols ks w) -> (Double, Double, wt)
       wgtdSum (wX, wY, totW) r =
         let xyw :: F.Record '[X,Y,w] = F.rcast r
         in  V.runcurryX (\x y w -> let w' = realToFrac w in (wX + (w' * x), wY + (w' * y), totW + w)) xyw
-      extract :: [F.Record binnedCols] -> F.Record '[x,y,w]  
+      extract :: [F.Record (BinnedDblCols ks w)] -> F.Record '[x,y,w]  
       extract = FL.fold (FL.Fold wgtdSum (0, 0, 0) (\(wX, wY, totW) -> let totW' = realToFrac totW in toX (wX/totW') &:  toY (wY/totW') &: totW &: V.RNil))
-  in aggregateF (Proxy @outKeyCols) (V.Identity . binRow . trimRow) (:) [] extract 
+  in aggregateF (Proxy @(OutKeyCols ks)) (V.Identity . binRow . trimRow) (:) [] extract 
       
   
 -- This is the anamorphic step.  Is it a co-algebra of []?
