@@ -294,21 +294,26 @@ type X = "x" F.:-> Double
 type Y = "y" F.:-> Double
 
 type UseCols ks x y w = ks V.++ '[x,y,w]
+type UseColsC ks x y w = (ks F.⊆ UseCols ks x y w, x ∈ UseCols ks x y w, y ∈ UseCols ks x y w, w ∈ UseCols ks x y w)
 type OutKeyCols ks = ks V.++ '[Bin2D]
 type BinnedDblCols ks w = ks V.++ '[Bin2D, X, Y, w]
+type BinnedDblColsC ks w = (Bin2D ∈ BinnedDblCols ks w, X ∈ BinnedDblCols ks w, Y ∈ BinnedDblCols ks w, w ∈ BinnedDblCols ks w)
 type BinnedCols ks x y w = ks V.++ '[Bin2D, x, y, w]
 type FieldOfType x a = (x ~ (V.Fst x F.:-> a), KnownSymbol (V.Fst x)) 
---type ScatterMergable ks x y w = (
+--type ScatterMergable ks x y w a b wt = (
 
 scatterMerge :: forall rs ks x y w a b wt.
-                  (ks F.⊆ rs, Ord (F.Record ks), FI.RecVec (ks V.++ '[Bin2D,x,y,w]),
+                  (ks F.⊆ rs,
+                   Ord (F.Record ks),
+                   FI.RecVec (BinnedCols ks x y w),
                    x ∈ rs, FieldOfType x a, Real a,
                    y ∈ rs, FieldOfType y b, Real b,
-                   w ∈ rs, FieldOfType w wt, Real wt
-                   Bin2D ∈ BinnedDblCols ks w, X ∈ BinnedDblCols ks w, Y ∈ BinnedDblCols ks w, w ∈ BinnedDblCols ks w,
-                   UseCols ks x y w F.⊆ rs, ks F.⊆ UseCols ks x y w, x ∈ UseCols ks x y w, y ∈ UseCols ks x y w, w ∈ UseCols ks x y w,
-                   OutKeyCols ks F.⊆ BinnedDblCols ks w, Ord (F.Record (OutKeyCols ks)),
-                   ((OutKeyCols ks) V.++ '[x,y,w]) ~ (ks V.++ '[Bin2D,x,y,w]))
+                   w ∈ rs, FieldOfType w wt, Real wt,
+                   BinnedDblColsC ks w,
+                   UseCols ks x y w F.⊆ rs, UseColsC ks x y w,
+                   OutKeyCols ks F.⊆ BinnedDblCols ks w,
+                   Ord (F.Record (OutKeyCols ks)),
+                   ((OutKeyCols ks) V.++ '[x,y,w]) ~ (BinnedCols ks x y w))
              => Proxy ks
              -> Proxy '[x,y,w]
              -> (Double -> a) -- when we put the averaged data back in the record with original types we need to convert back
