@@ -138,16 +138,7 @@ incomePovertyJoinData trendsData povertyData = do
   povertyFrame :: F.Frame SAIPE <- F.inCoreAoS povertyData
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
-  -- we do this with two passes
-  -- one to build the bins and one to do the scatterMerge
   let dataProxy = Proxy @[MedianHI, IncarcerationRate, TotalPop]
-  {-
-      (smYrBinFold, smYrFold) = buildScatterMerge [F.pr1|Year|] dataProxy 10 10 RescaleMedian RescaleNone round id
-      (smStateYrBinFold, smStateYrFold) = buildScatterMerge (Proxy @[State,Year]) dataProxy 10 10 RescaleMedian RescaleNone round id
-      (smUrbYrBinFold, smUrbYrFold) = buildScatterMerge (Proxy @[Urbanicity,Year]) dataProxy 10 10 RescaleMedian RescaleNone round id
-      (smYrBins, smStateYrBins, smUrbYrBins) = FL.fold ((,,) <$> smYrBinFold <*> smStateYrBinFold <*> smUrbYrBinFold) trendsWithPovertyF
-      (smYrFrame, smStateYrFrame, smUrbYrFrame) = FL.fold ((,,) <$> smYrFold smYrBins <*> smStateYrFold smStateYrBins <*> smUrbYrFold smUrbYrBins) trendsWithPovertyF
--}
       (smYrFrame, smStateYrFrame, smUrbYrFrame) = FL.fold ((,,)
                                                            <$> scatterMerge' [F.pr1|Year|] dataProxy round id 10 10 RescaleMedian RescaleNone
                                                            <*> scatterMerge' (Proxy @[State,Year]) dataProxy round id 10 10 RescaleMedian RescaleNone
