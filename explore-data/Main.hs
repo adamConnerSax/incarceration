@@ -75,13 +75,13 @@ ratesByStateAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Year, State, CrimeRate
 ratesByStateAndYear =
   let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FA.aggregateF (Proxy @[Year, State]) selectMaybe (V.recAdd . F.rcast) emptyRow rates
+  in FA.aggregateF (Proxy @[Year, State]) selectMaybe (flip $ V.recAdd . F.rcast) emptyRow rates
 
 ratesByUrbanicityAndYear :: FL.Fold MaybeITrends (F.FrameRec '[Urbanicity, Year, CrimeRate, ImprisonedPerCrimeRate])
 ratesByUrbanicityAndYear =
   let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FA.aggregateF (Proxy @[Urbanicity, Year]) selectMaybe (V.recAdd . F.rcast) emptyRow rates
+  in FA.aggregateF (Proxy @[Urbanicity, Year]) selectMaybe (flip $ V.recAdd . F.rcast) emptyRow rates
 
 gRates :: F.Record '["pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double] -> F.Record '[IncarcerationRate, PrisonAdmRate]
 gRates = runcurryX (\p a j -> j /(fromIntegral p) F.&: (fromIntegral a/fromIntegral p) F.&: V.RNil)
@@ -98,7 +98,7 @@ ratesByGenderAndYear =
       unpack :: MaybeITrends -> [F.Record '[Year, Gender, "pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double]]
       unpack = fromMaybe [] . fmap newRows . selectMaybe
       emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FA.aggregateF (Proxy @[Year, Gender]) unpack (V.recAdd . F.rcast) emptyRow gRates
+  in FA.aggregateF (Proxy @[Year, Gender]) unpack (flip $ V.recAdd . F.rcast) emptyRow gRates
 
 type TrendsPovRow = '[Year, Fips, State, CountyName, Urbanicity, TotalPop, CrimeRate, IncarcerationRate, ImprisonedPerCrimeRate]
 --TotalPop, TotalPop15To64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]
@@ -141,11 +141,17 @@ incomePovertyJoinData trendsData povertyData = do
   -- we do this with two passes
   -- one to build the bins and one to do the scatterMerge
   let dataProxy = Proxy @[MedianHI, IncarcerationRate, TotalPop]
+  {-
       (smYrBinFold, smYrFold) = buildScatterMerge [F.pr1|Year|] dataProxy 10 10 RescaleMedian RescaleNone round id
       (smStateYrBinFold, smStateYrFold) = buildScatterMerge (Proxy @[State,Year]) dataProxy 10 10 RescaleMedian RescaleNone round id
       (smUrbYrBinFold, smUrbYrFold) = buildScatterMerge (Proxy @[Urbanicity,Year]) dataProxy 10 10 RescaleMedian RescaleNone round id
       (smYrBins, smStateYrBins, smUrbYrBins) = FL.fold ((,,) <$> smYrBinFold <*> smStateYrBinFold <*> smUrbYrBinFold) trendsWithPovertyF
       (smYrFrame, smStateYrFrame, smUrbYrFrame) = FL.fold ((,,) <$> smYrFold smYrBins <*> smStateYrFold smStateYrBins <*> smUrbYrFold smUrbYrBins) trendsWithPovertyF
+-}
+      (smYrFrame, smStateYrFrame, smUrbYrFrame) = FL.fold ((,,)
+                                                           <$> scatterMerge' [F.pr1|Year|] dataProxy round id 10 10 RescaleMedian RescaleNone
+                                                           <*> scatterMerge' (Proxy @[State,Year]) dataProxy round id 10 10 RescaleMedian RescaleNone
+                                                           <*> scatterMerge' (Proxy @[Urbanicity,Year]) dataProxy round id 10 10 RescaleMedian RescaleNone) trendsWithPovertyF
   F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByYear.csv" smYrFrame
   F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByStateAndYear.csv" smStateYrFrame
   F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" smUrbYrFrame
