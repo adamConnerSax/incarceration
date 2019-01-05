@@ -10,3 +10,5 @@ cabal.project.local
 *.png
 /visualizations/output
 .Rproj.user
+.RData
+.RHistory
