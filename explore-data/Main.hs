@@ -46,8 +46,9 @@ import qualified Pipes.Prelude           as P
 
 data Config = Config
   {
-    trendsCsv  :: FilePath
-  , povertyCsv :: FilePath
+    trendsCsv       :: FilePath
+  , povertyCsv      :: FilePath
+  , fipsByCountyCsv :: FilePath
   } deriving (D.Generic)
 
 instance D.Interpret Config
@@ -117,9 +118,12 @@ main :: IO ()
 main = do
   config <- D.input D.auto "./config/explore-data.dhall"
   let trendsData = F.readTableMaybe $ trendsCsv config
-    --aggregationAnalyses trendsData
   let povertyData = F.readTable $ povertyCsv config -- no missing data here
+--  let fipsByCountyData = F.readTable $ fipsByCountyCsv config
+    --aggregationAnalyses trendsData
   incomePovertyJoinData trendsData povertyData
+
+
 
 aggregationAnalyses :: P.Producer (F.Rec (Maybe :. F.ElField) (F.RecordColumns IncarcerationTrends)) (P.Effect (F.SafeT IO)) () -> IO ()
 aggregationAnalyses trendsData = do
@@ -139,10 +143,11 @@ incomePovertyJoinData trendsData povertyData = do
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
   let dataProxy = Proxy @[MedianHI, IncarcerationRate, TotalPop]
+      smIncarcerationRatevsIncome proxy_ks = scatterMerge proxy_ks dataProxy round id 10 10 RescaleMedian RescaleNone
       (smYrFrame, smStateYrFrame, smUrbYrFrame) = FL.fold ((,,)
-                                                           <$> scatterMerge' [F.pr1|Year|] dataProxy round id 10 10 RescaleMedian RescaleNone
-                                                           <*> scatterMerge' (Proxy @[State,Year]) dataProxy round id 10 10 RescaleMedian RescaleNone
-                                                           <*> scatterMerge' (Proxy @[Urbanicity,Year]) dataProxy round id 10 10 RescaleMedian RescaleNone) trendsWithPovertyF
+                                                           <$> smIncarcerationRatevsIncome [F.pr1|Year|]
+                                                           <*> smIncarcerationRatevsIncome (Proxy @[State,Year])
+                                                           <*> smIncarcerationRatevsIncome (Proxy @[Urbanicity,Year])) trendsWithPovertyF
   F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByYear.csv" smYrFrame
   F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByStateAndYear.csv" smStateYrFrame
   F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" smUrbYrFrame
