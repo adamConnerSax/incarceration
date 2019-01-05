@@ -11,4 +11,4 @@ cabal.project.local
 /visualizations/output
 .Rproj.user
 .RData
-.RHistory
+.Rhistory
