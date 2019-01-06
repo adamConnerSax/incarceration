@@ -1,15 +1,16 @@
-{-# LANGUAGE ConstraintKinds       #-}
-{-# LANGUAGE DataKinds             #-}
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE FlexibleContexts      #-}
-{-# LANGUAGE GADTs                 #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE PolyKinds             #-}
-{-# LANGUAGE RankNTypes            #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
-{-# LANGUAGE TypeApplications      #-}
-{-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE TypeOperators         #-}
+{-# LANGUAGE ConstraintKinds     #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE GADTs               #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PolyKinds           #-}
+{-# LANGUAGE QuasiQuotes         #-}
+{-# LANGUAGE RankNTypes          #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE TypeFamilies        #-}
+{-# LANGUAGE TypeOperators       #-}
 module Main where
 
 import           Frames.Aggregations     as FA
@@ -19,6 +20,7 @@ import qualified Control.Foldl           as FL
 import           Control.Lens            ((^.))
 import           Control.Monad.IO.Class  (MonadIO, liftIO)
 import qualified Data.List               as List
+import qualified Data.Map                as M
 import           Data.Maybe              (catMaybes, fromMaybe, isJust)
 import           Data.Proxy              (Proxy (..))
 import           Data.Text               (Text)
@@ -108,12 +110,13 @@ main :: IO ()
 main = do
   let trendsData :: F.MonadSafe m => P.Producer MaybeITrends m ()
       trendsData = F.readTableMaybe incarcerationTrendsCsvPath -- some data is missing so we use the Maybe form
---  let povertyData = F.readTable saipeCsvPath 
+--  let povertyData = F.readTable saipeCsvPath
 --  let fipsByCountyData = F.readTable $ fipsByCountyCsv config
 --  let crimeStatsCO_Data = F.readTable crimeStatsCO_CsvPath
   let coloradoTrends = trendsData P.>-> P.map (F.rcast @CO_AnalysisVERA_Cols) P.>-> P.filter (stateFilter "CO")
-  coloradoRowCheck <- F.runSafeEffect $ FL.purely P.fold (justRowCount (Proxy @CO_AnalysisVERA_Cols)) coloradoTrends 
-  putStrLn $ "(CO rows, CO rows with all fields) = " ++ show coloradoRowCheck                        
+--      goodDataByYear = FL.Fold (aggregateToMap (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap $ FL.fold goodDataCount)
+  coloradoRowCheck <- F.runSafeEffect $ FL.purely P.fold (goodDataByKey  [F.pr1|Year|]) coloradoTrends
+  putStrLn $ "(CO rows, CO rows with all fields) = " ++ show coloradoRowCheck
     --aggregationAnalyses trendsData
   --incomePovertyJoinData trendsData povertyData
 
@@ -146,7 +149,7 @@ incomePovertyJoinData trendsData povertyData = do
 
 {-
 pFilterMaybe :: Monad m => (a -> Maybe b) -> P.Pipe a b m ()
-pFilterMaybe f =  P.map f P.>-> P.filter isJust P.>-> P.map fromJust  
+pFilterMaybe f =  P.map f P.>-> P.filter isJust P.>-> P.map fromJust
 -}
 
 maybeTest :: (a -> Bool) -> Maybe a -> Bool

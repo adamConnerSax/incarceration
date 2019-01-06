@@ -20,7 +20,9 @@ module Frames.Aggregations
   (
     RescaleType (..)
   , BinsWithRescale (..)
-  , justRowCount
+  , goodDataCount
+  , goodDataByKey
+  , aggregateToMap
   , aggregateGeneral
   , aggregateFiltered
   , aggregateF
@@ -41,7 +43,7 @@ import qualified Control.Lens         as L
 import qualified Data.Foldable     as Foldable
 import qualified Data.List            as List
 import qualified Data.Map             as M
-import           Data.Maybe           (fromMaybe, isJust, catMaybes)
+import           Data.Maybe           (fromMaybe, isJust, catMaybes, fromJust)
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Vinyl           as V
@@ -75,11 +77,14 @@ instance F.ShowCSV Bin2DT where
   showCSV = T.pack . show
 
 
-justRowCount :: forall rs fs. (fs F.⊆ rs) =>  Proxy fs -> FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (Int, Int)
-justRowCount _ =
-  let selectMaybe :: F.Rec (Maybe F.:. F.ElField) rs -> Maybe (F.Record fs)
-      selectMaybe = F.recMaybe . F.rcast
-  in (,) <$> FL.length <*> FL.prefilter (isJust . selectMaybe) (FL.length) 
+
+goodDataByKey :: forall ks rs. (ks F.⊆ rs, Ord (F.Record ks)) => Proxy ks ->  FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (M.Map (F.Record ks) (Int, Int))
+goodDataByKey _ =
+  let getKey = F.recMaybe . F.rcast @ks
+  in FL.prefilter (isJust . getKey) $ FL.Fold (aggregateToMap (fromJust . getKey) (flip (:)) []) M.empty (fmap $ FL.fold goodDataCount)   
+
+goodDataCount :: FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (Int, Int)
+goodDataCount = (,) <$> FL.length <*> FL.prefilter (isJust . F.recMaybe) FL.length
 
 aggregateToMap :: Ord k => (a -> k) -> (b -> a -> b) -> b -> M.Map k b -> a -> M.Map k b
 aggregateToMap getKey combine initial m r =
