@@ -35,6 +35,7 @@ library
   default-language:    Haskell2010
 
 executable explore-data
+  ghc-options:        -fno-worker-wrapper
   main-is:             Main.hs
   other-modules:       TrendsDataTypes
   -- other-extensions:

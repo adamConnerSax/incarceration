@@ -20,6 +20,7 @@ module Frames.Aggregations
   (
     RescaleType (..)
   , BinsWithRescale (..)
+  , justRowCount
   , aggregateGeneral
   , aggregateFiltered
   , aggregateF
@@ -73,6 +74,12 @@ type instance FI.VectorFor Bin2DT = V.Vector
 instance F.ShowCSV Bin2DT where
   showCSV = T.pack . show
 
+
+justRowCount :: forall rs fs. (fs F.⊆ rs) =>  Proxy fs -> FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (Int, Int)
+justRowCount _ =
+  let selectMaybe :: F.Rec (Maybe F.:. F.ElField) rs -> Maybe (F.Record fs)
+      selectMaybe = F.recMaybe . F.rcast
+  in (,) <$> FL.length <*> FL.prefilter (isJust . selectMaybe) (FL.length) 
 
 aggregateToMap :: Ord k => (a -> k) -> (b -> a -> b) -> b -> M.Map k b -> a -> M.Map k b
 aggregateToMap getKey combine initial m r =
