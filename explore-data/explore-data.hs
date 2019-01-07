@@ -13,8 +13,8 @@
 {-# LANGUAGE TypeOperators       #-}
 module Main where
 
+import           DataSources
 import           Frames.Aggregations     as FA
-import           TrendsDataTypes
 
 import qualified Control.Foldl           as FL
 import           Control.Lens            ((^.))
@@ -38,22 +38,7 @@ import qualified Frames.ShowCSV          as F
 import qualified Pipes                   as P
 import qualified Pipes.Prelude           as P
 
-{-
-type Row = IncarcerationTrends
-type MaybeRow r = F.Rec (Maybe F.:. F.ElField) (F.RecordColumns r)
-type MaybeITrends = MaybeRow IncarcerationTrends
 
-data GenderT = Male | Female deriving (Show,Enum,Bounded,Ord, Eq) -- we ought to have NonBinary here as well, but the data doesn't.
-type instance FI.VectorFor GenderT = V.Vector
-instance F.ShowCSV GenderT where
-  showCSV = T.pack . show
-
-F.declareColumn "ImprisonedPerCrimeRate" ''Double
-F.declareColumn "CrimeRate" ''Double
-F.declareColumn "IncarcerationRate" ''Double
-F.declareColumn "PrisonAdmRate" '' Double
-F.declareColumn "Gender" ''GenderT
--}
 rates :: F.Record [TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, ImprisonedPerCrimeRate]
 rates = runcurryX (\p ic pa -> (fromIntegral ic / fromIntegral p) &: (fromIntegral pa / fromIntegral ic) &: V.RNil)
 
@@ -109,10 +94,10 @@ trendsRowForPovertyAnalysis = do
 main :: IO ()
 main = do
   let trendsData :: F.MonadSafe m => P.Producer MaybeITrends m ()
-      trendsData = F.readTableMaybe incarcerationTrendsCsvPath -- some data is missing so we use the Maybe form
---  let povertyData = F.readTable saipeCsvPath
---  let fipsByCountyData = F.readTable $ fipsByCountyCsv config
---  let crimeStatsCO_Data = F.readTable crimeStatsCO_CsvPath
+      trendsData = F.readTableMaybe veraTrendsFP -- some data is missing so we use the Maybe form
+--  let povertyData = F.readTable censusSAIPE_FP
+--  let fipsByCountyData = F.readTable $ fipsByCountyFP config
+--  let crimeStatsCO_Data = F.readTable crimeStatsCO_FP
   let coloradoTrends = trendsData P.>-> P.map (F.rcast @CO_AnalysisVERA_Cols) P.>-> P.filter (stateFilter "CO")
 --      goodDataByYear = FL.Fold (aggregateToMap (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap $ FL.fold goodDataCount)
   coloradoRowCheck <- F.runSafeEffect $ FL.purely P.fold (goodDataByKey  [F.pr1|Year|]) coloradoTrends

@@ -18,6 +18,7 @@ extra-source-files:  CHANGELOG.md
 
 library
   exposed-modules: Frames.Aggregations
+                 , Frames.MaybeUtils
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.11.1.0
@@ -35,9 +36,10 @@ library
   default-language:    Haskell2010
 
 executable explore-data
-  ghc-options:        -fno-worker-wrapper
-  main-is:             Main.hs
-  other-modules:       TrendsDataTypes
+  ghc-options:        -O0 -fno-worker-wrapper
+  main-is:             explore-data.hs
+  other-modules:       DataSourcePaths
+                     , DataSources
   -- other-extensions:
   build-depends:       base >=4.11.1.0
                      , incarceration
@@ -45,6 +47,7 @@ executable explore-data
                      , dhall
                      , foldl
                      , Frames
+                     , Frames-dsv
                      , lens
                      , pipes
                      , text
@@ -52,3 +55,25 @@ executable explore-data
                      , vinyl >= 0.10.0
   hs-source-dirs:      explore-data
   default-language:    Haskell2010
+
+
+executable colorado-joins
+  ghc-options:         -O0 
+  main-is:             colorado-joins.hs
+  other-modules:       DataSourcePaths
+                     , DataSources
+  -- other-extensions:
+  build-depends:       base >=4.11.1.0
+                     , incarceration
+                     , containers
+                     , foldl
+                     , Frames
+                     , Frames-dsv
+                     , lens
+                     , pipes
+                     , text
+                     , vector
+                     , vinyl >= 0.10.0.1
+  hs-source-dirs:      explore-data
+  default-language:    Haskell2010
+  

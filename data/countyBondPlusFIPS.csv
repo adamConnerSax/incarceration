@@ -1,0 +1,382 @@
+county,year,cash_surety_property_bond_frequency,personal_recognizance_bond_frequency,total_bond_frequency,bond_type,FIPS
+"Adams",2014,8022.0,156,8178.0,"misdemeanorbondtype",8001
+"Adams",2015,8018.0,308,8326.0,"misdemeanorbondtype",8001
+"Adams",2016,6789.0,1211,8000.0,"misdemeanorbondtype",8001
+"Adams",2014,3166.0,215,3381.0,"felonybondtype",8001
+"Adams",2015,3305.0,354,3659.0,"felonybondtype",8001
+"Adams",2016,3307.0,713,4020.0,"felonybondtype",8001
+"Alamosa",2014,317.0,112,429.0,"misdemeanorbondtype",8003
+"Alamosa",2015,367.0,122,489.0,"misdemeanorbondtype",8003
+"Alamosa",2016,328.0,184,512.0,"misdemeanorbondtype",8003
+"Alamosa",2014,212.0,84,296.0,"felonybondtype",8003
+"Alamosa",2015,260.0,86,346.0,"felonybondtype",8003
+"Alamosa",2016,341.0,215,556.0,"felonybondtype",8003
+"Arapahoe",2014,4405.0,3151,7556.0,"misdemeanorbondtype",8005
+"Arapahoe",2015,3703.0,3890,7593.0,"misdemeanorbondtype",8005
+"Arapahoe",2016,4693.0,2393,7086.0,"misdemeanorbondtype",8005
+"Arapahoe",2014,2631.0,364,2995.0,"felonybondtype",8005
+"Arapahoe",2015,2482.0,668,3150.0,"felonybondtype",8005
+"Arapahoe",2016,2709.0,503,3212.0,"felonybondtype",8005
+"Archuleta",2014,212.0,118,330.0,"misdemeanorbondtype",8007
+"Archuleta",2015,156.0,97,253.0,"misdemeanorbondtype",8007
+"Archuleta",2016,194.0,126,320.0,"misdemeanorbondtype",8007
+"Archuleta",2014,46.0,41,87.0,"felonybondtype",8007
+"Archuleta",2015,46.0,36,82.0,"felonybondtype",8007
+"Archuleta",2016,49.0,46,95.0,"felonybondtype",8007
+"Baca",2014,103.0,10,113.0,"misdemeanorbondtype",8009
+"Baca",2015,106.0,7,113.0,"misdemeanorbondtype",8009
+"Baca",2016,105.0,7,112.0,"misdemeanorbondtype",8009
+"Baca",2014,27.0,3,30.0,"felonybondtype",8009
+"Baca",2015,18.0,11,29.0,"felonybondtype",8009
+"Baca",2016,26.0,6,32.0,"felonybondtype",8009
+"Bent",2014,184.0,53,237.0,"misdemeanorbondtype",8011
+"Bent",2015,109.0,52,161.0,"misdemeanorbondtype",8011
+"Bent",2016,116.0,65,181.0,"misdemeanorbondtype",8011
+"Bent",2014,35.0,14,49.0,"felonybondtype",8011
+"Bent",2015,30.0,18,48.0,"felonybondtype",8011
+"Bent",2016,53.0,13,66.0,"felonybondtype",8011
+"Boulder",2014,2444.0,545,2989.0,"misdemeanorbondtype",8013
+"Boulder",2015,2346.0,637,2983.0,"misdemeanorbondtype",8013
+"Boulder",2016,2275.0,860,3135.0,"misdemeanorbondtype",8013
+"Boulder",2014,1548.0,215,1763.0,"felonybondtype",8013
+"Boulder",2015,1630.0,294,1924.0,"felonybondtype",8013
+"Boulder",2016,1662.0,536,2198.0,"felonybondtype",8013
+"Broomfield",2014,1213.0,86,1299.0,"misdemeanorbondtype",8014
+"Broomfield",2015,1082.0,76,1158.0,"misdemeanorbondtype",8014
+"Broomfield",2016,826.0,262,1088.0,"misdemeanorbondtype",8014
+"Broomfield",2014,285.0,11,296.0,"felonybondtype",8014
+"Broomfield",2015,275.0,17,292.0,"felonybondtype",8014
+"Broomfield",2016,265.0,68,333.0,"felonybondtype",8014
+"Chaffee",2014,299.0,103,402.0,"misdemeanorbondtype",8015
+"Chaffee",2015,290.0,153,443.0,"misdemeanorbondtype",8015
+"Chaffee",2016,271.0,184,455.0,"misdemeanorbondtype",8015
+"Chaffee",2014,103.0,23,126.0,"felonybondtype",8015
+"Chaffee",2015,122.0,36,158.0,"felonybondtype",8015
+"Chaffee",2016,129.0,54,183.0,"felonybondtype",8015
+"Cheyenne",2014,41.0,6,47.0,"misdemeanorbondtype",8017
+"Cheyenne",2015,44.0,1,45.0,"misdemeanorbondtype",8017
+"Cheyenne",2016,71.0,8,79.0,"misdemeanorbondtype",8017
+"Cheyenne",2014,10.0,3,13.0,"felonybondtype",8017
+"Cheyenne",2015,7.0,1,8.0,"felonybondtype",8017
+"Cheyenne",2016,11.0,2,13.0,"felonybondtype",8017
+"Clear Creek",2014,360.0,133,493.0,"misdemeanorbondtype",8019
+"Clear Creek",2015,382.0,141,523.0,"misdemeanorbondtype",8019
+"Clear Creek",2016,393.0,122,515.0,"misdemeanorbondtype",8019
+"Clear Creek",2014,79.0,4,83.0,"felonybondtype",8019
+"Clear Creek",2015,63.0,4,67.0,"felonybondtype",8019
+"Clear Creek",2016,80.0,6,86.0,"felonybondtype",8019
+"Conejos",2014,132.0,35,167.0,"misdemeanorbondtype",8021
+"Conejos",2015,112.0,47,159.0,"misdemeanorbondtype",8021
+"Conejos",2016,115.0,42,157.0,"misdemeanorbondtype",8021
+"Conejos",2014,36.0,14,50.0,"felonybondtype",8021
+"Conejos",2015,51.0,17,68.0,"felonybondtype",8021
+"Conejos",2016,75.0,27,102.0,"felonybondtype",8021
+"Costilla",2014,121.0,28,149.0,"misdemeanorbondtype",8023
+"Costilla",2015,120.0,21,141.0,"misdemeanorbondtype",8023
+"Costilla",2016,115.0,24,139.0,"misdemeanorbondtype",8023
+"Costilla",2014,34.0,10,44.0,"felonybondtype",8023
+"Costilla",2015,41.0,5,46.0,"felonybondtype",8023
+"Costilla",2016,33.0,17,50.0,"felonybondtype",8023
+"Crowley",2014,54.0,20,74.0,"misdemeanorbondtype",8025
+"Crowley",2015,51.0,28,79.0,"misdemeanorbondtype",8025
+"Crowley",2016,34.0,15,49.0,"misdemeanorbondtype",8025
+"Crowley",2014,26.0,2,28.0,"felonybondtype",8025
+"Crowley",2015,25.0,20,45.0,"felonybondtype",8025
+"Crowley",2016,55.0,9,64.0,"felonybondtype",8025
+"Custer",2014,48.0,14,62.0,"misdemeanorbondtype",8027
+"Custer",2015,71.0,24,95.0,"misdemeanorbondtype",8027
+"Custer",2016,47.0,29,76.0,"misdemeanorbondtype",8027
+"Custer",2014,17.0,4,21.0,"felonybondtype",8027
+"Custer",2015,19.0,5,24.0,"felonybondtype",8027
+"Custer",2016,39.0,11,50.0,"felonybondtype",8027
+"Delta",2014,428.0,66,494.0,"misdemeanorbondtype",8029
+"Delta",2015,460.0,70,530.0,"misdemeanorbondtype",8029
+"Delta",2016,557.0,65,622.0,"misdemeanorbondtype",8029
+"Delta",2014,117.0,11,128.0,"felonybondtype",8029
+"Delta",2015,112.0,13,125.0,"felonybondtype",8029
+"Delta",2016,114.0,15,129.0,"felonybondtype",8029
+"Dolores",2014,29.0,10,39.0,"misdemeanorbondtype",8033
+"Dolores",2015,26.0,15,41.0,"misdemeanorbondtype",8033
+"Dolores",2016,15.0,24,39.0,"misdemeanorbondtype",8033
+"Dolores",2014,3.0,5,8.0,"felonybondtype",8033
+"Dolores",2015,9.0,2,11.0,"felonybondtype",8033
+"Dolores",2016,16.0,1,17.0,"felonybondtype",8033
+"Douglas",2014,2230.0,625,2855.0,"misdemeanorbondtype",8035
+"Douglas",2015,2315.0,975,3290.0,"misdemeanorbondtype",8035
+"Douglas",2016,2810.0,979,3789.0,"misdemeanorbondtype",8035
+"Douglas",2014,582.0,112,694.0,"felonybondtype",8035
+"Douglas",2015,573.0,197,770.0,"felonybondtype",8035
+"Douglas",2016,750.0,279,1029.0,"felonybondtype",8035
+"Eagle",2014,759.0,228,987.0,"misdemeanorbondtype",8037
+"Eagle",2015,861.0,166,1027.0,"misdemeanorbondtype",8037
+"Eagle",2016,891.0,158,1049.0,"misdemeanorbondtype",8037
+"Eagle",2014,225.0,34,259.0,"felonybondtype",8037
+"Eagle",2015,332.0,24,356.0,"felonybondtype",8037
+"Eagle",2016,283.0,17,300.0,"felonybondtype",8037
+"El Paso",2014,7742.0,993,8735.0,"misdemeanorbondtype",8041
+"El Paso",2015,8076.0,1069,9145.0,"misdemeanorbondtype",8041
+"El Paso",2016,8061.0,1074,9135.0,"misdemeanorbondtype",8041
+"El Paso",2014,5041.0,318,5359.0,"felonybondtype",8041
+"El Paso",2015,5260.0,362,5622.0,"felonybondtype",8041
+"El Paso",2016,5781.0,325,6106.0,"felonybondtype",8041
+"Elbert",2014,226.0,77,303.0,"misdemeanorbondtype",8039
+"Elbert",2015,240.0,82,322.0,"misdemeanorbondtype",8039
+"Elbert",2016,212.0,117,329.0,"misdemeanorbondtype",8039
+"Elbert",2014,53.0,11,64.0,"felonybondtype",8039
+"Elbert",2015,63.0,19,82.0,"felonybondtype",8039
+"Elbert",2016,86.0,35,121.0,"felonybondtype",8039
+"Fremont",2014,563.0,193,756.0,"misdemeanorbondtype",8043
+"Fremont",2015,636.0,226,862.0,"misdemeanorbondtype",8043
+"Fremont",2016,423.0,594,1017.0,"misdemeanorbondtype",8043
+"Fremont",2014,259.0,64,323.0,"felonybondtype",8043
+"Fremont",2015,282.0,93,375.0,"felonybondtype",8043
+"Fremont",2016,379.0,230,609.0,"felonybondtype",8043
+"Garfield",2014,1057.0,271,1328.0,"misdemeanorbondtype",8045
+"Garfield",2015,1104.0,288,1392.0,"misdemeanorbondtype",8045
+"Garfield",2016,1113.0,326,1439.0,"misdemeanorbondtype",8045
+"Garfield",2014,283.0,88,371.0,"felonybondtype",8045
+"Garfield",2015,401.0,84,485.0,"felonybondtype",8045
+"Garfield",2016,386.0,138,524.0,"felonybondtype",8045
+"Gilpin",2014,422.0,72,494.0,"misdemeanorbondtype",8047
+"Gilpin",2015,509.0,122,631.0,"misdemeanorbondtype",8047
+"Gilpin",2016,384.0,126,510.0,"misdemeanorbondtype",8047
+"Gilpin",2014,78.0,16,94.0,"felonybondtype",8047
+"Gilpin",2015,149.0,25,174.0,"felonybondtype",8047
+"Gilpin",2016,124.0,27,151.0,"felonybondtype",8047
+"Grand",2014,303.0,21,324.0,"misdemeanorbondtype",8049
+"Grand",2015,240.0,65,305.0,"misdemeanorbondtype",8049
+"Grand",2016,258.0,95,353.0,"misdemeanorbondtype",8049
+"Grand",2014,63.0,7,70.0,"felonybondtype",8049
+"Grand",2015,41.0,8,49.0,"felonybondtype",8049
+"Grand",2016,48.0,14,62.0,"felonybondtype",8049
+"Gunnison",2014,326.0,40,366.0,"misdemeanorbondtype",8051
+"Gunnison",2015,363.0,48,411.0,"misdemeanorbondtype",8051
+"Gunnison",2016,363.0,43,406.0,"misdemeanorbondtype",8051
+"Gunnison",2014,85.0,7,92.0,"felonybondtype",8051
+"Gunnison",2015,72.0,15,87.0,"felonybondtype",8051
+"Gunnison",2016,102.0,13,115.0,"felonybondtype",8051
+"Hinsdale",2014,10.0,NA,10.0,"misdemeanorbondtype",8053
+"Hinsdale",2015,6.0,5,11.0,"misdemeanorbondtype",8053
+"Hinsdale",2016,6.0,3,9.0,"misdemeanorbondtype",8053
+"Hinsdale",2014,2.0,1,3.0,"felonybondtype",8053
+"Hinsdale",2015,3.0,NA,3.0,"felonybondtype",8053
+"Hinsdale",2016,2.0,2,4.0,"felonybondtype",8053
+"Huerfano",2014,228.0,25,253.0,"misdemeanorbondtype",8055
+"Huerfano",2015,234.0,26,260.0,"misdemeanorbondtype",8055
+"Huerfano",2016,224.0,36,260.0,"misdemeanorbondtype",8055
+"Huerfano",2014,78.0,36,114.0,"felonybondtype",8055
+"Huerfano",2015,69.0,20,89.0,"felonybondtype",8055
+"Huerfano",2016,96.0,41,137.0,"felonybondtype",8055
+"Jackson",2014,17.0,12,29.0,"misdemeanorbondtype",8057
+"Jackson",2015,14.0,7,21.0,"misdemeanorbondtype",8057
+"Jackson",2016,15.0,3,18.0,"misdemeanorbondtype",8057
+"Jackson",2014,4.0,2,6.0,"felonybondtype",8057
+"Jackson",2015,1.0,4,5.0,"felonybondtype",8057
+"Jackson",2016,8.0,2,10.0,"felonybondtype",8057
+"Jefferson",2014,4831.0,813,5644.0,"misdemeanorbondtype",8059
+"Jefferson",2015,4920.0,964,5884.0,"misdemeanorbondtype",8059
+"Jefferson",2016,5304.0,1097,6401.0,"misdemeanorbondtype",8059
+"Jefferson",2014,2619.0,437,3056.0,"felonybondtype",8059
+"Jefferson",2015,3032.0,440,3472.0,"felonybondtype",8059
+"Jefferson",2016,3404.0,539,3943.0,"felonybondtype",8059
+"Kiowa",2014,87.0,3,90.0,"misdemeanorbondtype",8061
+"Kiowa",2015,65.0,4,69.0,"misdemeanorbondtype",8061
+"Kiowa",2016,53.0,3,56.0,"misdemeanorbondtype",8061
+"Kiowa",2014,8.0,2,10.0,"felonybondtype",8061
+"Kiowa",2015,9.0,1,10.0,"felonybondtype",8061
+"Kiowa",2016,4.0,NA,4.0,"felonybondtype",8061
+"Kit Carson",2014,181.0,39,220.0,"misdemeanorbondtype",8063
+"Kit Carson",2015,164.0,62,226.0,"misdemeanorbondtype",8063
+"Kit Carson",2016,196.0,73,269.0,"misdemeanorbondtype",8063
+"Kit Carson",2014,49.0,6,55.0,"felonybondtype",8063
+"Kit Carson",2015,54.0,14,68.0,"felonybondtype",8063
+"Kit Carson",2016,61.0,27,88.0,"felonybondtype",8063
+"La Plata",2014,753.0,463,1216.0,"misdemeanorbondtype",8067
+"La Plata",2015,906.0,541,1447.0,"misdemeanorbondtype",8067
+"La Plata",2016,1000.0,463,1463.0,"misdemeanorbondtype",8067
+"La Plata",2014,249.0,224,473.0,"felonybondtype",8067
+"La Plata",2015,281.0,210,491.0,"felonybondtype",8067
+"La Plata",2016,324.0,178,502.0,"felonybondtype",8067
+"Lake",2014,152.0,63,215.0,"misdemeanorbondtype",8065
+"Lake",2015,242.0,68,310.0,"misdemeanorbondtype",8065
+"Lake",2016,212.0,50,262.0,"misdemeanorbondtype",8065
+"Lake",2014,77.0,8,85.0,"felonybondtype",8065
+"Lake",2015,40.0,6,46.0,"felonybondtype",8065
+"Lake",2016,68.0,14,82.0,"felonybondtype",8065
+"Larimer",2014,2059.0,3712,5771.0,"misdemeanorbondtype",8069
+"Larimer",2015,2278.0,3780,6058.0,"misdemeanorbondtype",8069
+"Larimer",2016,2306.0,3737,6043.0,"misdemeanorbondtype",8069
+"Larimer",2014,1309.0,472,1781.0,"felonybondtype",8069
+"Larimer",2015,1647.0,508,2155.0,"felonybondtype",8069
+"Larimer",2016,2130.0,645,2775.0,"felonybondtype",8069
+"Las Animas",2014,706.0,123,829.0,"misdemeanorbondtype",8071
+"Las Animas",2015,698.0,86,784.0,"misdemeanorbondtype",8071
+"Las Animas",2016,781.0,65,846.0,"misdemeanorbondtype",8071
+"Las Animas",2014,105.0,62,167.0,"felonybondtype",8071
+"Las Animas",2015,137.0,62,199.0,"felonybondtype",8071
+"Las Animas",2016,112.0,43,155.0,"felonybondtype",8071
+"Lincoln",2014,238.0,8,246.0,"misdemeanorbondtype",8073
+"Lincoln",2015,354.0,5,359.0,"misdemeanorbondtype",8073
+"Lincoln",2016,389.0,8,397.0,"misdemeanorbondtype",8073
+"Lincoln",2014,63.0,3,66.0,"felonybondtype",8073
+"Lincoln",2015,80.0,NA,80.0,"felonybondtype",8073
+"Lincoln",2016,84.0,3,87.0,"felonybondtype",8073
+"Logan",2014,326.0,160,486.0,"misdemeanorbondtype",8075
+"Logan",2015,243.0,211,454.0,"misdemeanorbondtype",8075
+"Logan",2016,249.0,186,435.0,"misdemeanorbondtype",8075
+"Logan",2014,153.0,73,226.0,"felonybondtype",8075
+"Logan",2015,169.0,65,234.0,"felonybondtype",8075
+"Logan",2016,194.0,82,276.0,"felonybondtype",8075
+"Mesa",2014,1508.0,1312,2820.0,"misdemeanorbondtype",8077
+"Mesa",2015,1686.0,1317,3003.0,"misdemeanorbondtype",8077
+"Mesa",2016,1589.0,1402,2991.0,"misdemeanorbondtype",8077
+"Mesa",2014,785.0,721,1506.0,"felonybondtype",8077
+"Mesa",2015,755.0,817,1572.0,"felonybondtype",8077
+"Mesa",2016,957.0,1034,1991.0,"felonybondtype",8077
+"Mineral",2014,40.0,NA,40.0,"misdemeanorbondtype",8079
+"Mineral",2015,43.0,2,45.0,"misdemeanorbondtype",8079
+"Mineral",2016,36.0,2,38.0,"misdemeanorbondtype",8079
+"Mineral",2014,2.0,NA,2.0,"felonybondtype",8079
+"Mineral",2015,1.0,3,4.0,"felonybondtype",8079
+"Mineral",2016,1.0,NA,1.0,"felonybondtype",8079
+"Moffat",2014,246.0,95,341.0,"misdemeanorbondtype",8081
+"Moffat",2015,257.0,115,372.0,"misdemeanorbondtype",8081
+"Moffat",2016,246.0,157,403.0,"misdemeanorbondtype",8081
+"Moffat",2014,134.0,27,161.0,"felonybondtype",8081
+"Moffat",2015,164.0,67,231.0,"felonybondtype",8081
+"Moffat",2016,160.0,93,253.0,"felonybondtype",8081
+"Montezuma",2014,402.0,466,868.0,"misdemeanorbondtype",8083
+"Montezuma",2015,413.0,403,816.0,"misdemeanorbondtype",8083
+"Montezuma",2016,421.0,434,855.0,"misdemeanorbondtype",8083
+"Montezuma",2014,136.0,67,203.0,"felonybondtype",8083
+"Montezuma",2015,184.0,60,244.0,"felonybondtype",8083
+"Montezuma",2016,217.0,61,278.0,"felonybondtype",8083
+"Montrose",2014,700.0,155,855.0,"misdemeanorbondtype",8085
+"Montrose",2015,648.0,130,778.0,"misdemeanorbondtype",8085
+"Montrose",2016,607.0,181,788.0,"misdemeanorbondtype",8085
+"Montrose",2014,282.0,21,303.0,"felonybondtype",8085
+"Montrose",2015,276.0,21,297.0,"felonybondtype",8085
+"Montrose",2016,267.0,34,301.0,"felonybondtype",8085
+"Morgan",2014,755.0,201,956.0,"misdemeanorbondtype",8087
+"Morgan",2015,775.0,238,1013.0,"misdemeanorbondtype",8087
+"Morgan",2016,693.0,247,940.0,"misdemeanorbondtype",8087
+"Morgan",2014,182.0,53,235.0,"felonybondtype",8087
+"Morgan",2015,169.0,81,250.0,"felonybondtype",8087
+"Morgan",2016,207.0,90,297.0,"felonybondtype",8087
+"Otero",2014,479.0,157,636.0,"misdemeanorbondtype",8089
+"Otero",2015,376.0,228,604.0,"misdemeanorbondtype",8089
+"Otero",2016,210.0,305,515.0,"misdemeanorbondtype",8089
+"Otero",2014,139.0,65,204.0,"felonybondtype",8089
+"Otero",2015,171.0,53,224.0,"felonybondtype",8089
+"Otero",2016,153.0,65,218.0,"felonybondtype",8089
+"Ouray",2014,88.0,19,107.0,"misdemeanorbondtype",8091
+"Ouray",2015,79.0,14,93.0,"misdemeanorbondtype",8091
+"Ouray",2016,99.0,13,112.0,"misdemeanorbondtype",8091
+"Ouray",2014,14.0,2,16.0,"felonybondtype",8091
+"Ouray",2015,15.0,2,17.0,"felonybondtype",8091
+"Ouray",2016,22.0,2,24.0,"felonybondtype",8091
+"Park",2014,313.0,66,379.0,"misdemeanorbondtype",8093
+"Park",2015,292.0,84,376.0,"misdemeanorbondtype",8093
+"Park",2016,251.0,105,356.0,"misdemeanorbondtype",8093
+"Park",2014,53.0,13,66.0,"felonybondtype",8093
+"Park",2015,61.0,17,78.0,"felonybondtype",8093
+"Park",2016,56.0,11,67.0,"felonybondtype",8093
+"Phillips",2014,39.0,5,44.0,"misdemeanorbondtype",8095
+"Phillips",2015,41.0,22,63.0,"misdemeanorbondtype",8095
+"Phillips",2016,54.0,21,75.0,"misdemeanorbondtype",8095
+"Phillips",2014,12.0,NA,12.0,"felonybondtype",8095
+"Phillips",2015,18.0,2,20.0,"felonybondtype",8095
+"Phillips",2016,15.0,7,22.0,"felonybondtype",8095
+"Pitkin",2014,164.0,61,225.0,"misdemeanorbondtype",8097
+"Pitkin",2015,121.0,53,174.0,"misdemeanorbondtype",8097
+"Pitkin",2016,169.0,41,210.0,"misdemeanorbondtype",8097
+"Pitkin",2014,38.0,4,42.0,"felonybondtype",8097
+"Pitkin",2015,62.0,13,75.0,"felonybondtype",8097
+"Pitkin",2016,53.0,22,75.0,"felonybondtype",8097
+"Prowers",2014,629.0,68,697.0,"misdemeanorbondtype",8099
+"Prowers",2015,662.0,59,721.0,"misdemeanorbondtype",8099
+"Prowers",2016,625.0,34,659.0,"misdemeanorbondtype",8099
+"Prowers",2014,108.0,47,155.0,"felonybondtype",8099
+"Prowers",2015,157.0,48,205.0,"felonybondtype",8099
+"Prowers",2016,179.0,52,231.0,"felonybondtype",8099
+"Pueblo",2014,2513.0,835,3348.0,"misdemeanorbondtype",8101
+"Pueblo",2015,2077.0,1332,3409.0,"misdemeanorbondtype",8101
+"Pueblo",2016,1906.0,1576,3482.0,"misdemeanorbondtype",8101
+"Pueblo",2014,1364.0,481,1845.0,"felonybondtype",8101
+"Pueblo",2015,1388.0,787,2175.0,"felonybondtype",8101
+"Pueblo",2016,1607.0,657,2264.0,"felonybondtype",8101
+"Rio Blanco",2014,193.0,12,205.0,"misdemeanorbondtype",8103
+"Rio Blanco",2015,194.0,14,208.0,"misdemeanorbondtype",8103
+"Rio Blanco",2016,129.0,24,153.0,"misdemeanorbondtype",8103
+"Rio Blanco",2014,47.0,5,52.0,"felonybondtype",8103
+"Rio Blanco",2015,33.0,10,43.0,"felonybondtype",8103
+"Rio Blanco",2016,55.0,13,68.0,"felonybondtype",8103
+"Rio Grande",2014,231.0,97,328.0,"misdemeanorbondtype",8105
+"Rio Grande",2015,229.0,94,323.0,"misdemeanorbondtype",8105
+"Rio Grande",2016,202.0,87,289.0,"misdemeanorbondtype",8105
+"Rio Grande",2014,100.0,61,161.0,"felonybondtype",8105
+"Rio Grande",2015,73.0,63,136.0,"felonybondtype",8105
+"Rio Grande",2016,115.0,50,165.0,"felonybondtype",8105
+"Routt",2014,385.0,166,551.0,"misdemeanorbondtype",8107
+"Routt",2015,365.0,172,537.0,"misdemeanorbondtype",8107
+"Routt",2016,309.0,176,485.0,"misdemeanorbondtype",8107
+"Routt",2014,72.0,29,101.0,"felonybondtype",8107
+"Routt",2015,95.0,65,160.0,"felonybondtype",8107
+"Routt",2016,58.0,42,100.0,"felonybondtype",8107
+"Saguache",2014,84.0,38,122.0,"misdemeanorbondtype",8109
+"Saguache",2015,69.0,31,100.0,"misdemeanorbondtype",8109
+"Saguache",2016,88.0,30,118.0,"misdemeanorbondtype",8109
+"Saguache",2014,18.0,23,41.0,"felonybondtype",8109
+"Saguache",2015,19.0,19,38.0,"felonybondtype",8109
+"Saguache",2016,48.0,14,62.0,"felonybondtype",8109
+"San Juan",2014,11.0,2,13.0,"misdemeanorbondtype",8111
+"San Juan",2015,19.0,1,20.0,"misdemeanorbondtype",8111
+"San Juan",2016,19.0,4,23.0,"misdemeanorbondtype",8111
+"San Juan",2014,3.0,1,4.0,"felonybondtype",8111
+"San Juan",2015,NA,NA,NA,"felonybondtype",8111
+"San Juan",2016,8.0,5,13.0,"felonybondtype",8111
+"San Miguel",2014,134.0,33,167.0,"misdemeanorbondtype",8113
+"San Miguel",2015,143.0,30,173.0,"misdemeanorbondtype",8113
+"San Miguel",2016,209.0,25,234.0,"misdemeanorbondtype",8113
+"San Miguel",2014,28.0,7,35.0,"felonybondtype",8113
+"San Miguel",2015,48.0,6,54.0,"felonybondtype",8113
+"San Miguel",2016,46.0,12,58.0,"felonybondtype",8113
+"Sedgwick",2014,36.0,7,43.0,"misdemeanorbondtype",8115
+"Sedgwick",2015,56.0,15,71.0,"misdemeanorbondtype",8115
+"Sedgwick",2016,62.0,7,69.0,"misdemeanorbondtype",8115
+"Sedgwick",2014,8.0,2,10.0,"felonybondtype",8115
+"Sedgwick",2015,13.0,7,20.0,"felonybondtype",8115
+"Sedgwick",2016,21.0,9,30.0,"felonybondtype",8115
+"Summit",2014,862.0,63,925.0,"misdemeanorbondtype",8117
+"Summit",2015,938.0,110,1048.0,"misdemeanorbondtype",8117
+"Summit",2016,820.0,112,932.0,"misdemeanorbondtype",8117
+"Summit",2014,209.0,13,222.0,"felonybondtype",8117
+"Summit",2015,230.0,19,249.0,"felonybondtype",8117
+"Summit",2016,264.0,19,283.0,"felonybondtype",8117
+"Teller",2014,529.0,139,668.0,"misdemeanorbondtype",8119
+"Teller",2015,504.0,121,625.0,"misdemeanorbondtype",8119
+"Teller",2016,461.0,119,580.0,"misdemeanorbondtype",8119
+"Teller",2014,169.0,14,183.0,"felonybondtype",8119
+"Teller",2015,167.0,21,188.0,"felonybondtype",8119
+"Teller",2016,205.0,27,232.0,"felonybondtype",8119
+"Washington",2014,67.0,29,96.0,"misdemeanorbondtype",8121
+"Washington",2015,80.0,37,117.0,"misdemeanorbondtype",8121
+"Washington",2016,97.0,25,122.0,"misdemeanorbondtype",8121
+"Washington",2014,11.0,4,15.0,"felonybondtype",8121
+"Washington",2015,8.0,6,14.0,"felonybondtype",8121
+"Washington",2016,21.0,12,33.0,"felonybondtype",8121
+"Weld",2014,3329.0,1343,4672.0,"misdemeanorbondtype",8123
+"Weld",2015,3200.0,2156,5356.0,"misdemeanorbondtype",8123
+"Weld",2016,2677.0,2747,5424.0,"misdemeanorbondtype",8123
+"Weld",2014,1648.0,468,2116.0,"felonybondtype",8123
+"Weld",2015,1591.0,596,2187.0,"felonybondtype",8123
+"Weld",2016,1887.0,647,2534.0,"felonybondtype",8123
+"Yuma",2014,90.0,22,112.0,"misdemeanorbondtype",8125
+"Yuma",2015,121.0,30,151.0,"misdemeanorbondtype",8125
+"Yuma",2016,107.0,39,146.0,"misdemeanorbondtype",8125
+"Yuma",2014,32.0,3,35.0,"felonybondtype",8125
+"Yuma",2015,43.0,10,53.0,"felonybondtype",8125
+"Yuma",2016,47.0,14,61.0,"felonybondtype",8125
+"Denver",2014,3817.0,1271,5088.0,"felonybondtype",8031
+"Denver",2015,4036.0,1319,5355.0,"felonybondtype",8031
+"Denver",2016,4037.0,2572,6609.0,"felonybondtype",8031

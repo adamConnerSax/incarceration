@@ -22,6 +22,8 @@ module Frames.Aggregations
   , BinsWithRescale (..)
   , goodDataCount
   , goodDataByKey
+  , filterField
+  , filterMaybeField
   , aggregateToMap
   , aggregateGeneral
   , aggregateFiltered
@@ -50,6 +52,7 @@ import qualified Data.Vinyl           as V
 import qualified Data.Vinyl.Curry     as V
 import qualified Data.Vinyl.Functor   as V
 import qualified Data.Vinyl.TypeLevel as V
+import qualified Data.Vinyl.XRec as V
 import qualified Data.Vinyl.Class.Method as V
 import qualified Data.Vinyl.Core      as V
 import           Data.Vinyl.Lens      (type (∈))
@@ -76,8 +79,6 @@ type instance FI.VectorFor Bin2DT = V.Vector
 instance F.ShowCSV Bin2DT where
   showCSV = T.pack . show
 
-
-
 goodDataByKey :: forall ks rs. (ks F.⊆ rs, Ord (F.Record ks)) => Proxy ks ->  FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (M.Map (F.Record ks) (Int, Int))
 goodDataByKey _ =
   let getKey = F.recMaybe . F.rcast @ks
@@ -85,6 +86,17 @@ goodDataByKey _ =
 
 goodDataCount :: FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (Int, Int)
 goodDataCount = (,) <$> FL.length <*> FL.prefilter (isJust . F.recMaybe) FL.length
+
+filterMaybeField :: forall k rs. (F.ElemOf rs k, Eq (V.HKD F.ElField k), (V.IsoHKD F.ElField k))
+                 => Proxy k -> V.HKD F.ElField k -> F.Rec (Maybe :. F.ElField) rs -> Bool
+filterMaybeField _ kv =
+  let maybeTest t = maybe False t
+  in maybeTest (== kv) . V.toHKD . F.rget @k
+
+filterField :: forall k rs. (F.ElemOf rs k, Eq (V.HKD F.ElField k), (V.IsoHKD F.ElField k))
+                 => Proxy k -> V.HKD F.ElField k -> F.Record rs -> Bool
+filterField _ kv = (== kv) . V.toHKD . F.rget @k
+
 
 aggregateToMap :: Ord k => (a -> k) -> (b -> a -> b) -> b -> M.Map k b -> a -> M.Map k b
 aggregateToMap getKey combine initial m r =
