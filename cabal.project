@@ -2,4 +2,8 @@ packages: .
 jobs: 4
 with-compiler: /usr/local/bin/ghc
 
+source-repository-package
+    type: git
+    location: https://github.com/adamConnerSax/Frames
+    tag: fee36db0ddca9e837684a602dfa2b8dff64b8ee8
 
