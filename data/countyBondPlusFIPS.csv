@@ -1,4 +1,4 @@
-county,year,cash_surety_property_bond_frequency,personal_recognizance_bond_frequency,total_bond_frequency,bond_type,FIPS
+county,year,cash_surety_property_bond_frequency,personal_recognizance_bond_frequency,total_bond_frequency,bond_type,fips
 "Adams",2014,8022.0,156,8178.0,"misdemeanorbondtype",8001
 "Adams",2015,8018.0,308,8326.0,"misdemeanorbondtype",8001
 "Adams",2016,6789.0,1211,8000.0,"misdemeanorbondtype",8001

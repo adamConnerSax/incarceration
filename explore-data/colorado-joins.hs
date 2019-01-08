@@ -22,6 +22,7 @@ import           Frames.MaybeUtils       as FM
 import qualified Control.Foldl           as FL
 import           Control.Lens            ((^.))
 import           Control.Monad.IO.Class  (MonadIO, liftIO)
+import qualified Data.Foldable           as Foldable
 import qualified Data.List               as List
 import qualified Data.Map                as M
 import           Data.Maybe              (catMaybes, fromJust, fromMaybe,
@@ -52,30 +53,13 @@ import qualified Pipes.Prelude           as P
 
 type CO_AnalysisVERA_Cols = [Year, State, TotalPop, TotalJailAdm, TotalJailPop, TotalPrisonAdm, TotalPrisonPop]
 
-F.tableTypes' (F.rowGen fipsByCountyFP) { F.rowTypeName = "FIPSByCountyRenamed", F.columnNames = ["FIPS","County","State"]}
+F.tableTypes' (F.rowGen fipsByCountyFP) { F.rowTypeName = "FIPSByCountyRenamed", F.columnNames = ["fips","County","State"]}
 
 type instance FI.VectorFor (Maybe a) = V.Vector
 
-{-
---We should package the below up, along with some produceCSV and writeCSV functions
-instance (F.ShowCSV a) => F.ShowCSV (Maybe a) where
-  showCSV = fromMaybe "NA" . fmap F.showCSV
 
-type AddMaybe rs = V.MapTyCon Maybe rs
-
-type family RDeleteL ds rs where
-  RDeleteL '[] rs = rs
-  RDeleteL (d ': ds) rs = RDeleteL ds (F.RDelete d rs)
-
-unMaybeKeys :: forall ks rs as.(ks F.⊆ rs, as ~ RDeleteL ks rs, as F.⊆ rs, V.RPureConstrained V.KnownField as, V.RecApplicative as, V.RApply as, V.RMap as)
-  => Proxy rs -> Proxy ks -> F.Rec (Maybe F.:. F.ElField) rs -> F.Record (ks V.++ (AddMaybe as))
-unMaybeKeys _ _ mr =
-  let keys = fromJust $ F.recMaybe $ F.rcast @ks mr
-      remainder = V.rsequenceInFields $ F.rcast @as mr
- in keys `V.rappend` remainder
-
--- end of MaybeUtils
--}
+justsFromRec :: V.RMap fs => F.Record fs -> F.Rec (Maybe :. F.ElField) fs
+justsFromRec = V.rmap (V.Compose . Just)
 
 main :: IO ()
 main = do
@@ -93,15 +77,25 @@ main = do
       countyBondData = countyBondCO_Data P.>-> P.map (FM.unMaybeKeys (Proxy @[County,Year]))
   -- load streams into memory for joins
   countyBondFrame <- F.inCoreAoS countyBondData
-  fipsByCountyFrame <- F.inCoreAoS $ fipsByCountyData P.>-> P.map (F.rcast @[FIPS,County]) -- get rid of state col
+  fipsByCountyFrame <- F.inCoreAoS $ fipsByCountyData P.>-> P.map (F.rcast @[Fips,County]) -- get rid of state col
   povertyFrame <- F.inCoreAoS povertyData
-  let countyBondPlusFIPS = F.leftJoin @'[County] countyBondFrame fipsByCountyFrame
-      countyBondPlusFIPSFrame = F.toFrame $ fmap (FM.unMaybeKeys (Proxy @[FIPS, Year])) $ countyBondPlusFIPS
---      countyBondPlusFIPSAndSAIPE = F.leftJoin @'[FIPS, Year] countyBondPlusFIPSFrame povertyFrame
+--  let --countyBondPlusFIPS = F.leftJoinMaybe @'[County] countyBondFrame fipsByCountyFrame
+  --countyBondFrameM :: F.Frame (F.Rec (Maybe :. F.ElField) (F.RecordColumns CountyBondCO))
+  countyBondFrameM :: F.Frame (F.Rec (Maybe :. F.ElField) (F.RecordColumns CountyBondCO)) <- fmap F.boxedFrame $ F.runSafeEffect $ (P.toListM countyBondCO_Data)
+  let fipsByCountyM :: F.Frame (F.Rec (Maybe :. F.ElField) '[Fips,County])
+      fipsByCountyM = fmap justsFromRec fipsByCountyFrame
+--      countyBondPlusFIPS :: _
+      countyBondPlusFIPS = FM.leftJoinMaybe (Proxy @'[County]) countyBondFrameM fipsByCountyM
+--      countyBondPlusFIPSFrameM :: _
+      countyBondPlusFIPSFrameM = F.boxedFrame countyBondPlusFIPS
+      povertyFrameM :: F.Frame (V.Rec (Maybe :. F.ElField) (F.RecordColumns SAIPE)) = fmap justsFromRec povertyFrame
+--      countyBondPlusFIPSFrame = F.boxedFrame $ countyBondPlusFIPS --fmap (FM.unMaybeKeys (Proxy @[FIPS, Year])) $ countyBondPlusFIPS
+      countyBondPlusFIPSAndSAIPE = FM.leftJoinMaybe (Proxy @[Fips, Year]) countyBondPlusFIPSFrameM povertyFrameM
   --F.runSafeEffect $ FM.produceCSV_Maybe countyBondPlus P.>-> P.print -- P.map T.pack P.>-> F.consumeTextLines "data/countyBondPlusFIPS.csv"
-  putStrLn $ show countyBondPlusFIPS -- P.>-> P.print
+--  putStrLn $ show $ Foldable.toList countyBondFrameM -- P.>-> P.print
+--  putStrLn $ show $ Foldable.toList fipsByCountyM
   FM.writeCSV_Maybe "data/countyBondPlusFIPS.csv" countyBondPlusFIPS
---  FM.writeCSV_Maybe "data/countyBondPlusSAIPE.csv" countyBondPlusFIPSAndSAIPE
+  FM.writeCSV_Maybe "data/countyBondPlusSAIPE.csv" countyBondPlusFIPSAndSAIPE
 --  coloradoRowCheck <- F.runSafeEffect $ FL.purely P.fold (goodDataByKey  [F.pr1|Year|]) coloradoTrendsData
 --  putStrLn $ "(CO rows, CO rows with all fields) = " ++ show coloradoRowCheck
   return ()
