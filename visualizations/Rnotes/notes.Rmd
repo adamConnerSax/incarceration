@@ -49,10 +49,11 @@ A quick look at the joined data...
 coloradoData <- read_csv(here("../../data","countyBondPlus.csv"))
 coloradoDataToPlot <- transmute(coloradoData,
                               year=factor(year),
+                              population=total_pop,
                               cashBondPct = cash_surety_property_bond_frequency/total_bond_frequency,
                               povertyRate = povertyR/100,
                               urbanicity = urbanicity)
-ggplot(coloradoDataToPlot,mapping=aes(x=povertyRate,y=cashBondPct,color=year)) + geom_point() + facet_wrap(vars(urbanicity), ncol=2) + scale_y_continuous(labels=scales::percent) + scale_x_continuous(labels=scales::percent) + labs(title="Cash Bonds as % of All Bonds vs Poverty Rate",subtitle="One point per county") + xlab("Poverty Rate") + ylab("Cash bond as % of all bonds")
+ggplot(coloradoDataToPlot,mapping=aes(x=povertyRate,y=cashBondPct,color=year,size=population)) + geom_point() + facet_wrap(vars(urbanicity), ncol=2) + scale_y_continuous(labels=scales::percent) + scale_x_continuous(labels=scales::percent) + labs(title="Cash Bonds as % of All Bonds vs Poverty Rate",subtitle="One point per county") + xlab("Poverty Rate") + ylab("Cash bond as % of all bonds")
 ggsave("CashBondvsPoverty.pdf",width=8,height=11)
 ```
 

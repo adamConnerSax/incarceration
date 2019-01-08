@@ -30,6 +30,8 @@ library
                      , lens
                      , pipes
                      , profunctors
+                     , random-fu
+                     , random-source
                      , text
                      , vector
                      , vinyl

@@ -57,6 +57,14 @@ ggsave("incarcerationRateAndIncome2014.pdf",width=8,height=11)
 
     ## Warning: Removed 3 rows containing missing values (geom_point).
 
+A quick look at the joined data...
+
+    ## Warning: Removed 1 rows containing missing values (geom_point).
+
+![](notes_files/figure-markdown_github/CO%20data-1.png)
+
+    ## Warning: Removed 1 rows containing missing values (geom_point).
+
 From call
 =========
 
