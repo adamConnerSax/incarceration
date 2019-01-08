@@ -91,16 +91,4 @@ main = do
 --  putStrLn $ "(CO rows, CO rows with all fields) = " ++ show coloradoRowCheck
   return ()
 
-{-
-pFilterMaybe :: Monad m => (a -> Maybe b) -> P.Pipe a b m ()
-pFilterMaybe f =  P.map f P.>-> P.filter isJust P.>-> P.map fromJust
-
-
-maybeTest :: (a -> Bool) -> Maybe a -> Bool
-maybeTest t = maybe False t
-
-fipsFilter x = maybeTest (== x) . V.toHKD . F.rget @Fips -- use F.rgetField?
-stateFilter s = maybeTest (== s) . V.toHKD . F.rget @State
-yearFilter y = maybeTest (== y) . V.toHKD . F.rget @Year
--}
 
