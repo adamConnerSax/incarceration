@@ -28,6 +28,7 @@ library
                      , foldl
                      , Frames
                      , lens
+                     , mtl
                      , pipes
                      , profunctors
                      , random-fu

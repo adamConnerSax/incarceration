@@ -69,10 +69,11 @@ import qualified Pipes.Prelude        as P
 import           Control.Arrow (second)
 import           Data.Proxy (Proxy(..))
 import qualified Data.Vector as V
+import qualified Data.Vector.Unboxed as U
 import           GHC.TypeLits (KnownSymbol)
 import Data.Random.Source.PureMT as R
 import Data.Random as R
---import Control.Monad.State (StateT, evalState)
+import Control.Monad.State (evalState)
 
 goodDataByKey :: forall ks rs. (ks F.⊆ rs, Ord (F.Record ks)) => Proxy ks ->  FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (M.Map (F.Record ks) (Int, Int))
 goodDataByKey _ =
@@ -290,41 +291,39 @@ scatterMergeOne numBinsX numBinsY rtX rtY dataRows =
 -- initialize with random centers (Forgy) for now.
 
 
-forgyCentroids :: forall x y w f. Foldable f
+forgyCentroids :: forall x y w f. (F.AllConstrained (DataFieldOf [x,y,w]) '[x, y, w], Foldable f)
                => Int -- number of clusters
                -> R.PureMT
                -> f (F.Record '[x,y,w])
                -> [(Double, Double)] 
 forgyCentroids n randomSource dataRows =
-  let (xMin, xMax, yMin, yMax) = FL.fold ((,,,)
-                                           <$> PF.lmap (F.rgetField @x) FL.minimum
-                                           <*> PF.lmap (F.rgetField @x) FL.maximum
-                                           <*> PF.lmap (F.rgetField @y) FL.minimum
-                                           <*> PF.lmap (F.rgetField @y) FL.maximum) dataRows
+  let h = fromMaybe (0 :: Double) . fmap realToFrac   
+      (xMin, xMax, yMin, yMax) = FL.fold ((,,,)
+                                           <$> PF.dimap (F.rgetField @x) h FL.minimum
+                                           <*> PF.dimap (F.rgetField @x) h FL.maximum
+                                           <*> PF.dimap (F.rgetField @y) h FL.minimum
+                                           <*> PF.dimap (F.rgetField @y) h FL.maximum) dataRows
       uniformPair = do
-        ux <- R.uniform xMin xMax
+        ux <- R.uniform xMin xMax -- TODO: this is not a good way to deal with the Maybe here
         uy <- R.uniform yMin yMax
         return (ux,uy)
-      uniformPairList = mapM (const uniformPair) $ replicate n ()
-  in fst $ R.sampleState (R.sample uniformPairList) randomSource
+      uniformPairList :: R.RVar [(Double, Double)] = mapM (const uniformPair) $ replicate n ()
+  in fst $ R.sampleState uniformPairList randomSource
 
 {-
 kMeansOne :: forall x y w f. (Foldable f)
           => [(Double, Double)]  -- initial centroids
-          -> RescaleType (FType x) -- rescaling/normalizing for x-values
-          -> RescaleType (FType y) -- rescaling/normalizing for y-values
-          -> ((FType x, FType y) -> (FType x, FType y) -> Double) -- distance function 
+          -> ((FType x, FType y) -> (FType x, FType y) -> Double) -- distance function
+          -> Double
           -> f (Record '[x,y,w])
           -> [(Double, Double, FType w)]
-kMeansOne numClusters rtX rtY dist dataRows =
-  let (xMin, xMax, yMin, yMax) = FL.fold ((,,,)
-                                           <$> PF.lmap (F.rgetField @x) FL.min
-                                           <*> PF.lmap (F.rgetField @x) FL.max
-                                           <*> PF.lmap (F.rgetField @y) FL.min
-                                           <*> PF.lmap (F.rgetField @y) FL.max) dataRows
+kMeansOne initial distF epsilon dataRows =
+  -}
+
+weightedKMeans :: [V.Vector Double] -> (V.Vector Double -> V.Vector Double -> Double) -> 
       
 
--}
+
 
 -- All unused below but might be useful to have around.
 
