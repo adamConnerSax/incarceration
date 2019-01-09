@@ -1,0 +1,196 @@
+
+./Setup.hs,15
+main main1,2
+
+./explore-data/DataSources.hs,438
+module DataSourcesDataSources7,8
+type Row Row33,34
+type MaybeCols MaybeCols34,35
+type MaybeCols c c34,35
+type MaybeRow MaybeRow35,36
+type MaybeRow r r35,36
+type MaybeITrends MaybeITrends36,37
+data GenderT GenderT38,39
+data GenderT = Male Male38,39
+data GenderT = Male | Female Female38,39
+type instance instance39,40
+type instance FI.VectorFor FI.VectorFor39,40
+instance instance40,41
+proxyYear proxyYear49,50
+
+./explore-data/DataSourcePaths.hs,421
+module DataSourcePaths DataSourcePaths1,2
+veraDir veraDir4,5
+veraTrendsFP veraTrendsFP5,6
+d4dRepoDir d4dRepoDir8,9
+crimeStatsCO_FP crimeStatsCO_FP9,10
+countyBondCO_FP countyBondCO_FP10,11
+countyDistrictCrosswalkCO_FP countyDistrictCrosswalkCO_FP11,12
+externalDataDir externalDataDir14,15
+fipsByCountyFP fipsByCountyFP15,16
+censusSAIPE_FP censusSAIPE_FP16,17
+--countyBondCO_FP --countyBondCO_FP17,18
+
+./explore-data/explore-data.hs,1023
+module Main Main13,14
+rates rates41,42
+rates rates42,43
+ratesByStateAndYear ratesByStateAndYear45,46
+ratesByStateAndYear ratesByStateAndYear46,47
+ratesByUrbanicityAndYear ratesByUrbanicityAndYear51,52
+ratesByUrbanicityAndYear ratesByUrbanicityAndYear52,53
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols57,58
+--jailDataByStateAndYear --jailDataByStateAndYear59,60
+gRates gRates61,62
+gRates gRates62,63
+ratesByGenderAndYear ratesByGenderAndYear64,65
+ratesByGenderAndYear ratesByGenderAndYear65,66
+type TrendsPovRow TrendsPovRow80,81
+trendsRowForPovertyAnalysis trendsRowForPovertyAnalysis83,84
+trendsRowForPovertyAnalysis trendsRowForPovertyAnalysis84,85
+main main93,94
+main main94,95
+aggregationAnalyses aggregationAnalyses107,108
+aggregationAnalyses aggregationAnalyses108,109
+incomePovertyJoinData incomePovertyJoinData119,120
+maybeTest maybeTest139,140
+maybeTest maybeTest140,141
+fipsFilter fipsFilter142,143
+stateFilter stateFilter143,144
+yearFilter yearFilter144,145
+
+./explore-data/colorado-joins.hs,290
+module Main Main15,16
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols53,54
+F.tableTypes' F.tableTypes'55,56
+type instance instance57,58
+type instance FI.VectorFor FI.VectorFor57,58
+justsFromRec justsFromRec60,61
+justsFromRec justsFromRec61,62
+main main63,64
+main main64,65
+
+./colorado-joins.hs,24
+module Main Main13,14
+
+./src/Frames/Aggregations.hs,3906
+module Frames.AggregationsFrames.Aggregations18,19
+goodDataByKey goodDataByKey80,81
+goodDataByKey goodDataByKey81,82
+goodDataCount goodDataCount85,86
+goodDataCount goodDataCount86,87
+filterMaybeField filterMaybeField88,89
+filterMaybeField filterMaybeField90,91
+filterField filterField94,95
+filterField filterField96,97
+aggregateToMap aggregateToMap99,100
+aggregateToMap aggregateToMap100,101
+aggregateGeneral aggregateGeneral106,107
+aggregateGeneral aggregateGeneral107,108
+aggregateFiltered aggregateFiltered112,113
+aggregateFiltered aggregateFiltered113,114
+aggregateFs aggregateFs116,117
+aggregateFs aggregateFs123,124
+aggregateF aggregateF128,129
+aggregateF aggregateF135,136
+reshapeRowSimple reshapeRowSimple139,140
+reshapeRowSimple reshapeRowSimple145,146
+data RescaleType RescaleType150,151
+  RescaleNone RescaleNone151,152
+  RescaleMean RescaleMean152,153
+  RescaleMedian RescaleMedian153,154
+  RescaleNormalize RescaleNormalize154,155
+  RescaleGiven RescaleGiven155,156
+data BinsWithRescale BinsWithRescale158,159
+rescale rescale160,161
+rescale rescale161,162
+type FType FType175,176
+type FType x x175,176
+type Binnable Binnable177,178
+binField binField180,181
+binField binField181,182
+type KeyedRecord KeyedRecord201,202
+type KeyedRecord ks ks201,202
+type BinnableKeyedRecord BinnableKeyedRecord202,203
+type BinnableKeyedRecord rs rs202,203
+binFields binFields204,205
+binFields binFields206,207
+sortedListToBinLookup' sortedListToBinLookup'234,235
+sortedListToBinLookup' sortedListToBinLookup'235,236
+type X X237,238
+type Y Y238,239
+type UseCols UseCols240,241
+type DataField DataField241,242
+class (DataField x, x â rs) => DataFieldOf DataFieldOf244,245
+type ScatterMergeable ScatterMergeable247,248
+scatterMerge scatterMerge252,253
+scatterMerge scatterMerge262,263
+type ScatterMergeableData ScatterMergeableData268,269
+scatterMergeOne scatterMergeOne270,271
+scatterMergeOne scatterMergeOne272,273
+data Weighted Weighted295,296
+data Weighted a w = Weighted Weighted295,296
+data Weighted a w = Weighted { dimension dimension295,296
+data Weighted a w = Weighted { dimension :: Int, location location295,296
+data Weighted a w = Weighted { dimension :: Int, location :: a -> U.Vector Double, weight weight295,296
+newtype Cluster Cluster296,297
+newtype Cluster a = Cluster Cluster296,297
+newtype Cluster a = Cluster { members members296,297
+newtype Clusters Clusters297,298
+newtype Clusters a = Clusters Clusters297,298
+newtype Centroids Centroids298,299
+newtype Centroids = Centroids Centroids298,299
+newtype Centroids = Centroids { centers centers298,299
+type Distance Distance299,300
+emptyCluster emptyCluster301,302
+emptyCluster emptyCluster302,303
+forgyCentroids forgyCentroids306,307
+forgyCentroids forgyCentroids311,312
+weighted2DRecord weighted2DRecord325,326
+weighted2DRecord weighted2DRecord326,327
+centroid centroid329,330
+centroid centroid330,331
+euclidSq euclidSq339,340
+euclidSq euclidSq340,341
+type KMeansable KMeansable344,345
+kMeans kMeans351,352
+kMeans kMeans360,361
+kMeansOne kMeansOne369,370
+kMeansOne kMeansOne375,376
+weightedKMeans weightedKMeans382,383
+weightedKMeans weightedKMeans388,389
+data Bin2DT Bin2DT413,414
+data Bin2DT = Bin2D Bin2D413,414
+type instance instance417,418
+type instance FI.VectorFor FI.VectorFor417,418
+instance instance418,419
+type OutKeyCols OutKeyCols422,423
+type BinnedDblCols BinnedDblCols423,424
+type BinnedDblColsC BinnedDblColsC424,425
+type BinnedResultCols BinnedResultCols425,426
+type UseColsC UseColsC426,427
+type ScatterMergeable' ScatterMergeable'428,429
+scatterMerge' scatterMerge'439,440
+scatterMerge' scatterMerge'447,448
+type BinMap BinMap469,470
+buildScatterMerge buildScatterMerge470,471
+buildScatterMerge buildScatterMerge481,482
+
+./src/Frames/MaybeUtils.hs,589
+module Frames.MaybeUtils Frames.MaybeUtils12,13
+instance instance36,37
+type AddMaybe AddMaybe39,40
+type AddMaybe rs rs39,40
+unMaybeKeys unMaybeKeys41,42
+unMaybeKeys unMaybeKeys43,44
+joinMaybeOne joinMaybeOne48,49
+joinMaybeOne joinMaybeOne49,50
+class JoinMaybe JoinMaybe51,52
+class JoinMaybe JoinMaybe51,52
+  joinMaybe joinMaybe52,53
+leftJoinMaybe leftJoinMaybe61,62
+leftJoinMaybe leftJoinMaybe90,91
+produceCSV_Maybe produceCSV_Maybe106,107
+produceCSV_Maybe produceCSV_Maybe110,111
+writeCSV_Maybe writeCSV_Maybe113,114
+writeCSV_Maybe writeCSV_Maybe117,118

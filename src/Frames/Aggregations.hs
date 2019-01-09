@@ -33,6 +33,8 @@ module Frames.Aggregations
   , rescale
   , ScatterMergeable (..)
   , scatterMerge
+  , kMeans
+  , euclidSq
   , scatterMergeOne
   , scatterMerge'
   , buildScatterMerge
@@ -71,9 +73,10 @@ import           Data.Proxy (Proxy(..))
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as U
 import           GHC.TypeLits (KnownSymbol)
-import Data.Random.Source.PureMT as R
-import Data.Random as R
-import Control.Monad.State (evalState)
+import           Data.Random.Source.PureMT as R
+import           Data.Random as R
+import           Control.Monad.State (evalState)
+import           Data.Function (on)
 
 goodDataByKey :: forall ks rs. (ks F.⊆ rs, Ord (F.Record ks)) => Proxy ks ->  FL.Fold (F.Rec (Maybe F.:. F.ElField) rs) (M.Map (F.Record ks) (Int, Int))
 goodDataByKey _ =
@@ -290,12 +293,22 @@ scatterMergeOne numBinsX numBinsY rtX rtY dataRows =
 -- use the weights when computing the centroid location
 -- initialize with random centers (Forgy) for now.
 
+data Weighted a w = Weighted { dimension :: Int, location :: a -> U.Vector Double, weight :: a -> w } 
+newtype Cluster a = Cluster { members :: [a] } deriving (Eq, Show)
+newtype Clusters a = Clusters (V.Vector (Cluster a))  deriving (Show, Eq)
+newtype Centroids = Centroids { centers :: V.Vector (U.Vector Double) } deriving (Show)
+type Distance = U.Vector Double -> U.Vector Double -> Double
 
+emptyCluster :: Cluster a 
+emptyCluster = Cluster []
+
+-- compute some initial random locations
+-- TODO: use normal dist around mean and std-dev
 forgyCentroids :: forall x y w f. (F.AllConstrained (DataFieldOf [x,y,w]) '[x, y, w], Foldable f)
                => Int -- number of clusters
                -> R.PureMT
                -> f (F.Record '[x,y,w])
-               -> [(Double, Double)] 
+               -> ([(Double, Double)], R.PureMT) 
 forgyCentroids n randomSource dataRows =
   let h = fromMaybe (0 :: Double) . fmap realToFrac   
       (xMin, xMax, yMin, yMax) = FL.fold ((,,,)
@@ -308,22 +321,93 @@ forgyCentroids n randomSource dataRows =
         uy <- R.uniform yMin yMax
         return (ux,uy)
       uniformPairList :: R.RVar [(Double, Double)] = mapM (const uniformPair) $ replicate n ()
-  in fst $ R.sampleState uniformPairList randomSource
+  in R.sampleState uniformPairList randomSource
 
-{-
-kMeansOne :: forall x y w f. (Foldable f)
+weighted2DRecord :: forall x y w. (F.AllConstrained (DataFieldOf [x,y,w]) '[x, y, w]) => Weighted (F.Record '[x,y,w]) (FType w)
+weighted2DRecord = Weighted 2 (V.runcurryX (\x y _ -> U.fromList [realToFrac x, realToFrac y])) (F.rgetField @w)
+
+-- compute the centroid of the data.  Useful for the kMeans algo and computing the centroid of the final clusters
+centroid :: forall g w a. (Foldable g, Real w) => Weighted a w -> g a -> (U.Vector Double, w)
+centroid weighted as =
+  let addOne :: (U.Vector Double, w) -> a -> (U.Vector Double, w)
+      addOne (sumV, sumW) x =
+        let w = weight weighted $ x
+            v = location weighted $ x
+        in (U.zipWith (+) sumV (U.map (* (realToFrac w)) v), sumW + w)
+      finishOne (sumV, sumW) = U.map (/(realToFrac sumW)) sumV
+  in FL.fold ((,) <$> FL.Fold addOne (U.replicate (dimension weighted) 0, 0) finishOne <*> FL.premap (weight weighted) FL.sum) as
+
+euclidSq :: Distance
+euclidSq v1 v2 = U.sum $ U.zipWith diffsq v1 v2
+  where diffsq a b = (a-b)^(2::Int)
+
+-- this is the same as ScatterMergable so perhaps should be renamed to ?
+type KMeansable rs ks x y w = (ScatterMergeableData x y w, FI.RecVec (ks V.++ [x,y,w]),
+                               F.AllConstrained (DataFieldOf [x,y,w]) '[x, y, w], KeyedRecord ks rs,
+                               ks F.⊆ (ks V.++ [x,y,w]), (ks V.++ [x,y,w]) F.⊆ rs,
+                               F.ElemOf (ks V.++ [x,y,w]) x, F.ElemOf (ks V.++ [x,y,w]) y, F.ElemOf (ks V.++ [x,y,w]) w)
+-- TODOS:
+-- Add rescaling
+-- Thread random source through
+kMeans :: forall rs ks x y w. (KMeansable rs ks x y w)
+       => Proxy ks
+       -> Proxy '[x,y,w]
+       -> (Double -> FType x) -- when we put the averaged data back in the record with original types we need to convert back
+       -> (Double -> FType y)
+       -> Int 
+       -> Distance
+       -> PureMT
+       -> FL.Fold (F.Record rs) (F.FrameRec (UseCols ks x y w))
+kMeans proxy_ks _ toX toY numClusters  distance randomSource =
+  let combine l r = F.rcast @[x,y,w] r : l
+      toRecord :: (Double, Double, FType w) -> F.Record '[x,y,w]
+      toRecord (x', y', w) = toX x' &: toY y' &: w &: V.RNil
+      computeOne rows = kMeansOne initial weighted2DRecord distance rows where
+        initial = fst $ forgyCentroids numClusters randomSource rows
+  in aggregateFs proxy_ks (V.Identity . (F.rcast @(ks V.++ [x,y,w]))) combine [] (fmap toRecord . computeOne)
+
+
+kMeansOne :: forall x y w f. (Foldable f, F.AllConstrained (DataFieldOf [x,y,w]) '[x,y,w])
           => [(Double, Double)]  -- initial centroids
-          -> ((FType x, FType y) -> (FType x, FType y) -> Double) -- distance function
-          -> Double
-          -> f (Record '[x,y,w])
+          -> Weighted (F.Record '[x,y,w]) (FType w) 
+          -> Distance
+          -> f (F.Record '[x,y,w])
           -> [(Double, Double, FType w)]
-kMeansOne initial distF epsilon dataRows =
-  -}
-
-weightedKMeans :: [V.Vector Double] -> (V.Vector Double -> V.Vector Double -> Double) -> 
-      
-
-
+kMeansOne initial weighted distance dataRows =
+  let initialCentroids = Centroids $ V.fromList $ fmap (\(x,y) -> U.fromList [x,y]) initial
+      (Clusters clusters) = weightedKMeans initialCentroids weighted distance dataRows
+      fix :: (U.Vector Double, FType w) -> (Double, Double, FType w)
+      fix (v, wgt) = (v U.! 0, v U.! 1, wgt)
+  in V.toList $ fmap (fix . centroid weighted . members) clusters
+        
+weightedKMeans :: forall a w f. (Foldable f, Real w, Eq a)
+               => Centroids -- initial guesses at centers 
+               -> Weighted a w -- location/weight from data
+               -> Distance
+               -> f a
+               -> Clusters a 
+weightedKMeans initial weighted distF as = 
+  -- put them all in one cluster just to start.  Doesn't matter since we have initial centroids
+  let k = V.length (centers initial) -- number of clusters
+      d = U.length (V.head $ centers initial) -- number of dimensions
+      clusters0 = Clusters (V.fromList $ Cluster (Foldable.toList as) : (List.replicate (k - 1) emptyCluster))
+      nearest :: Centroids -> a -> Int
+      nearest cs a = V.minIndexBy (compare `on` distF (location weighted a)) (centers cs)
+      updateClusters :: Centroids -> Clusters a -> Clusters a
+      updateClusters centroids (Clusters oldCs) =
+        let doOne :: [(Int, a)] -> Cluster a -> [(Int, a)]
+            doOne soFar (Cluster as) = FL.fold (FL.Fold (\l x -> (nearest centroids x, x) : l) soFar id) as
+            repackage :: [(Int, a)] -> Clusters a
+            repackage = Clusters . V.unsafeAccum (\(Cluster l) x -> Cluster (x : l)) (V.replicate k emptyCluster)
+        in FL.fold (FL.Fold doOne [] repackage) oldCs
+      centroids :: Clusters a -> Centroids
+      centroids (Clusters cs) = Centroids $ fmap (fst. centroid weighted . members) cs
+      doStep cents clusters = let newClusters = updateClusters cents clusters in (newClusters, centroids newClusters) 
+      go oldClusters (newClusters, centroids) =
+        case (oldClusters == newClusters) of
+          True -> newClusters
+          False -> go newClusters (doStep centroids newClusters)
+  in go clusters0 (doStep initial clusters0)
 
 -- All unused below but might be useful to have around.
 

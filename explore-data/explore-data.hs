@@ -14,30 +14,30 @@
 module Main where
 
 import           DataSources
-import           Frames.Aggregations     as FA
+import           Frames.Aggregations       as FA
 
-import qualified Control.Foldl           as FL
-import           Control.Lens            ((^.))
-import           Control.Monad.IO.Class  (MonadIO, liftIO)
-import qualified Data.List               as List
-import qualified Data.Map                as M
-import           Data.Maybe              (catMaybes, fromMaybe, isJust)
-import           Data.Proxy              (Proxy (..))
-import           Data.Text               (Text)
-import qualified Data.Text               as T
-import qualified Data.Vector             as V
-import qualified Data.Vinyl              as V
-import qualified Data.Vinyl.Class.Method as V
-import           Data.Vinyl.Curry        (runcurryX)
-import           Data.Vinyl.XRec         as V
-import           Frames                  ((:.), (&:))
-import qualified Frames                  as F
-import qualified Frames.CSV              as F
-import qualified Frames.InCore           as FI
-import qualified Frames.ShowCSV          as F
-import qualified Pipes                   as P
-import qualified Pipes.Prelude           as P
-
+import qualified Control.Foldl             as FL
+import           Control.Lens              ((^.))
+import           Control.Monad.IO.Class    (MonadIO, liftIO)
+import qualified Data.List                 as List
+import qualified Data.Map                  as M
+import           Data.Maybe                (catMaybes, fromMaybe, isJust)
+import           Data.Proxy                (Proxy (..))
+import           Data.Random.Source.PureMT (pureMT)
+import           Data.Text                 (Text)
+import qualified Data.Text                 as T
+import qualified Data.Vector               as V
+import qualified Data.Vinyl                as V
+import qualified Data.Vinyl.Class.Method   as V
+import           Data.Vinyl.Curry          (runcurryX)
+import           Data.Vinyl.XRec           as V
+import           Frames                    ((:.), (&:))
+import qualified Frames                    as F
+import qualified Frames.CSV                as F
+import qualified Frames.InCore             as FI
+import qualified Frames.ShowCSV            as F
+import qualified Pipes                     as P
+import qualified Pipes.Prelude             as P
 
 rates :: F.Record [TotalPop15to64, IndexCrime, TotalPrisonAdm] -> F.Record [CrimeRate, ImprisonedPerCrimeRate]
 rates = runcurryX (\p ic pa -> (fromIntegral ic / fromIntegral p) &: (fromIntegral pa / fromIntegral ic) &: V.RNil)
@@ -95,15 +95,15 @@ main :: IO ()
 main = do
   let trendsData :: F.MonadSafe m => P.Producer MaybeITrends m ()
       trendsData = F.readTableMaybe veraTrendsFP -- some data is missing so we use the Maybe form
---  let povertyData = F.readTable censusSAIPE_FP
+  let povertyData = F.readTable censusSAIPE_FP
 --  let fipsByCountyData = F.readTable $ fipsByCountyFP config
 --  let crimeStatsCO_Data = F.readTable crimeStatsCO_FP
-  let coloradoTrends = trendsData P.>-> P.map (F.rcast @CO_AnalysisVERA_Cols) P.>-> P.filter (stateFilter "CO")
+--  let coloradoTrends = trendsData P.>-> P.map (F.rcast @CO_AnalysisVERA_Cols) P.>-> P.filter (stateFilter "CO")
 --      goodDataByYear = FL.Fold (aggregateToMap (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap $ FL.fold goodDataCount)
-  coloradoRowCheck <- F.runSafeEffect $ FL.purely P.fold (goodDataByKey  [F.pr1|Year|]) coloradoTrends
-  putStrLn $ "(CO rows, CO rows with all fields) = " ++ show coloradoRowCheck
-    --aggregationAnalyses trendsData
-  --incomePovertyJoinData trendsData povertyData
+--  coloradoRowCheck <- F.runSafeEffect $ FL.purely P.fold (goodDataByKey  [F.pr1|Year|]) coloradoTrends
+--  putStrLn $ "(CO rows, CO rows with all fields) = " ++ show coloradoRowCheck
+  --aggregationAnalyses trendsData
+  incomePovertyJoinData trendsData povertyData
 
 aggregationAnalyses :: P.Producer (F.Rec (Maybe :. F.ElField) (F.RecordColumns IncarcerationTrends)) (P.Effect (F.SafeT IO)) () -> IO ()
 aggregationAnalyses trendsData = do
@@ -123,14 +123,14 @@ incomePovertyJoinData trendsData povertyData = do
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
   let dataProxy = Proxy @[MedianHI, IncarcerationRate, TotalPop]
-      smIncarcerationRatevsIncome proxy_ks = scatterMerge proxy_ks dataProxy round id 10 10 RescaleMedian RescaleNone
-      (smYrFrame, smStateYrFrame, smUrbYrFrame) = FL.fold ((,,)
-                                                           <$> smIncarcerationRatevsIncome proxyYear
-                                                           <*> smIncarcerationRatevsIncome (Proxy @[State,Year])
-                                                           <*> smIncarcerationRatevsIncome (Proxy @[Urbanicity,Year])) trendsWithPovertyF
-  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByYear.csv" smYrFrame
-  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByStateAndYear.csv" smStateYrFrame
-  F.writeCSV "data/scatterMergeIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" smUrbYrFrame
+      kmIncarcerationRatevsIncome proxy_ks = kMeans proxy_ks dataProxy round id 10 euclidSq (pureMT 1)
+      (kmYrFrame, kmStateYrFrame, kmUrbYrFrame) = FL.fold ((,,)
+                                                           <$> kmIncarcerationRatevsIncome proxyYear
+                                                           <*> kmIncarcerationRatevsIncome (Proxy @[State,Year])
+                                                           <*> kmIncarcerationRatevsIncome (Proxy @[Urbanicity,Year])) trendsWithPovertyF
+  F.writeCSV "data/kMeansIncarcerationRate_vs_MedianHIByYear.csv" kmYrFrame
+  F.writeCSV "data/kMeansIncarcerationRate_vs_MedianHIByStateAndYear.csv" kmStateYrFrame
+  F.writeCSV "data/kMeansIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" kmUrbYrFrame
 
 {-
 pFilterMaybe :: Monad m => (a -> Maybe b) -> P.Pipe a b m ()

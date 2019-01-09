@@ -54,6 +54,7 @@ executable explore-data
                      , Frames-dsv
                      , lens
                      , pipes
+                     , random-source
                      , text
                      , vector
                      , vinyl >= 0.10.0
