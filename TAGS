@@ -73,7 +73,7 @@ main main64,65
 ./colorado-joins.hs,24
 module Main Main13,14
 
-./src/Frames/Aggregations.hs,3906
+./src/Frames/Aggregations.hs,3982
 module Frames.AggregationsFrames.Aggregations18,19
 goodDataByKey goodDataByKey80,81
 goodDataByKey goodDataByKey81,82
@@ -122,59 +122,61 @@ type Y Y238,239
 type UseCols UseCols240,241
 type DataField DataField241,242
 class (DataField x, x â rs) => DataFieldOf DataFieldOf244,245
-type ScatterMergeable ScatterMergeable247,248
-scatterMerge scatterMerge252,253
-scatterMerge scatterMerge262,263
-type ScatterMergeableData ScatterMergeableData268,269
-scatterMergeOne scatterMergeOne270,271
-scatterMergeOne scatterMergeOne272,273
-data Weighted Weighted295,296
-data Weighted a w = Weighted Weighted295,296
-data Weighted a w = Weighted { dimension dimension295,296
-data Weighted a w = Weighted { dimension :: Int, location location295,296
-data Weighted a w = Weighted { dimension :: Int, location :: a -> U.Vector Double, weight weight295,296
-newtype Cluster Cluster296,297
-newtype Cluster a = Cluster Cluster296,297
-newtype Cluster a = Cluster { members members296,297
-newtype Clusters Clusters297,298
-newtype Clusters a = Clusters Clusters297,298
-newtype Centroids Centroids298,299
-newtype Centroids = Centroids Centroids298,299
-newtype Centroids = Centroids { centers centers298,299
-type Distance Distance299,300
-emptyCluster emptyCluster301,302
-emptyCluster emptyCluster302,303
-forgyCentroids forgyCentroids306,307
-forgyCentroids forgyCentroids311,312
-weighted2DRecord weighted2DRecord325,326
-weighted2DRecord weighted2DRecord326,327
-centroid centroid329,330
-centroid centroid330,331
-euclidSq euclidSq339,340
-euclidSq euclidSq340,341
-type KMeansable KMeansable344,345
-kMeans kMeans351,352
-kMeans kMeans360,361
-kMeansOne kMeansOne369,370
-kMeansOne kMeansOne375,376
-weightedKMeans weightedKMeans382,383
-weightedKMeans weightedKMeans388,389
-data Bin2DT Bin2DT413,414
-data Bin2DT = Bin2D Bin2D413,414
-type instance instance417,418
-type instance FI.VectorFor FI.VectorFor417,418
-instance instance418,419
-type OutKeyCols OutKeyCols422,423
-type BinnedDblCols BinnedDblCols423,424
-type BinnedDblColsC BinnedDblColsC424,425
-type BinnedResultCols BinnedResultCols425,426
-type UseColsC UseColsC426,427
-type ScatterMergeable' ScatterMergeable'428,429
-scatterMerge' scatterMerge'439,440
-scatterMerge' scatterMerge'447,448
-type BinMap BinMap469,470
-buildScatterMerge buildScatterMerge470,471
-buildScatterMerge buildScatterMerge481,482
+transformEach transformEach248,249
+transformEach transformEach253,254
+type TwoDTransformable TwoDTransformable258,259
+scatterMerge scatterMerge265,266
+scatterMerge scatterMerge275,276
+type ScatterMergeableData ScatterMergeableData281,282
+scatterMergeOne scatterMergeOne283,284
+scatterMergeOne scatterMergeOne285,286
+data Weighted Weighted308,309
+data Weighted a w = Weighted Weighted308,309
+data Weighted a w = Weighted { dimension dimension308,309
+data Weighted a w = Weighted { dimension :: Int, location location308,309
+data Weighted a w = Weighted { dimension :: Int, location :: a -> U.Vector Double, weight weight308,309
+newtype Cluster Cluster309,310
+newtype Cluster a = Cluster Cluster309,310
+newtype Cluster a = Cluster { members members309,310
+newtype Clusters Clusters310,311
+newtype Clusters a = Clusters Clusters310,311
+newtype Centroids Centroids311,312
+newtype Centroids = Centroids Centroids311,312
+newtype Centroids = Centroids { centers centers311,312
+type Distance Distance312,313
+emptyCluster emptyCluster314,315
+emptyCluster emptyCluster315,316
+forgyCentroids forgyCentroids319,320
+forgyCentroids forgyCentroids324,325
+weighted2DRecord weighted2DRecord338,339
+weighted2DRecord weighted2DRecord339,340
+centroid centroid342,343
+centroid centroid343,344
+euclidSq euclidSq352,353
+euclidSq euclidSq353,354
+type KMeansable KMeansable357,358
+kMeans kMeans364,365
+kMeans kMeans373,374
+kMeansOne kMeansOne382,383
+kMeansOne kMeansOne388,389
+weightedKMeans weightedKMeans395,396
+weightedKMeans weightedKMeans401,402
+data Bin2DT Bin2DT426,427
+data Bin2DT = Bin2D Bin2D426,427
+type instance instance430,431
+type instance FI.VectorFor FI.VectorFor430,431
+instance instance431,432
+type OutKeyCols OutKeyCols435,436
+type BinnedDblCols BinnedDblCols436,437
+type BinnedDblColsC BinnedDblColsC437,438
+type BinnedResultCols BinnedResultCols438,439
+type UseColsC UseColsC439,440
+type ScatterMergeable' ScatterMergeable'441,442
+scatterMerge' scatterMerge'452,453
+scatterMerge' scatterMerge'460,461
+type BinMap BinMap482,483
+buildScatterMerge buildScatterMerge483,484
+buildScatterMerge buildScatterMerge494,495
 
 ./src/Frames/MaybeUtils.hs,589
 module Frames.MaybeUtils Frames.MaybeUtils12,13

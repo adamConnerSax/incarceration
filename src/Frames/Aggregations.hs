@@ -31,7 +31,7 @@ module Frames.Aggregations
   , Binnable (..)
   , binField
   , rescale
-  , ScatterMergeable (..)
+  , TwoDTransformable (..)
   , scatterMerge
   , kMeans
   , euclidSq
@@ -245,12 +245,25 @@ type DataField x = (V.KnownField x, Real (FType x))
 class (DataField x, x ∈ rs) => DataFieldOf rs x
 instance (DataField x, x ∈ rs) => DataFieldOf rs x
 
-type ScatterMergeable rs ks x y w = (ScatterMergeableData x y w, FI.RecVec (ks V.++ [x,y,w]),
+
+transformEach :: forall rs ks x y w. (TwoDTransformable rs ks x y w)
+              => Proxy ks
+              -> Proxy [x,y,w]
+              -> ([F.Record '[x,y,w]] -> [F.Record '[x,y,w]])
+              -> FL.Fold (F.Record rs) (F.FrameRec (UseCols ks x y w))
+transformEach proxy_ks _ doOne =
+  let combine l r = F.rcast @[x,y,w] r : l
+  in aggregateFs proxy_ks (V.Identity . (F.rcast @(ks V.++ [x,y,w]))) combine [] doOne
+                   
+
+type TwoDTransformable rs ks x y w = (ScatterMergeableData x y w, FI.RecVec (ks V.++ [x,y,w]),
                                      F.AllConstrained (DataFieldOf [x,y,w]) '[x, y, w], KeyedRecord ks rs,
                                      ks F.⊆ (ks V.++ [x,y,w]), (ks V.++ [x,y,w]) F.⊆ rs,
                                      F.ElemOf (ks V.++ [x,y,w]) x, F.ElemOf (ks V.++ [x,y,w]) y, F.ElemOf (ks V.++ [x,y,w]) w)
-         
-scatterMerge :: forall rs ks x y w. ScatterMergeable rs ks x y w
+
+
+                                  
+scatterMerge :: forall rs ks x y w. TwoDTransformable rs ks x y w
               => Proxy ks
               -> Proxy '[x,y,w]
               -> (Double -> FType x) -- when we put the averaged data back in the record with original types we need to convert back
