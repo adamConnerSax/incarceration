@@ -53,7 +53,9 @@ executable explore-data
                      , Frames
                      , Frames-dsv
                      , lens
+                     , mtl
                      , pipes
+                     , random-fu
                      , random-source
                      , text
                      , vector

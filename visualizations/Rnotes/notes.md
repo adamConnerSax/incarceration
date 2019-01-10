@@ -12,19 +12,26 @@ Combo with poverty/income data
 
 ``` r
 trendsWithIncome_KM <- read_csv(here("../../data/", "kMeansIncarcerationRate_vs_MedianHIByYear.csv"))
-ggplot(trendsWithIncome_KM,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + geom_point() + facet_wrap(~year,ncol=3) + scale_y_continuous(limits=c(NA,0.012), labels = scales::percent) + labs(title="Incarceration Rate vs. Median Income (entire US)") + xlab("Median Household Income (scaled to median=100)")
+ggplot(trendsWithIncome_KM,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + geom_point() + facet_wrap(~year,ncol=3) + labs(title="Incarceration Rate vs. Median Income (entire US)") + xlab("Median Household Income (scaled to median=100)")
 ```
+
+    ## Warning: Removed 76 rows containing missing values (geom_point).
 
 ![](notes_files/figure-markdown_github/income%20scatter-1.png)
 
 ``` r
 ggsave("incarcerationRateAndIncome.pdf",width=8,height=11)
-trendsWithIncomeByState_KM <- read_csv(here("../../data/", "kMeansIncarcerationRate_vs_MedianHIByStateAndYear.csv"))
-colorado <- filter(trendsWithIncomeByState_KM,state=="CO")
-ggplot(colorado,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + geom_point() + facet_wrap(~year,ncol=3) + scale_y_continuous(limits=c(NA,0.012), labels = scales::percent) + labs(title = "Incarceration Rate vs. Median Income (Colorado)") +xlab("Median Household Income (scaled to median=100)")
 ```
 
-    ## Warning: Removed 32 rows containing missing values (geom_point).
+    ## Warning: Removed 76 rows containing missing values (geom_point).
+
+``` r
+trendsWithIncomeByState_KM <- read_csv(here("../../data/", "kMeansIncarcerationRate_vs_MedianHIByStateAndYear.csv"))
+colorado <- filter(trendsWithIncomeByState_KM,state=="CO")
+ggplot(colorado,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + geom_point() + facet_wrap(~year,ncol=3)  + labs(title = "Incarceration Rate vs. Median Income (Colorado)") +xlab("Median Household Income (scaled to median=100)")
+```
+
+    ## Warning: Removed 117 rows containing missing values (geom_point).
 
 ![](notes_files/figure-markdown_github/income%20scatter-2.png)
 
@@ -32,19 +39,23 @@ ggplot(colorado,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + g
 ggsave("incarcerationRateAndIncomeCO.pdf",width=8,height=11)
 ```
 
-    ## Warning: Removed 32 rows containing missing values (geom_point).
+    ## Warning: Removed 117 rows containing missing values (geom_point).
 
 ``` r
 trendsWithIncomeByUrbanicity_KM <- read_csv(here("../../data/", "kMeansIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv"))  %>% mutate (urbanicity = factor(urbanicity))
 data2014 <- filter(trendsWithIncomeByUrbanicity_KM,year=="2014") 
-ggplot(data2014,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + geom_point() + facet_wrap(vars(urbanicity),ncol=2) + scale_y_continuous(limits=c(NA,0.012), labels = scales::percent) + labs(title = "Incarceration Rate vs. Median Income (2014)") + xlab("Median Household Income (scaled to median=100)")
+ggplot(data2014,mapping=aes(x=medianHI,y=IncarcerationRate,color=total_pop)) + geom_point() + facet_wrap(vars(urbanicity),ncol=2) + labs(title = "Incarceration Rate vs. Median Income (2014)") + xlab("Median Household Income (scaled to median=100)")
 ```
+
+    ## Warning: Removed 8 rows containing missing values (geom_point).
 
 ![](notes_files/figure-markdown_github/income%20scatter-3.png)
 
 ``` r
 ggsave("incarcerationRateAndIncome2014.pdf",width=8,height=11)
 ```
+
+    ## Warning: Removed 8 rows containing missing values (geom_point).
 
 A quick look at the joined data...
 

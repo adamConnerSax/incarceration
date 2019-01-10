@@ -19,10 +19,13 @@ import           Frames.Aggregations       as FA
 import qualified Control.Foldl             as FL
 import           Control.Lens              ((^.))
 import           Control.Monad.IO.Class    (MonadIO, liftIO)
+import           Control.Monad.State       (evalStateT)
+import           Data.Functor.Identity     (runIdentity)
 import qualified Data.List                 as List
 import qualified Data.Map                  as M
 import           Data.Maybe                (catMaybes, fromMaybe, isJust)
 import           Data.Proxy                (Proxy (..))
+import           Data.Random               as R
 import           Data.Random.Source.PureMT (pureMT)
 import           Data.Text                 (Text)
 import qualified Data.Text                 as T
@@ -123,11 +126,13 @@ incomePovertyJoinData trendsData povertyData = do
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
   let dataProxy = Proxy @[MedianHI, IncarcerationRate, TotalPop]
-      kmIncarcerationRatevsIncome proxy_ks = kMeans proxy_ks dataProxy round id 10 euclidSq (pureMT 1)
-      (kmYrFrame, kmStateYrFrame, kmUrbYrFrame) = FL.fold ((,,)
-                                                           <$> kmIncarcerationRatevsIncome proxyYear
-                                                           <*> kmIncarcerationRatevsIncome (Proxy @[State,Year])
-                                                           <*> kmIncarcerationRatevsIncome (Proxy @[Urbanicity,Year])) trendsWithPovertyF
+      kmIncarcerationRatevsIncome proxy_ks = kMeans proxy_ks dataProxy round id (RescaleMedian 100) (RescaleGiven (0,0.01)) 10 forgyCentroids euclidSq
+      (kmYrFrame, kmStateYrFrame, kmUrbYrFrame) =
+        runIdentity $ flip evalStateT (pureMT 1) $ FL.foldM ((,,)
+                                                             <$> kmIncarcerationRatevsIncome proxyYear
+                                                             <*> kmIncarcerationRatevsIncome (Proxy @[State,Year])
+                                                             <*> kmIncarcerationRatevsIncome (Proxy @[Urbanicity,Year])) trendsWithPovertyF
+
   F.writeCSV "data/kMeansIncarcerationRate_vs_MedianHIByYear.csv" kmYrFrame
   F.writeCSV "data/kMeansIncarcerationRate_vs_MedianHIByStateAndYear.csv" kmStateYrFrame
   F.writeCSV "data/kMeansIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv" kmUrbYrFrame

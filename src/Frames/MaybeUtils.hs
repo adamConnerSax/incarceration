@@ -17,7 +17,7 @@ import qualified Frames                  as F
 import qualified Frames.CSV              as F
 import qualified Frames.ShowCSV          as F
 import qualified Frames.Melt as F
-import Control.Monad (join)
+import           Control.Monad (join)
 import qualified Pipes                   as P
 import qualified Data.Vinyl              as V
 import qualified Data.Vinyl.Derived      as V
@@ -25,13 +25,13 @@ import qualified Data.Vinyl.TypeLevel      as V
 import qualified Data.Vinyl.Class.Method as V
 import qualified Data.Vinyl.Core         as V
 import qualified Data.Vinyl.XRec         as V
-import Frames.InCore (RecVec)
+import           Frames.InCore (RecVec)
 import           Data.Vinyl.Curry        (runcurryX)
 import qualified Data.Vinyl.Functor      as V
 import           Data.Proxy              (Proxy (..))
-import Data.Maybe (fromMaybe, fromJust)
-import Data.Discrimination (Grouping)
-import GHC.TypeLits (KnownSymbol)
+import           Data.Maybe (fromMaybe, fromJust)
+import           Data.Discrimination (Grouping)
+import           GHC.TypeLits (KnownSymbol)
 
 -- TBD: This should be an argument to produceCSV_Maybe and writeCSV_Maybe.
 instance F.ShowCSV a => F.ShowCSV (Maybe a) where
