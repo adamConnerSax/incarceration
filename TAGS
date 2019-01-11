@@ -18,18 +18,18 @@ type instance FI.VectorFor FI.VectorFor39,40
 instance instance40,41
 proxyYear proxyYear49,50
 
-./explore-data/DataSourcePaths.hs,421
+./explore-data/DataSourcePaths.hs,420
 module DataSourcePaths DataSourcePaths1,2
 veraDir veraDir4,5
-veraTrendsFP veraTrendsFP5,6
-d4dRepoDir d4dRepoDir8,9
-crimeStatsCO_FP crimeStatsCO_FP9,10
-countyBondCO_FP countyBondCO_FP10,11
-countyDistrictCrosswalkCO_FP countyDistrictCrosswalkCO_FP11,12
-externalDataDir externalDataDir14,15
-fipsByCountyFP fipsByCountyFP15,16
-censusSAIPE_FP censusSAIPE_FP16,17
---countyBondCO_FP --countyBondCO_FP17,18
+externalDataDir externalDataDir5,6
+d4dRepoDir d4dRepoDir6,7
+veraTrendsFP veraTrendsFP8,9
+crimeStatsCO_FP crimeStatsCO_FP11,12
+--countyBondCO_FP --countyBondCO_FP12,13
+countyDistrictCrosswalkCO_FP countyDistrictCrosswalkCO_FP14,15
+countyBondCO_FP countyBondCO_FP17,18
+fipsByCountyFP fipsByCountyFP18,19
+censusSAIPE_FP censusSAIPE_FP19,20
 
 ./explore-data/explore-data.hs,1023
 module Main Main13,14
@@ -59,16 +59,17 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-joins.hs,290
+./explore-data/colorado-joins.hs,320
 module Main Main15,16
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols53,54
-F.tableTypes' F.tableTypes'55,56
-type instance instance57,58
-type instance FI.VectorFor FI.VectorFor57,58
-justsFromRec justsFromRec60,61
-justsFromRec justsFromRec61,62
-main main63,64
-main main64,65
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols55,56
+F.tableTypes' F.tableTypes'57,58
+type instance instance59,60
+type instance FI.VectorFor FI.VectorFor59,60
+justsFromRec justsFromRec62,63
+justsFromRec justsFromRec63,64
+type MoneyPct MoneyPct65,66
+main main67,68
+main main68,69
 
 ./colorado-joins.hs,24
 module Main Main13,14
@@ -113,10 +114,10 @@ wgt wgt208,209
 wgt wgt209,210
 weightedRescale weightedRescale211,212
 weightedRescale weightedRescale212,213
-data ScaleAndUnscale ScaleAndUnscale236,237
-data ScaleAndUnscale a = ScaleAndUnscale ScaleAndUnscale236,237
-data ScaleAndUnscale a = ScaleAndUnscale { from from236,237
-data ScaleAndUnscale a = ScaleAndUnscale { from :: (a -> Double), backTo backTo236,237
+data ScaleAndUnscale ScaleAndUnscale237,238
+data ScaleAndUnscale a = ScaleAndUnscale ScaleAndUnscale237,238
+data ScaleAndUnscale a = ScaleAndUnscale { from from237,238
+data ScaleAndUnscale a = ScaleAndUnscale { from :: (a -> Double), backTo backTo237,238
 scaleAndUnscaleHelper scaleAndUnscaleHelper239,240
 scaleAndUnscaleHelper scaleAndUnscaleHelper240,241
 scaleAndUnscale scaleAndUnscale245,246

@@ -57,6 +57,11 @@ ggplot(coloradoDataToPlot,mapping=aes(x=povertyRate,y=cashBondPct,color=year,siz
 ggsave("CashBondvsPoverty.pdf",width=8,height=11)
 ```
 
+```{r CO data kmeans, echo=FALSE}
+kmByYearAndUrbanicity = read_csv(here"../../data/","countyBondPlusSAIPE.csv")
+ggplot(kmByYearAndUrbanicity,mapping=aes(x=povertyR,y=moneyPct,size=total_pop,color=factor(year))) + geom_point() + facet_wrap(vars(urbanicity),ncol=2)
+```
+
 
 # From call
 Bail reform, CO

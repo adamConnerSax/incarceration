@@ -217,8 +217,10 @@ weightedRescale (RescaleMean s) =
       f (wm, tw) = (0, wm/(s * realToFrac tw))
   in f <$> folds 
 weightedRescale (RescaleNormalize s) =
-  let folds = (,,) <$> PF.lmap wgt FL.mean <*> PF.lmap wgt FL.std <*> PF.lmap snd FL.sum
-      f (wm, ws, tw) = (realToFrac (wm/realToFrac tw), ws/realToFrac tw)
+  let folds = (,,,) <$> PF.lmap wgt FL.mean <*> PF.lmap wgt FL.std <*> PF.lmap snd FL.sum <*> FL.length
+      weightedMean x n tw = realToFrac x/realToFrac tw
+      weightedSD s n tw = sqrt (realToFrac n) * s/realToFrac tw
+      f (wm, ws, tw, n) = (weightedMean wm n tw, weightedSD ws n tw)
   in f <$> folds
 weightedRescale (RescaleMedian s) = (,) <$> pure 0 <*> (fmap ((/s) . realToFrac . listToMedian) FL.list) where
   listToMedian :: [(a,w)] -> a
@@ -233,9 +235,7 @@ weightedRescale (RescaleMedian s) = (,) <$> pure 0 <*> (fmap ((/s) . realToFrac 
         go _ [] = 0 -- this shouldn't happen
         go wgtSoFar ((a,w) : was) = let wgtSoFar' = wgtSoFar + w in if realToFrac wgtSoFar' > mw then a else go wgtSoFar' was
         
-
 data ScaleAndUnscale a = ScaleAndUnscale { from :: (a -> Double), backTo :: (Double -> a) }
-
 
 scaleAndUnscaleHelper :: Real a => (Double -> a) -> ((a, Double), (a,Double)) -> ScaleAndUnscale a
 scaleAndUnscaleHelper toA s = ScaleAndUnscale (csF s) (osF s) where

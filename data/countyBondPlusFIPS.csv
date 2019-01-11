@@ -1,382 +1,382 @@
-county,year,cash_surety_property_bond_frequency,personal_recognizance_bond_frequency,total_bond_frequency,bond_type,fips
-"Adams",2014,8022.0,156,8178.0,"misdemeanorbondtype",8001
-"Adams",2015,8018.0,308,8326.0,"misdemeanorbondtype",8001
-"Adams",2016,6789.0,1211,8000.0,"misdemeanorbondtype",8001
-"Adams",2014,3166.0,215,3381.0,"felonybondtype",8001
-"Adams",2015,3305.0,354,3659.0,"felonybondtype",8001
-"Adams",2016,3307.0,713,4020.0,"felonybondtype",8001
-"Alamosa",2014,317.0,112,429.0,"misdemeanorbondtype",8003
-"Alamosa",2015,367.0,122,489.0,"misdemeanorbondtype",8003
-"Alamosa",2016,328.0,184,512.0,"misdemeanorbondtype",8003
-"Alamosa",2014,212.0,84,296.0,"felonybondtype",8003
-"Alamosa",2015,260.0,86,346.0,"felonybondtype",8003
-"Alamosa",2016,341.0,215,556.0,"felonybondtype",8003
-"Arapahoe",2014,4405.0,3151,7556.0,"misdemeanorbondtype",8005
-"Arapahoe",2015,3703.0,3890,7593.0,"misdemeanorbondtype",8005
-"Arapahoe",2016,4693.0,2393,7086.0,"misdemeanorbondtype",8005
-"Arapahoe",2014,2631.0,364,2995.0,"felonybondtype",8005
-"Arapahoe",2015,2482.0,668,3150.0,"felonybondtype",8005
-"Arapahoe",2016,2709.0,503,3212.0,"felonybondtype",8005
-"Archuleta",2014,212.0,118,330.0,"misdemeanorbondtype",8007
-"Archuleta",2015,156.0,97,253.0,"misdemeanorbondtype",8007
-"Archuleta",2016,194.0,126,320.0,"misdemeanorbondtype",8007
-"Archuleta",2014,46.0,41,87.0,"felonybondtype",8007
-"Archuleta",2015,46.0,36,82.0,"felonybondtype",8007
-"Archuleta",2016,49.0,46,95.0,"felonybondtype",8007
-"Baca",2014,103.0,10,113.0,"misdemeanorbondtype",8009
-"Baca",2015,106.0,7,113.0,"misdemeanorbondtype",8009
-"Baca",2016,105.0,7,112.0,"misdemeanorbondtype",8009
-"Baca",2014,27.0,3,30.0,"felonybondtype",8009
-"Baca",2015,18.0,11,29.0,"felonybondtype",8009
-"Baca",2016,26.0,6,32.0,"felonybondtype",8009
-"Bent",2014,184.0,53,237.0,"misdemeanorbondtype",8011
-"Bent",2015,109.0,52,161.0,"misdemeanorbondtype",8011
-"Bent",2016,116.0,65,181.0,"misdemeanorbondtype",8011
-"Bent",2014,35.0,14,49.0,"felonybondtype",8011
-"Bent",2015,30.0,18,48.0,"felonybondtype",8011
-"Bent",2016,53.0,13,66.0,"felonybondtype",8011
-"Boulder",2014,2444.0,545,2989.0,"misdemeanorbondtype",8013
-"Boulder",2015,2346.0,637,2983.0,"misdemeanorbondtype",8013
-"Boulder",2016,2275.0,860,3135.0,"misdemeanorbondtype",8013
-"Boulder",2014,1548.0,215,1763.0,"felonybondtype",8013
-"Boulder",2015,1630.0,294,1924.0,"felonybondtype",8013
-"Boulder",2016,1662.0,536,2198.0,"felonybondtype",8013
-"Broomfield",2014,1213.0,86,1299.0,"misdemeanorbondtype",8014
-"Broomfield",2015,1082.0,76,1158.0,"misdemeanorbondtype",8014
-"Broomfield",2016,826.0,262,1088.0,"misdemeanorbondtype",8014
-"Broomfield",2014,285.0,11,296.0,"felonybondtype",8014
-"Broomfield",2015,275.0,17,292.0,"felonybondtype",8014
-"Broomfield",2016,265.0,68,333.0,"felonybondtype",8014
-"Chaffee",2014,299.0,103,402.0,"misdemeanorbondtype",8015
-"Chaffee",2015,290.0,153,443.0,"misdemeanorbondtype",8015
-"Chaffee",2016,271.0,184,455.0,"misdemeanorbondtype",8015
-"Chaffee",2014,103.0,23,126.0,"felonybondtype",8015
-"Chaffee",2015,122.0,36,158.0,"felonybondtype",8015
-"Chaffee",2016,129.0,54,183.0,"felonybondtype",8015
-"Cheyenne",2014,41.0,6,47.0,"misdemeanorbondtype",8017
-"Cheyenne",2015,44.0,1,45.0,"misdemeanorbondtype",8017
-"Cheyenne",2016,71.0,8,79.0,"misdemeanorbondtype",8017
-"Cheyenne",2014,10.0,3,13.0,"felonybondtype",8017
-"Cheyenne",2015,7.0,1,8.0,"felonybondtype",8017
-"Cheyenne",2016,11.0,2,13.0,"felonybondtype",8017
-"Clear Creek",2014,360.0,133,493.0,"misdemeanorbondtype",8019
-"Clear Creek",2015,382.0,141,523.0,"misdemeanorbondtype",8019
-"Clear Creek",2016,393.0,122,515.0,"misdemeanorbondtype",8019
-"Clear Creek",2014,79.0,4,83.0,"felonybondtype",8019
-"Clear Creek",2015,63.0,4,67.0,"felonybondtype",8019
-"Clear Creek",2016,80.0,6,86.0,"felonybondtype",8019
-"Conejos",2014,132.0,35,167.0,"misdemeanorbondtype",8021
-"Conejos",2015,112.0,47,159.0,"misdemeanorbondtype",8021
-"Conejos",2016,115.0,42,157.0,"misdemeanorbondtype",8021
-"Conejos",2014,36.0,14,50.0,"felonybondtype",8021
-"Conejos",2015,51.0,17,68.0,"felonybondtype",8021
-"Conejos",2016,75.0,27,102.0,"felonybondtype",8021
-"Costilla",2014,121.0,28,149.0,"misdemeanorbondtype",8023
-"Costilla",2015,120.0,21,141.0,"misdemeanorbondtype",8023
-"Costilla",2016,115.0,24,139.0,"misdemeanorbondtype",8023
-"Costilla",2014,34.0,10,44.0,"felonybondtype",8023
-"Costilla",2015,41.0,5,46.0,"felonybondtype",8023
-"Costilla",2016,33.0,17,50.0,"felonybondtype",8023
-"Crowley",2014,54.0,20,74.0,"misdemeanorbondtype",8025
-"Crowley",2015,51.0,28,79.0,"misdemeanorbondtype",8025
-"Crowley",2016,34.0,15,49.0,"misdemeanorbondtype",8025
-"Crowley",2014,26.0,2,28.0,"felonybondtype",8025
-"Crowley",2015,25.0,20,45.0,"felonybondtype",8025
-"Crowley",2016,55.0,9,64.0,"felonybondtype",8025
-"Custer",2014,48.0,14,62.0,"misdemeanorbondtype",8027
-"Custer",2015,71.0,24,95.0,"misdemeanorbondtype",8027
-"Custer",2016,47.0,29,76.0,"misdemeanorbondtype",8027
-"Custer",2014,17.0,4,21.0,"felonybondtype",8027
-"Custer",2015,19.0,5,24.0,"felonybondtype",8027
-"Custer",2016,39.0,11,50.0,"felonybondtype",8027
-"Delta",2014,428.0,66,494.0,"misdemeanorbondtype",8029
-"Delta",2015,460.0,70,530.0,"misdemeanorbondtype",8029
-"Delta",2016,557.0,65,622.0,"misdemeanorbondtype",8029
-"Delta",2014,117.0,11,128.0,"felonybondtype",8029
-"Delta",2015,112.0,13,125.0,"felonybondtype",8029
-"Delta",2016,114.0,15,129.0,"felonybondtype",8029
-"Dolores",2014,29.0,10,39.0,"misdemeanorbondtype",8033
-"Dolores",2015,26.0,15,41.0,"misdemeanorbondtype",8033
-"Dolores",2016,15.0,24,39.0,"misdemeanorbondtype",8033
-"Dolores",2014,3.0,5,8.0,"felonybondtype",8033
-"Dolores",2015,9.0,2,11.0,"felonybondtype",8033
-"Dolores",2016,16.0,1,17.0,"felonybondtype",8033
-"Douglas",2014,2230.0,625,2855.0,"misdemeanorbondtype",8035
-"Douglas",2015,2315.0,975,3290.0,"misdemeanorbondtype",8035
-"Douglas",2016,2810.0,979,3789.0,"misdemeanorbondtype",8035
-"Douglas",2014,582.0,112,694.0,"felonybondtype",8035
-"Douglas",2015,573.0,197,770.0,"felonybondtype",8035
-"Douglas",2016,750.0,279,1029.0,"felonybondtype",8035
-"Eagle",2014,759.0,228,987.0,"misdemeanorbondtype",8037
-"Eagle",2015,861.0,166,1027.0,"misdemeanorbondtype",8037
-"Eagle",2016,891.0,158,1049.0,"misdemeanorbondtype",8037
-"Eagle",2014,225.0,34,259.0,"felonybondtype",8037
-"Eagle",2015,332.0,24,356.0,"felonybondtype",8037
-"Eagle",2016,283.0,17,300.0,"felonybondtype",8037
-"El Paso",2014,7742.0,993,8735.0,"misdemeanorbondtype",8041
-"El Paso",2015,8076.0,1069,9145.0,"misdemeanorbondtype",8041
-"El Paso",2016,8061.0,1074,9135.0,"misdemeanorbondtype",8041
-"El Paso",2014,5041.0,318,5359.0,"felonybondtype",8041
-"El Paso",2015,5260.0,362,5622.0,"felonybondtype",8041
-"El Paso",2016,5781.0,325,6106.0,"felonybondtype",8041
-"Elbert",2014,226.0,77,303.0,"misdemeanorbondtype",8039
-"Elbert",2015,240.0,82,322.0,"misdemeanorbondtype",8039
-"Elbert",2016,212.0,117,329.0,"misdemeanorbondtype",8039
-"Elbert",2014,53.0,11,64.0,"felonybondtype",8039
-"Elbert",2015,63.0,19,82.0,"felonybondtype",8039
-"Elbert",2016,86.0,35,121.0,"felonybondtype",8039
-"Fremont",2014,563.0,193,756.0,"misdemeanorbondtype",8043
-"Fremont",2015,636.0,226,862.0,"misdemeanorbondtype",8043
-"Fremont",2016,423.0,594,1017.0,"misdemeanorbondtype",8043
-"Fremont",2014,259.0,64,323.0,"felonybondtype",8043
-"Fremont",2015,282.0,93,375.0,"felonybondtype",8043
-"Fremont",2016,379.0,230,609.0,"felonybondtype",8043
-"Garfield",2014,1057.0,271,1328.0,"misdemeanorbondtype",8045
-"Garfield",2015,1104.0,288,1392.0,"misdemeanorbondtype",8045
-"Garfield",2016,1113.0,326,1439.0,"misdemeanorbondtype",8045
-"Garfield",2014,283.0,88,371.0,"felonybondtype",8045
-"Garfield",2015,401.0,84,485.0,"felonybondtype",8045
-"Garfield",2016,386.0,138,524.0,"felonybondtype",8045
-"Gilpin",2014,422.0,72,494.0,"misdemeanorbondtype",8047
-"Gilpin",2015,509.0,122,631.0,"misdemeanorbondtype",8047
-"Gilpin",2016,384.0,126,510.0,"misdemeanorbondtype",8047
-"Gilpin",2014,78.0,16,94.0,"felonybondtype",8047
-"Gilpin",2015,149.0,25,174.0,"felonybondtype",8047
-"Gilpin",2016,124.0,27,151.0,"felonybondtype",8047
-"Grand",2014,303.0,21,324.0,"misdemeanorbondtype",8049
-"Grand",2015,240.0,65,305.0,"misdemeanorbondtype",8049
-"Grand",2016,258.0,95,353.0,"misdemeanorbondtype",8049
-"Grand",2014,63.0,7,70.0,"felonybondtype",8049
-"Grand",2015,41.0,8,49.0,"felonybondtype",8049
-"Grand",2016,48.0,14,62.0,"felonybondtype",8049
-"Gunnison",2014,326.0,40,366.0,"misdemeanorbondtype",8051
-"Gunnison",2015,363.0,48,411.0,"misdemeanorbondtype",8051
-"Gunnison",2016,363.0,43,406.0,"misdemeanorbondtype",8051
-"Gunnison",2014,85.0,7,92.0,"felonybondtype",8051
-"Gunnison",2015,72.0,15,87.0,"felonybondtype",8051
-"Gunnison",2016,102.0,13,115.0,"felonybondtype",8051
-"Hinsdale",2014,10.0,NA,10.0,"misdemeanorbondtype",8053
-"Hinsdale",2015,6.0,5,11.0,"misdemeanorbondtype",8053
-"Hinsdale",2016,6.0,3,9.0,"misdemeanorbondtype",8053
-"Hinsdale",2014,2.0,1,3.0,"felonybondtype",8053
-"Hinsdale",2015,3.0,NA,3.0,"felonybondtype",8053
-"Hinsdale",2016,2.0,2,4.0,"felonybondtype",8053
-"Huerfano",2014,228.0,25,253.0,"misdemeanorbondtype",8055
-"Huerfano",2015,234.0,26,260.0,"misdemeanorbondtype",8055
-"Huerfano",2016,224.0,36,260.0,"misdemeanorbondtype",8055
-"Huerfano",2014,78.0,36,114.0,"felonybondtype",8055
-"Huerfano",2015,69.0,20,89.0,"felonybondtype",8055
-"Huerfano",2016,96.0,41,137.0,"felonybondtype",8055
-"Jackson",2014,17.0,12,29.0,"misdemeanorbondtype",8057
-"Jackson",2015,14.0,7,21.0,"misdemeanorbondtype",8057
-"Jackson",2016,15.0,3,18.0,"misdemeanorbondtype",8057
-"Jackson",2014,4.0,2,6.0,"felonybondtype",8057
-"Jackson",2015,1.0,4,5.0,"felonybondtype",8057
-"Jackson",2016,8.0,2,10.0,"felonybondtype",8057
-"Jefferson",2014,4831.0,813,5644.0,"misdemeanorbondtype",8059
-"Jefferson",2015,4920.0,964,5884.0,"misdemeanorbondtype",8059
-"Jefferson",2016,5304.0,1097,6401.0,"misdemeanorbondtype",8059
-"Jefferson",2014,2619.0,437,3056.0,"felonybondtype",8059
-"Jefferson",2015,3032.0,440,3472.0,"felonybondtype",8059
-"Jefferson",2016,3404.0,539,3943.0,"felonybondtype",8059
-"Kiowa",2014,87.0,3,90.0,"misdemeanorbondtype",8061
-"Kiowa",2015,65.0,4,69.0,"misdemeanorbondtype",8061
-"Kiowa",2016,53.0,3,56.0,"misdemeanorbondtype",8061
-"Kiowa",2014,8.0,2,10.0,"felonybondtype",8061
-"Kiowa",2015,9.0,1,10.0,"felonybondtype",8061
-"Kiowa",2016,4.0,NA,4.0,"felonybondtype",8061
-"Kit Carson",2014,181.0,39,220.0,"misdemeanorbondtype",8063
-"Kit Carson",2015,164.0,62,226.0,"misdemeanorbondtype",8063
-"Kit Carson",2016,196.0,73,269.0,"misdemeanorbondtype",8063
-"Kit Carson",2014,49.0,6,55.0,"felonybondtype",8063
-"Kit Carson",2015,54.0,14,68.0,"felonybondtype",8063
-"Kit Carson",2016,61.0,27,88.0,"felonybondtype",8063
-"La Plata",2014,753.0,463,1216.0,"misdemeanorbondtype",8067
-"La Plata",2015,906.0,541,1447.0,"misdemeanorbondtype",8067
-"La Plata",2016,1000.0,463,1463.0,"misdemeanorbondtype",8067
-"La Plata",2014,249.0,224,473.0,"felonybondtype",8067
-"La Plata",2015,281.0,210,491.0,"felonybondtype",8067
-"La Plata",2016,324.0,178,502.0,"felonybondtype",8067
-"Lake",2014,152.0,63,215.0,"misdemeanorbondtype",8065
-"Lake",2015,242.0,68,310.0,"misdemeanorbondtype",8065
-"Lake",2016,212.0,50,262.0,"misdemeanorbondtype",8065
-"Lake",2014,77.0,8,85.0,"felonybondtype",8065
-"Lake",2015,40.0,6,46.0,"felonybondtype",8065
-"Lake",2016,68.0,14,82.0,"felonybondtype",8065
-"Larimer",2014,2059.0,3712,5771.0,"misdemeanorbondtype",8069
-"Larimer",2015,2278.0,3780,6058.0,"misdemeanorbondtype",8069
-"Larimer",2016,2306.0,3737,6043.0,"misdemeanorbondtype",8069
-"Larimer",2014,1309.0,472,1781.0,"felonybondtype",8069
-"Larimer",2015,1647.0,508,2155.0,"felonybondtype",8069
-"Larimer",2016,2130.0,645,2775.0,"felonybondtype",8069
-"Las Animas",2014,706.0,123,829.0,"misdemeanorbondtype",8071
-"Las Animas",2015,698.0,86,784.0,"misdemeanorbondtype",8071
-"Las Animas",2016,781.0,65,846.0,"misdemeanorbondtype",8071
-"Las Animas",2014,105.0,62,167.0,"felonybondtype",8071
-"Las Animas",2015,137.0,62,199.0,"felonybondtype",8071
-"Las Animas",2016,112.0,43,155.0,"felonybondtype",8071
-"Lincoln",2014,238.0,8,246.0,"misdemeanorbondtype",8073
-"Lincoln",2015,354.0,5,359.0,"misdemeanorbondtype",8073
-"Lincoln",2016,389.0,8,397.0,"misdemeanorbondtype",8073
-"Lincoln",2014,63.0,3,66.0,"felonybondtype",8073
-"Lincoln",2015,80.0,NA,80.0,"felonybondtype",8073
-"Lincoln",2016,84.0,3,87.0,"felonybondtype",8073
-"Logan",2014,326.0,160,486.0,"misdemeanorbondtype",8075
-"Logan",2015,243.0,211,454.0,"misdemeanorbondtype",8075
-"Logan",2016,249.0,186,435.0,"misdemeanorbondtype",8075
-"Logan",2014,153.0,73,226.0,"felonybondtype",8075
-"Logan",2015,169.0,65,234.0,"felonybondtype",8075
-"Logan",2016,194.0,82,276.0,"felonybondtype",8075
-"Mesa",2014,1508.0,1312,2820.0,"misdemeanorbondtype",8077
-"Mesa",2015,1686.0,1317,3003.0,"misdemeanorbondtype",8077
-"Mesa",2016,1589.0,1402,2991.0,"misdemeanorbondtype",8077
-"Mesa",2014,785.0,721,1506.0,"felonybondtype",8077
-"Mesa",2015,755.0,817,1572.0,"felonybondtype",8077
-"Mesa",2016,957.0,1034,1991.0,"felonybondtype",8077
-"Mineral",2014,40.0,NA,40.0,"misdemeanorbondtype",8079
-"Mineral",2015,43.0,2,45.0,"misdemeanorbondtype",8079
-"Mineral",2016,36.0,2,38.0,"misdemeanorbondtype",8079
-"Mineral",2014,2.0,NA,2.0,"felonybondtype",8079
-"Mineral",2015,1.0,3,4.0,"felonybondtype",8079
-"Mineral",2016,1.0,NA,1.0,"felonybondtype",8079
-"Moffat",2014,246.0,95,341.0,"misdemeanorbondtype",8081
-"Moffat",2015,257.0,115,372.0,"misdemeanorbondtype",8081
-"Moffat",2016,246.0,157,403.0,"misdemeanorbondtype",8081
-"Moffat",2014,134.0,27,161.0,"felonybondtype",8081
-"Moffat",2015,164.0,67,231.0,"felonybondtype",8081
-"Moffat",2016,160.0,93,253.0,"felonybondtype",8081
-"Montezuma",2014,402.0,466,868.0,"misdemeanorbondtype",8083
-"Montezuma",2015,413.0,403,816.0,"misdemeanorbondtype",8083
-"Montezuma",2016,421.0,434,855.0,"misdemeanorbondtype",8083
-"Montezuma",2014,136.0,67,203.0,"felonybondtype",8083
-"Montezuma",2015,184.0,60,244.0,"felonybondtype",8083
-"Montezuma",2016,217.0,61,278.0,"felonybondtype",8083
-"Montrose",2014,700.0,155,855.0,"misdemeanorbondtype",8085
-"Montrose",2015,648.0,130,778.0,"misdemeanorbondtype",8085
-"Montrose",2016,607.0,181,788.0,"misdemeanorbondtype",8085
-"Montrose",2014,282.0,21,303.0,"felonybondtype",8085
-"Montrose",2015,276.0,21,297.0,"felonybondtype",8085
-"Montrose",2016,267.0,34,301.0,"felonybondtype",8085
-"Morgan",2014,755.0,201,956.0,"misdemeanorbondtype",8087
-"Morgan",2015,775.0,238,1013.0,"misdemeanorbondtype",8087
-"Morgan",2016,693.0,247,940.0,"misdemeanorbondtype",8087
-"Morgan",2014,182.0,53,235.0,"felonybondtype",8087
-"Morgan",2015,169.0,81,250.0,"felonybondtype",8087
-"Morgan",2016,207.0,90,297.0,"felonybondtype",8087
-"Otero",2014,479.0,157,636.0,"misdemeanorbondtype",8089
-"Otero",2015,376.0,228,604.0,"misdemeanorbondtype",8089
-"Otero",2016,210.0,305,515.0,"misdemeanorbondtype",8089
-"Otero",2014,139.0,65,204.0,"felonybondtype",8089
-"Otero",2015,171.0,53,224.0,"felonybondtype",8089
-"Otero",2016,153.0,65,218.0,"felonybondtype",8089
-"Ouray",2014,88.0,19,107.0,"misdemeanorbondtype",8091
-"Ouray",2015,79.0,14,93.0,"misdemeanorbondtype",8091
-"Ouray",2016,99.0,13,112.0,"misdemeanorbondtype",8091
-"Ouray",2014,14.0,2,16.0,"felonybondtype",8091
-"Ouray",2015,15.0,2,17.0,"felonybondtype",8091
-"Ouray",2016,22.0,2,24.0,"felonybondtype",8091
-"Park",2014,313.0,66,379.0,"misdemeanorbondtype",8093
-"Park",2015,292.0,84,376.0,"misdemeanorbondtype",8093
-"Park",2016,251.0,105,356.0,"misdemeanorbondtype",8093
-"Park",2014,53.0,13,66.0,"felonybondtype",8093
-"Park",2015,61.0,17,78.0,"felonybondtype",8093
-"Park",2016,56.0,11,67.0,"felonybondtype",8093
-"Phillips",2014,39.0,5,44.0,"misdemeanorbondtype",8095
-"Phillips",2015,41.0,22,63.0,"misdemeanorbondtype",8095
-"Phillips",2016,54.0,21,75.0,"misdemeanorbondtype",8095
-"Phillips",2014,12.0,NA,12.0,"felonybondtype",8095
-"Phillips",2015,18.0,2,20.0,"felonybondtype",8095
-"Phillips",2016,15.0,7,22.0,"felonybondtype",8095
-"Pitkin",2014,164.0,61,225.0,"misdemeanorbondtype",8097
-"Pitkin",2015,121.0,53,174.0,"misdemeanorbondtype",8097
-"Pitkin",2016,169.0,41,210.0,"misdemeanorbondtype",8097
-"Pitkin",2014,38.0,4,42.0,"felonybondtype",8097
-"Pitkin",2015,62.0,13,75.0,"felonybondtype",8097
-"Pitkin",2016,53.0,22,75.0,"felonybondtype",8097
-"Prowers",2014,629.0,68,697.0,"misdemeanorbondtype",8099
-"Prowers",2015,662.0,59,721.0,"misdemeanorbondtype",8099
-"Prowers",2016,625.0,34,659.0,"misdemeanorbondtype",8099
-"Prowers",2014,108.0,47,155.0,"felonybondtype",8099
-"Prowers",2015,157.0,48,205.0,"felonybondtype",8099
-"Prowers",2016,179.0,52,231.0,"felonybondtype",8099
-"Pueblo",2014,2513.0,835,3348.0,"misdemeanorbondtype",8101
-"Pueblo",2015,2077.0,1332,3409.0,"misdemeanorbondtype",8101
-"Pueblo",2016,1906.0,1576,3482.0,"misdemeanorbondtype",8101
-"Pueblo",2014,1364.0,481,1845.0,"felonybondtype",8101
-"Pueblo",2015,1388.0,787,2175.0,"felonybondtype",8101
-"Pueblo",2016,1607.0,657,2264.0,"felonybondtype",8101
-"Rio Blanco",2014,193.0,12,205.0,"misdemeanorbondtype",8103
-"Rio Blanco",2015,194.0,14,208.0,"misdemeanorbondtype",8103
-"Rio Blanco",2016,129.0,24,153.0,"misdemeanorbondtype",8103
-"Rio Blanco",2014,47.0,5,52.0,"felonybondtype",8103
-"Rio Blanco",2015,33.0,10,43.0,"felonybondtype",8103
-"Rio Blanco",2016,55.0,13,68.0,"felonybondtype",8103
-"Rio Grande",2014,231.0,97,328.0,"misdemeanorbondtype",8105
-"Rio Grande",2015,229.0,94,323.0,"misdemeanorbondtype",8105
-"Rio Grande",2016,202.0,87,289.0,"misdemeanorbondtype",8105
-"Rio Grande",2014,100.0,61,161.0,"felonybondtype",8105
-"Rio Grande",2015,73.0,63,136.0,"felonybondtype",8105
-"Rio Grande",2016,115.0,50,165.0,"felonybondtype",8105
-"Routt",2014,385.0,166,551.0,"misdemeanorbondtype",8107
-"Routt",2015,365.0,172,537.0,"misdemeanorbondtype",8107
-"Routt",2016,309.0,176,485.0,"misdemeanorbondtype",8107
-"Routt",2014,72.0,29,101.0,"felonybondtype",8107
-"Routt",2015,95.0,65,160.0,"felonybondtype",8107
-"Routt",2016,58.0,42,100.0,"felonybondtype",8107
-"Saguache",2014,84.0,38,122.0,"misdemeanorbondtype",8109
-"Saguache",2015,69.0,31,100.0,"misdemeanorbondtype",8109
-"Saguache",2016,88.0,30,118.0,"misdemeanorbondtype",8109
-"Saguache",2014,18.0,23,41.0,"felonybondtype",8109
-"Saguache",2015,19.0,19,38.0,"felonybondtype",8109
-"Saguache",2016,48.0,14,62.0,"felonybondtype",8109
-"San Juan",2014,11.0,2,13.0,"misdemeanorbondtype",8111
-"San Juan",2015,19.0,1,20.0,"misdemeanorbondtype",8111
-"San Juan",2016,19.0,4,23.0,"misdemeanorbondtype",8111
-"San Juan",2014,3.0,1,4.0,"felonybondtype",8111
-"San Juan",2015,NA,NA,NA,"felonybondtype",8111
-"San Juan",2016,8.0,5,13.0,"felonybondtype",8111
-"San Miguel",2014,134.0,33,167.0,"misdemeanorbondtype",8113
-"San Miguel",2015,143.0,30,173.0,"misdemeanorbondtype",8113
-"San Miguel",2016,209.0,25,234.0,"misdemeanorbondtype",8113
-"San Miguel",2014,28.0,7,35.0,"felonybondtype",8113
-"San Miguel",2015,48.0,6,54.0,"felonybondtype",8113
-"San Miguel",2016,46.0,12,58.0,"felonybondtype",8113
-"Sedgwick",2014,36.0,7,43.0,"misdemeanorbondtype",8115
-"Sedgwick",2015,56.0,15,71.0,"misdemeanorbondtype",8115
-"Sedgwick",2016,62.0,7,69.0,"misdemeanorbondtype",8115
-"Sedgwick",2014,8.0,2,10.0,"felonybondtype",8115
-"Sedgwick",2015,13.0,7,20.0,"felonybondtype",8115
-"Sedgwick",2016,21.0,9,30.0,"felonybondtype",8115
-"Summit",2014,862.0,63,925.0,"misdemeanorbondtype",8117
-"Summit",2015,938.0,110,1048.0,"misdemeanorbondtype",8117
-"Summit",2016,820.0,112,932.0,"misdemeanorbondtype",8117
-"Summit",2014,209.0,13,222.0,"felonybondtype",8117
-"Summit",2015,230.0,19,249.0,"felonybondtype",8117
-"Summit",2016,264.0,19,283.0,"felonybondtype",8117
-"Teller",2014,529.0,139,668.0,"misdemeanorbondtype",8119
-"Teller",2015,504.0,121,625.0,"misdemeanorbondtype",8119
-"Teller",2016,461.0,119,580.0,"misdemeanorbondtype",8119
-"Teller",2014,169.0,14,183.0,"felonybondtype",8119
-"Teller",2015,167.0,21,188.0,"felonybondtype",8119
-"Teller",2016,205.0,27,232.0,"felonybondtype",8119
-"Washington",2014,67.0,29,96.0,"misdemeanorbondtype",8121
-"Washington",2015,80.0,37,117.0,"misdemeanorbondtype",8121
-"Washington",2016,97.0,25,122.0,"misdemeanorbondtype",8121
-"Washington",2014,11.0,4,15.0,"felonybondtype",8121
-"Washington",2015,8.0,6,14.0,"felonybondtype",8121
-"Washington",2016,21.0,12,33.0,"felonybondtype",8121
-"Weld",2014,3329.0,1343,4672.0,"misdemeanorbondtype",8123
-"Weld",2015,3200.0,2156,5356.0,"misdemeanorbondtype",8123
-"Weld",2016,2677.0,2747,5424.0,"misdemeanorbondtype",8123
-"Weld",2014,1648.0,468,2116.0,"felonybondtype",8123
-"Weld",2015,1591.0,596,2187.0,"felonybondtype",8123
-"Weld",2016,1887.0,647,2534.0,"felonybondtype",8123
-"Yuma",2014,90.0,22,112.0,"misdemeanorbondtype",8125
-"Yuma",2015,121.0,30,151.0,"misdemeanorbondtype",8125
-"Yuma",2016,107.0,39,146.0,"misdemeanorbondtype",8125
-"Yuma",2014,32.0,3,35.0,"felonybondtype",8125
-"Yuma",2015,43.0,10,53.0,"felonybondtype",8125
-"Yuma",2016,47.0,14,61.0,"felonybondtype",8125
-"Denver",2014,3817.0,1271,5088.0,"felonybondtype",8031
-"Denver",2015,4036.0,1319,5355.0,"felonybondtype",8031
-"Denver",2016,4037.0,2572,6609.0,"felonybondtype",8031
+county,,year,money_bond_freq,pr_bond_freq,total_bond_freq,off_type,money_posted,money_bond_new_no,money_new_yes,pr_posted,pr_new_no,pr_new_yes,total_new,fips
+"Adams",1,2014,8022,156,8178,"Misdemeanor",5369,4650,719,286,250,36,5655,8001
+"Adams",2,2015,8018,308,8326,"Misdemeanor",5243,4512,731,369,335,34,5612,8001
+"Adams",3,2016,6789,1211,8000,"Misdemeanor",3672,3149,523,1307,1113,194,4979,8001
+"Adams",190,2014,3166,215,3381,"Felony",1846,1467,379,221,195,26,2067,8001
+"Adams",191,2015,3305,354,3659,"Felony",1916,1517,399,345,286,59,2261,8001
+"Adams",192,2016,3307,713,4020,"Felony",1835,1444,391,720,619,101,2555,8001
+"Alamosa",4,2014,317,112,429,"Misdemeanor",188,154,34,110,88,22,298,8003
+"Alamosa",5,2015,367,122,489,"Misdemeanor",219,154,65,115,84,31,334,8003
+"Alamosa",6,2016,328,184,512,"Misdemeanor",166,135,31,178,141,37,344,8003
+"Alamosa",193,2014,212,84,296,"Felony",108,84,24,82,67,15,190,8003
+"Alamosa",194,2015,260,86,346,"Felony",138,99,39,85,68,17,223,8003
+"Alamosa",195,2016,341,215,556,"Felony",165,122,43,214,167,47,379,8003
+"Arapahoe",7,2014,4405,3151,7556,"Misdemeanor",2589,2184,405,2091,1820,271,4680,8005
+"Arapahoe",8,2015,3703,3890,7593,"Misdemeanor",2329,1976,353,2317,2049,268,4646,8005
+"Arapahoe",9,2016,4693,2393,7086,"Misdemeanor",2099,1876,223,1583,1421,162,3682,8005
+"Arapahoe",196,2014,2631,364,2995,"Felony",1501,1206,295,356,302,54,1857,8005
+"Arapahoe",197,2015,2482,668,3150,"Felony",1504,1226,278,668,565,103,2172,8005
+"Arapahoe",198,2016,2709,503,3212,"Felony",1692,1432,260,507,443,64,2199,8005
+"Archuleta",10,2014,212,118,330,"Misdemeanor",135,118,17,119,100,19,254,8007
+"Archuleta",11,2015,156,97,253,"Misdemeanor",114,95,19,93,71,22,207,8007
+"Archuleta",12,2016,194,126,320,"Misdemeanor",128,99,29,127,97,30,255,8007
+"Archuleta",199,2014,46,41,87,"Felony",30,22,8,42,33,9,72,8007
+"Archuleta",200,2015,46,36,82,"Felony",31,22,9,36,28,8,67,8007
+"Archuleta",201,2016,49,46,95,"Felony",32,21,11,47,27,20,79,8007
+"Baca",13,2014,103,10,113,"Misdemeanor",55,51,4,10,10,NA,65,8009
+"Baca",14,2015,106,7,113,"Misdemeanor",51,43,8,7,6,1,58,8009
+"Baca",15,2016,105,7,112,"Misdemeanor",54,46,8,8,8,NA,62,8009
+"Baca",202,2014,27,3,30,"Felony",17,13,4,3,3,NA,20,8009
+"Baca",203,2015,18,11,29,"Felony",13,8,5,10,10,NA,23,8009
+"Baca",204,2016,26,6,32,"Felony",10,9,1,6,4,2,16,8009
+"Bent",16,2014,184,53,237,"Misdemeanor",151,114,37,49,36,13,200,8011
+"Bent",17,2015,109,52,161,"Misdemeanor",74,60,14,46,40,6,120,8011
+"Bent",18,2016,116,65,181,"Misdemeanor",70,53,17,59,42,17,129,8011
+"Bent",205,2014,35,14,49,"Felony",28,17,11,15,10,5,43,8011
+"Bent",206,2015,30,18,48,"Felony",24,16,8,16,13,3,40,8011
+"Bent",207,2016,53,13,66,"Felony",35,25,10,12,6,6,47,8011
+"Boulder",19,2014,2444,545,2989,"Misdemeanor",1444,1256,188,590,543,47,2034,8013
+"Boulder",20,2015,2346,637,2983,"Misdemeanor",1331,1149,182,645,593,52,1976,8013
+"Boulder",21,2016,2275,860,3135,"Misdemeanor",1265,1086,179,848,758,90,2113,8013
+"Boulder",208,2014,1548,215,1763,"Felony",842,715,127,235,217,18,1077,8013
+"Boulder",209,2015,1630,294,1924,"Felony",904,756,148,308,282,26,1212,8013
+"Boulder",210,2016,1662,536,2198,"Felony",898,763,135,550,496,54,1448,8013
+"Broomfield",22,2014,1213,86,1299,"Misdemeanor",905,833,72,86,77,9,991,8014
+"Broomfield",23,2015,1082,76,1158,"Misdemeanor",771,679,92,74,69,5,845,8014
+"Broomfield",24,2016,826,262,1088,"Misdemeanor",518,453,65,264,233,31,782,8014
+"Broomfield",211,2014,285,11,296,"Felony",199,167,32,11,10,1,210,8014
+"Broomfield",212,2015,275,17,292,"Felony",173,141,32,18,17,1,191,8014
+"Broomfield",213,2016,265,68,333,"Felony",170,140,30,69,61,8,239,8014
+"Chaffee",25,2014,299,103,402,"Misdemeanor",196,171,25,103,95,8,299,8015
+"Chaffee",26,2015,290,153,443,"Misdemeanor",175,152,23,158,136,22,333,8015
+"Chaffee",27,2016,271,184,455,"Misdemeanor",149,119,30,175,146,29,324,8015
+"Chaffee",214,2014,103,23,126,"Felony",67,58,9,25,24,1,92,8015
+"Chaffee",215,2015,122,36,158,"Felony",60,50,10,36,29,7,96,8015
+"Chaffee",216,2016,129,54,183,"Felony",56,42,14,57,44,13,113,8015
+"Cheyenne",28,2014,41,6,47,"Misdemeanor",21,19,2,6,5,1,27,8017
+"Cheyenne",29,2015,44,1,45,"Misdemeanor",24,23,1,1,1,NA,25,8017
+"Cheyenne",30,2016,71,8,79,"Misdemeanor",31,27,4,8,6,2,39,8017
+"Cheyenne",217,2014,10,3,13,"Felony",5,4,1,2,2,NA,7,8017
+"Cheyenne",218,2015,7,1,8,"Felony",7,7,NA,1,1,NA,8,8017
+"Cheyenne",219,2016,11,2,13,"Felony",10,7,3,1,1,NA,11,8017
+"Clear Creek",31,2014,360,133,493,"Misdemeanor",215,190,25,24,19,5,239,8019
+"Clear Creek",32,2015,382,141,523,"Misdemeanor",246,224,22,30,29,1,276,8019
+"Clear Creek",33,2016,393,122,515,"Misdemeanor",224,194,30,38,29,9,262,8019
+"Clear Creek",220,2014,79,4,83,"Felony",55,48,7,3,3,NA,58,8019
+"Clear Creek",221,2015,63,4,67,"Felony",41,33,8,4,2,2,45,8019
+"Clear Creek",222,2016,80,6,86,"Felony",51,45,6,5,4,1,56,8019
+"Conejos",34,2014,132,35,167,"Misdemeanor",85,72,13,33,24,9,118,8021
+"Conejos",35,2015,112,47,159,"Misdemeanor",71,59,12,47,42,5,118,8021
+"Conejos",36,2016,115,42,157,"Misdemeanor",77,61,16,40,30,10,117,8021
+"Conejos",223,2014,36,14,50,"Felony",16,12,4,13,11,2,29,8021
+"Conejos",224,2015,51,17,68,"Felony",38,28,10,19,13,6,57,8021
+"Conejos",225,2016,75,27,102,"Felony",50,32,18,26,22,4,76,8021
+"Costilla",37,2014,121,28,149,"Misdemeanor",70,61,9,22,19,3,92,8023
+"Costilla",38,2015,120,21,141,"Misdemeanor",86,73,13,20,18,2,106,8023
+"Costilla",39,2016,115,24,139,"Misdemeanor",55,49,6,18,17,1,73,8023
+"Costilla",226,2014,34,10,44,"Felony",26,20,6,6,5,1,32,8023
+"Costilla",227,2015,41,5,46,"Felony",34,29,5,7,7,NA,41,8023
+"Costilla",228,2016,33,17,50,"Felony",23,22,1,14,14,NA,37,8023
+"Crowley",40,2014,54,20,74,"Misdemeanor",40,32,8,21,18,3,61,8025
+"Crowley",41,2015,51,28,79,"Misdemeanor",37,29,8,29,22,7,66,8025
+"Crowley",42,2016,34,15,49,"Misdemeanor",22,19,3,14,8,6,36,8025
+"Crowley",229,2014,26,2,28,"Felony",17,13,4,4,2,2,21,8025
+"Crowley",230,2015,25,20,45,"Felony",20,16,4,21,18,3,41,8025
+"Crowley",231,2016,55,9,64,"Felony",40,33,7,10,5,5,50,8025
+"Custer",43,2014,48,14,62,"Misdemeanor",38,32,6,14,14,NA,52,8027
+"Custer",44,2015,71,24,95,"Misdemeanor",46,40,6,24,21,3,70,8027
+"Custer",45,2016,47,29,76,"Misdemeanor",36,29,7,30,26,4,66,8027
+"Custer",232,2014,17,4,21,"Felony",14,12,2,3,2,1,17,8027
+"Custer",233,2015,19,5,24,"Felony",8,8,NA,8,8,NA,16,8027
+"Custer",234,2016,39,11,50,"Felony",24,23,1,12,11,1,36,8027
+"Delta",46,2014,428,66,494,"Misdemeanor",283,234,49,130,115,15,413,8029
+"Delta",47,2015,460,70,530,"Misdemeanor",297,256,41,146,124,22,443,8029
+"Delta",48,2016,557,65,622,"Misdemeanor",282,252,30,217,179,38,499,8029
+"Delta",235,2014,117,11,128,"Felony",65,46,19,32,23,9,97,8029
+"Delta",236,2015,112,13,125,"Felony",61,40,21,35,29,6,96,8029
+"Delta",237,2016,114,15,129,"Felony",59,41,18,42,36,6,101,8029
+"Dolores",49,2014,29,10,39,"Misdemeanor",18,15,3,8,8,NA,26,8033
+"Dolores",50,2015,26,15,41,"Misdemeanor",12,11,1,8,8,NA,20,8033
+"Dolores",51,2016,15,24,39,"Misdemeanor",8,7,1,12,11,1,20,8033
+"Dolores",241,2014,3,5,8,"Felony",3,2,1,5,4,1,8,8033
+"Dolores",242,2015,9,2,11,"Felony",5,4,1,2,2,NA,7,8033
+"Dolores",243,2016,16,1,17,"Felony",12,11,1,1,1,NA,13,8033
+"Douglas",52,2014,2230,625,2855,"Misdemeanor",1339,1199,140,582,529,53,1921,8035
+"Douglas",53,2015,2315,975,3290,"Misdemeanor",1381,1260,121,928,840,88,2309,8035
+"Douglas",54,2016,2810,979,3789,"Misdemeanor",1581,1444,137,943,842,101,2524,8035
+"Douglas",244,2014,582,112,694,"Felony",343,295,48,110,98,12,453,8035
+"Douglas",245,2015,573,197,770,"Felony",357,302,55,198,175,23,555,8035
+"Douglas",246,2016,750,279,1029,"Felony",476,419,57,276,244,32,752,8035
+"Eagle",55,2014,759,228,987,"Misdemeanor",362,317,45,223,197,26,585,8037
+"Eagle",56,2015,861,166,1027,"Misdemeanor",419,359,60,208,188,20,627,8037
+"Eagle",57,2016,891,158,1049,"Misdemeanor",483,417,66,166,147,19,649,8037
+"Eagle",247,2014,225,34,259,"Felony",180,164,16,34,32,2,214,8037
+"Eagle",248,2015,332,24,356,"Felony",257,238,19,26,26,NA,283,8037
+"Eagle",249,2016,283,17,300,"Felony",201,189,12,18,17,1,219,8037
+"El Paso",58,2014,7742,993,8735,"Misdemeanor",3521,3085,436,1176,1099,77,4697,8041
+"El Paso",59,2015,8076,1069,9145,"Misdemeanor",3720,3262,458,1097,1030,67,4817,8041
+"El Paso",60,2016,8061,1074,9135,"Misdemeanor",3212,2841,371,1087,1020,67,4299,8041
+"El Paso",250,2014,5041,318,5359,"Felony",2834,2222,612,366,326,40,3200,8041
+"El Paso",251,2015,5260,362,5622,"Felony",2800,2277,523,359,326,33,3159,8041
+"El Paso",252,2016,5781,325,6106,"Felony",3043,2546,497,330,301,29,3373,8041
+"Elbert",61,2014,226,77,303,"Misdemeanor",152,137,15,75,66,9,227,8039
+"Elbert",62,2015,240,82,322,"Misdemeanor",162,137,25,81,69,12,243,8039
+"Elbert",63,2016,212,117,329,"Misdemeanor",154,138,16,116,95,21,270,8039
+"Elbert",253,2014,53,11,64,"Felony",35,27,8,10,10,NA,45,8039
+"Elbert",254,2015,63,19,82,"Felony",46,36,10,19,15,4,65,8039
+"Elbert",255,2016,86,35,121,"Felony",64,52,12,35,31,4,99,8039
+"Fremont",64,2014,563,193,756,"Misdemeanor",399,337,62,94,79,15,493,8043
+"Fremont",65,2015,636,226,862,"Misdemeanor",445,390,55,219,172,47,664,8043
+"Fremont",66,2016,423,594,1017,"Misdemeanor",198,162,36,586,513,73,784,8043
+"Fremont",256,2014,259,64,323,"Felony",170,141,29,41,36,5,211,8043
+"Fremont",257,2015,282,93,375,"Felony",149,124,25,88,79,9,237,8043
+"Fremont",258,2016,379,230,609,"Felony",144,111,33,220,183,37,364,8043
+"Garfield",67,2014,1057,271,1328,"Misdemeanor",620,492,128,310,244,66,930,8045
+"Garfield",68,2015,1104,288,1392,"Misdemeanor",671,550,121,308,272,36,979,8045
+"Garfield",69,2016,1113,326,1439,"Misdemeanor",590,504,86,355,297,58,945,8045
+"Garfield",259,2014,283,88,371,"Felony",194,137,57,106,77,29,300,8045
+"Garfield",260,2015,401,84,485,"Felony",252,172,80,108,77,31,360,8045
+"Garfield",261,2016,386,138,524,"Felony",258,186,72,150,127,23,408,8045
+"Gilpin",70,2014,422,72,494,"Misdemeanor",286,254,32,73,62,11,359,8047
+"Gilpin",71,2015,509,122,631,"Misdemeanor",356,309,47,122,113,9,478,8047
+"Gilpin",72,2016,384,126,510,"Misdemeanor",231,209,22,122,109,13,353,8047
+"Gilpin",262,2014,78,16,94,"Felony",64,56,8,16,15,1,80,8047
+"Gilpin",263,2015,149,25,174,"Felony",112,96,16,25,23,2,137,8047
+"Gilpin",264,2016,124,27,151,"Felony",77,72,5,28,25,3,105,8047
+"Grand",73,2014,303,21,324,"Misdemeanor",223,202,21,19,18,1,242,8049
+"Grand",74,2015,240,65,305,"Misdemeanor",182,162,20,62,56,6,244,8049
+"Grand",75,2016,258,95,353,"Misdemeanor",181,159,22,93,77,16,274,8049
+"Grand",265,2014,63,7,70,"Felony",44,36,8,7,5,2,51,8049
+"Grand",266,2015,41,8,49,"Felony",29,25,4,8,8,NA,37,8049
+"Grand",267,2016,48,14,62,"Felony",33,27,6,14,12,2,47,8049
+"Gunnison",76,2014,326,40,366,"Misdemeanor",256,226,30,41,38,3,297,8051
+"Gunnison",77,2015,363,48,411,"Misdemeanor",294,256,38,53,44,9,347,8051
+"Gunnison",78,2016,363,43,406,"Misdemeanor",283,243,40,42,36,6,325,8051
+"Gunnison",268,2014,85,7,92,"Felony",73,60,13,7,7,NA,80,8051
+"Gunnison",269,2015,72,15,87,"Felony",53,46,7,14,11,3,67,8051
+"Gunnison",270,2016,102,13,115,"Felony",76,55,21,11,9,2,87,8051
+"Hinsdale",79,2014,10,NA,10,"Misdemeanor",4,4,NA,NA,NA,NA,4,8053
+"Hinsdale",80,2015,6,5,11,"Misdemeanor",5,5,NA,NA,NA,NA,5,8053
+"Hinsdale",81,2016,6,3,9,"Misdemeanor",1,1,NA,NA,NA,NA,1,8053
+"Hinsdale",271,2014,2,1,3,"Felony",1,1,NA,1,1,NA,2,8053
+"Hinsdale",272,2015,3,NA,3,"Felony",2,2,NA,1,1,NA,3,8053
+"Hinsdale",273,2016,2,2,4,"Felony",2,2,NA,1,NA,1,3,8053
+"Huerfano",82,2014,228,25,253,"Misdemeanor",107,94,13,25,24,1,132,8055
+"Huerfano",83,2015,234,26,260,"Misdemeanor",100,81,19,26,22,4,126,8055
+"Huerfano",84,2016,224,36,260,"Misdemeanor",88,79,9,36,29,7,124,8055
+"Huerfano",274,2014,78,36,114,"Felony",47,34,13,37,31,6,84,8055
+"Huerfano",275,2015,69,20,89,"Felony",45,34,11,20,15,5,65,8055
+"Huerfano",276,2016,96,41,137,"Felony",59,49,10,42,28,14,101,8055
+"Jackson",85,2014,17,12,29,"Misdemeanor",11,9,2,12,9,3,23,8057
+"Jackson",86,2015,14,7,21,"Misdemeanor",8,7,1,7,6,1,15,8057
+"Jackson",87,2016,15,3,18,"Misdemeanor",3,3,NA,3,2,1,6,8057
+"Jackson",277,2014,4,2,6,"Felony",3,3,NA,1,1,NA,4,8057
+"Jackson",278,2015,1,4,5,"Felony",1,1,NA,3,3,NA,4,8057
+"Jackson",279,2016,8,2,10,"Felony",7,5,2,2,2,NA,9,8057
+"Jefferson",88,2014,4831,813,5644,"Misdemeanor",2360,2079,281,806,739,67,3166,8059
+"Jefferson",89,2015,4920,964,5884,"Misdemeanor",2321,2022,299,952,862,90,3273,8059
+"Jefferson",90,2016,5304,1097,6401,"Misdemeanor",2285,2022,263,1046,957,89,3331,8059
+"Jefferson",280,2014,2619,437,3056,"Felony",1416,1179,237,448,399,49,1864,8059
+"Jefferson",281,2015,3032,440,3472,"Felony",1611,1343,268,456,410,46,2067,8059
+"Jefferson",282,2016,3404,539,3943,"Felony",1738,1503,235,563,493,70,2301,8059
+"Kiowa",91,2014,87,3,90,"Misdemeanor",44,41,3,2,2,NA,46,8061
+"Kiowa",92,2015,65,4,69,"Misdemeanor",26,25,1,4,4,NA,30,8061
+"Kiowa",93,2016,53,3,56,"Misdemeanor",26,24,2,3,3,NA,29,8061
+"Kiowa",283,2014,8,2,10,"Felony",6,4,2,2,1,1,8,8061
+"Kiowa",284,2015,9,1,10,"Felony",4,4,NA,1,NA,1,5,8061
+"Kiowa",285,2016,4,NA,4,"Felony",2,2,NA,NA,NA,NA,2,8061
+"Kit Carson",94,2014,181,39,220,"Misdemeanor",112,101,11,37,29,8,149,8063
+"Kit Carson",95,2015,164,62,226,"Misdemeanor",105,94,11,58,51,7,163,8063
+"Kit Carson",96,2016,196,73,269,"Misdemeanor",108,88,20,70,61,9,178,8063
+"Kit Carson",286,2014,49,6,55,"Felony",29,24,5,5,3,2,34,8063
+"Kit Carson",287,2015,54,14,68,"Felony",33,23,10,13,13,NA,46,8063
+"Kit Carson",288,2016,61,27,88,"Felony",35,23,12,26,15,11,61,8063
+"La Plata",97,2014,753,463,1216,"Misdemeanor",450,389,61,380,303,77,830,8067
+"La Plata",98,2015,906,541,1447,"Misdemeanor",547,476,71,507,408,99,1054,8067
+"La Plata",99,2016,1000,463,1463,"Misdemeanor",617,549,68,430,366,64,1047,8067
+"La Plata",289,2014,249,224,473,"Felony",141,89,52,184,135,49,325,8067
+"La Plata",290,2015,281,210,491,"Felony",174,139,35,199,150,49,373,8067
+"La Plata",291,2016,324,178,502,"Felony",216,183,33,163,139,24,379,8067
+"Lake",100,2014,152,63,215,"Misdemeanor",107,91,16,64,51,13,171,8065
+"Lake",101,2015,242,68,310,"Misdemeanor",182,148,34,67,56,11,249,8065
+"Lake",102,2016,212,50,262,"Misdemeanor",150,122,28,47,43,4,197,8065
+"Lake",292,2014,77,8,85,"Felony",59,47,12,8,7,1,67,8065
+"Lake",293,2015,40,6,46,"Felony",31,27,4,6,6,NA,37,8065
+"Lake",294,2016,68,14,82,"Felony",56,47,9,13,11,2,69,8065
+"Larimer",103,2014,2059,3712,5771,"Misdemeanor",1350,1091,259,2986,2705,281,4336,8069
+"Larimer",104,2015,2278,3780,6058,"Misdemeanor",1459,1181,278,2908,2581,327,4367,8069
+"Larimer",105,2016,2306,3737,6043,"Misdemeanor",1395,1133,262,2827,2542,285,4222,8069
+"Larimer",295,2014,1309,472,1781,"Felony",765,609,156,439,388,51,1204,8069
+"Larimer",296,2015,1647,508,2155,"Felony",941,735,206,465,410,55,1406,8069
+"Larimer",297,2016,2130,645,2775,"Felony",1161,905,256,586,522,64,1747,8069
+"Las Animas",106,2014,706,123,829,"Misdemeanor",465,385,80,132,86,46,597,8071
+"Las Animas",107,2015,698,86,784,"Misdemeanor",399,337,62,94,70,24,493,8071
+"Las Animas",108,2016,781,65,846,"Misdemeanor",400,335,65,65,47,18,465,8071
+"Las Animas",298,2014,105,62,167,"Felony",72,55,17,62,48,14,134,8071
+"Las Animas",299,2015,137,62,199,"Felony",77,60,17,65,46,19,142,8071
+"Las Animas",300,2016,112,43,155,"Felony",70,52,18,44,30,14,114,8071
+"Lincoln",109,2014,238,8,246,"Misdemeanor",100,89,11,6,6,NA,106,8073
+"Lincoln",110,2015,354,5,359,"Misdemeanor",99,86,13,8,6,2,107,8073
+"Lincoln",111,2016,389,8,397,"Misdemeanor",106,97,9,11,10,1,117,8073
+"Lincoln",301,2014,63,3,66,"Felony",22,19,3,4,4,NA,26,8073
+"Lincoln",302,2015,80,NA,80,"Felony",25,24,1,NA,NA,NA,25,8073
+"Lincoln",303,2016,84,3,87,"Felony",44,34,10,2,1,1,46,8073
+"Logan",112,2014,326,160,486,"Misdemeanor",204,169,35,155,124,31,359,8075
+"Logan",113,2015,243,211,454,"Misdemeanor",168,134,34,203,163,40,371,8075
+"Logan",114,2016,249,186,435,"Misdemeanor",166,135,31,172,141,31,338,8075
+"Logan",304,2014,153,73,226,"Felony",85,64,21,68,54,14,153,8075
+"Logan",305,2015,169,65,234,"Felony",104,79,25,67,54,13,171,8075
+"Logan",306,2016,194,82,276,"Felony",95,77,18,72,64,8,167,8075
+"Mesa",115,2014,1508,1312,2820,"Misdemeanor",604,466,138,1309,1088,221,1913,8077
+"Mesa",116,2015,1686,1317,3003,"Misdemeanor",591,483,108,1314,1053,261,1905,8077
+"Mesa",117,2016,1589,1402,2991,"Misdemeanor",451,376,75,1399,1119,280,1850,8077
+"Mesa",307,2014,785,721,1506,"Felony",363,277,86,721,585,136,1084,8077
+"Mesa",308,2015,755,817,1572,"Felony",288,230,58,824,671,153,1112,8077
+"Mesa",309,2016,957,1034,1991,"Felony",314,252,62,1043,849,194,1357,8077
+"Mineral",118,2014,40,NA,40,"Misdemeanor",14,13,1,NA,NA,NA,14,8079
+"Mineral",119,2015,43,2,45,"Misdemeanor",14,14,NA,1,1,NA,15,8079
+"Mineral",120,2016,36,2,38,"Misdemeanor",7,7,NA,2,2,NA,9,8079
+"Mineral",310,2014,2,NA,2,"Felony",2,2,NA,NA,NA,NA,2,8079
+"Mineral",311,2015,1,3,4,"Felony",NA,NA,NA,2,1,1,2,8079
+"Mineral",312,2016,1,NA,1,"Felony",1,1,NA,NA,NA,NA,1,8079
+"Moffat",121,2014,246,95,341,"Misdemeanor",177,137,40,92,69,23,269,8081
+"Moffat",122,2015,257,115,372,"Misdemeanor",176,142,34,116,89,27,292,8081
+"Moffat",123,2016,246,157,403,"Misdemeanor",150,123,27,147,121,26,297,8081
+"Moffat",313,2014,134,27,161,"Felony",92,62,30,28,23,5,120,8081
+"Moffat",314,2015,164,67,231,"Felony",121,82,39,65,53,12,186,8081
+"Moffat",315,2016,160,93,253,"Felony",97,68,29,89,75,14,186,8081
+"Montezuma",124,2014,402,466,868,"Misdemeanor",276,250,26,368,308,60,644,8083
+"Montezuma",125,2015,413,403,816,"Misdemeanor",269,226,43,298,255,43,567,8083
+"Montezuma",126,2016,421,434,855,"Misdemeanor",252,229,23,275,250,25,527,8083
+"Montezuma",316,2014,136,67,203,"Felony",86,73,13,67,54,13,153,8083
+"Montezuma",317,2015,184,60,244,"Felony",140,121,19,57,49,8,197,8083
+"Montezuma",318,2016,217,61,278,"Felony",154,137,17,61,55,6,215,8083
+"Montrose",127,2014,700,155,855,"Misdemeanor",522,393,129,180,153,27,702,8085
+"Montrose",128,2015,648,130,778,"Misdemeanor",421,328,93,173,137,36,594,8085
+"Montrose",129,2016,607,181,788,"Misdemeanor",393,309,84,238,189,49,631,8085
+"Montrose",319,2014,282,21,303,"Felony",166,110,56,45,35,10,211,8085
+"Montrose",320,2015,276,21,297,"Felony",174,113,61,49,37,12,223,8085
+"Montrose",321,2016,267,34,301,"Felony",191,112,79,71,59,12,262,8085
+"Morgan",130,2014,755,201,956,"Misdemeanor",336,288,48,176,151,25,512,8087
+"Morgan",131,2015,775,238,1013,"Misdemeanor",352,303,49,230,187,43,582,8087
+"Morgan",132,2016,693,247,940,"Misdemeanor",319,279,40,231,194,37,550,8087
+"Morgan",322,2014,182,53,235,"Felony",113,74,39,52,44,8,165,8087
+"Morgan",323,2015,169,81,250,"Felony",98,77,21,78,59,19,176,8087
+"Morgan",324,2016,207,90,297,"Felony",108,81,27,89,64,25,197,8087
+"Otero",133,2014,479,157,636,"Misdemeanor",369,290,79,161,132,29,530,8089
+"Otero",134,2015,376,228,604,"Misdemeanor",312,253,59,191,159,32,503,8089
+"Otero",135,2016,210,305,515,"Misdemeanor",180,135,45,241,208,33,421,8089
+"Otero",325,2014,139,65,204,"Felony",99,76,23,64,45,19,163,8089
+"Otero",326,2015,171,53,224,"Felony",136,88,48,51,35,16,187,8089
+"Otero",327,2016,153,65,218,"Felony",109,79,30,64,48,16,173,8089
+"Ouray",136,2014,88,19,107,"Misdemeanor",68,60,8,13,10,3,81,8091
+"Ouray",137,2015,79,14,93,"Misdemeanor",46,41,5,13,12,1,59,8091
+"Ouray",138,2016,99,13,112,"Misdemeanor",60,51,9,13,11,2,73,8091
+"Ouray",328,2014,14,2,16,"Felony",8,6,2,2,2,NA,10,8091
+"Ouray",329,2015,15,2,17,"Felony",12,9,3,3,2,1,15,8091
+"Ouray",330,2016,22,2,24,"Felony",19,15,4,3,2,1,22,8091
+"Park",139,2014,313,66,379,"Misdemeanor",232,211,21,73,67,6,305,8093
+"Park",140,2015,292,84,376,"Misdemeanor",172,158,14,96,88,8,268,8093
+"Park",141,2016,251,105,356,"Misdemeanor",154,139,15,103,92,11,257,8093
+"Park",331,2014,53,13,66,"Felony",38,31,7,17,15,2,55,8093
+"Park",332,2015,61,17,78,"Felony",52,42,10,19,14,5,71,8093
+"Park",333,2016,56,11,67,"Felony",43,40,3,11,9,2,54,8093
+"Phillips",142,2014,39,5,44,"Misdemeanor",27,21,6,5,4,1,32,8095
+"Phillips",143,2015,41,22,63,"Misdemeanor",27,19,8,21,14,7,48,8095
+"Phillips",144,2016,54,21,75,"Misdemeanor",36,30,6,16,15,1,52,8095
+"Phillips",334,2014,12,NA,12,"Felony",9,7,2,NA,NA,NA,9,8095
+"Phillips",335,2015,18,2,20,"Felony",15,11,4,2,2,NA,17,8095
+"Phillips",336,2016,15,7,22,"Felony",12,11,1,7,7,NA,19,8095
+"Pitkin",145,2014,164,61,225,"Misdemeanor",117,97,20,62,50,12,179,8097
+"Pitkin",146,2015,121,53,174,"Misdemeanor",74,65,9,53,43,10,127,8097
+"Pitkin",147,2016,169,41,210,"Misdemeanor",94,80,14,39,32,7,133,8097
+"Pitkin",337,2014,38,4,42,"Felony",30,25,5,4,3,1,34,8097
+"Pitkin",338,2015,62,13,75,"Felony",51,44,7,13,9,4,64,8097
+"Pitkin",339,2016,53,22,75,"Felony",42,32,10,23,20,3,65,8097
+"Prowers",148,2014,629,68,697,"Misdemeanor",334,270,64,73,47,26,407,8099
+"Prowers",149,2015,662,59,721,"Misdemeanor",325,264,61,62,50,12,387,8099
+"Prowers",150,2016,625,34,659,"Misdemeanor",273,223,50,34,29,5,307,8099
+"Prowers",340,2014,108,47,155,"Felony",76,63,13,47,36,11,123,8099
+"Prowers",341,2015,157,48,205,"Felony",113,81,32,48,39,9,161,8099
+"Prowers",342,2016,179,52,231,"Felony",100,86,14,53,47,6,153,8099
+"Pueblo",151,2014,2513,835,3348,"Misdemeanor",1496,1340,156,826,729,97,2322,8101
+"Pueblo",152,2015,2077,1332,3409,"Misdemeanor",1183,1021,162,1307,1145,162,2490,8101
+"Pueblo",153,2016,1906,1576,3482,"Misdemeanor",827,719,108,1506,1319,187,2333,8101
+"Pueblo",343,2014,1364,481,1845,"Felony",588,453,135,481,420,61,1069,8101
+"Pueblo",344,2015,1388,787,2175,"Felony",637,502,135,790,688,102,1427,8101
+"Pueblo",345,2016,1607,657,2264,"Felony",644,541,103,651,586,65,1295,8101
+"Rio Blanco",154,2014,193,12,205,"Misdemeanor",150,140,10,10,10,NA,160,8103
+"Rio Blanco",155,2015,194,14,208,"Misdemeanor",138,111,27,15,15,NA,153,8103
+"Rio Blanco",156,2016,129,24,153,"Misdemeanor",84,71,13,20,17,3,104,8103
+"Rio Blanco",346,2014,47,5,52,"Felony",35,26,9,9,6,3,44,8103
+"Rio Blanco",347,2015,33,10,43,"Felony",26,22,4,9,7,2,35,8103
+"Rio Blanco",348,2016,55,13,68,"Felony",44,34,10,11,10,1,55,8103
+"Rio Grande",157,2014,231,97,328,"Misdemeanor",97,67,30,104,79,25,201,8105
+"Rio Grande",158,2015,229,94,323,"Misdemeanor",104,82,22,87,70,17,191,8105
+"Rio Grande",159,2016,202,87,289,"Misdemeanor",103,77,26,84,69,15,187,8105
+"Rio Grande",349,2014,100,61,161,"Felony",62,43,19,67,50,17,129,8105
+"Rio Grande",350,2015,73,63,136,"Felony",52,33,19,60,49,11,112,8105
+"Rio Grande",351,2016,115,50,165,"Felony",76,45,31,53,38,15,129,8105
+"Routt",160,2014,385,166,551,"Misdemeanor",296,270,26,161,143,18,457,8107
+"Routt",161,2015,365,172,537,"Misdemeanor",249,235,14,171,151,20,420,8107
+"Routt",162,2016,309,176,485,"Misdemeanor",200,183,17,169,146,23,369,8107
+"Routt",352,2014,72,29,101,"Felony",53,43,10,30,26,4,83,8107
+"Routt",353,2015,95,65,160,"Felony",72,59,13,62,53,9,134,8107
+"Routt",354,2016,58,42,100,"Felony",39,31,8,40,34,6,79,8107
+"Saguache",163,2014,84,38,122,"Misdemeanor",35,25,10,38,34,4,73,8109
+"Saguache",164,2015,69,31,100,"Misdemeanor",29,26,3,30,26,4,59,8109
+"Saguache",165,2016,88,30,118,"Misdemeanor",35,27,8,26,23,3,61,8109
+"Saguache",355,2014,18,23,41,"Felony",15,13,2,21,17,4,36,8109
+"Saguache",356,2015,19,19,38,"Felony",13,8,5,19,15,4,32,8109
+"Saguache",357,2016,48,14,62,"Felony",31,27,4,14,10,4,45,8109
+"San Juan",166,2014,11,2,13,"Misdemeanor",3,2,1,1,1,NA,4,8111
+"San Juan",167,2015,19,1,20,"Misdemeanor",6,3,3,1,1,NA,7,8111
+"San Juan",168,2016,19,4,23,"Misdemeanor",8,5,3,2,2,NA,10,8111
+"San Juan",358,2014,3,1,4,"Felony",2,2,NA,1,NA,1,3,8111
+"San Juan",359,2015,NA,NA,NA,"Felony",NA,NA,NA,NA,NA,NA,NA,8111
+"San Juan",360,2016,8,5,13,"Felony",7,5,2,3,3,NA,10,8111
+"San Miguel",169,2014,134,33,167,"Misdemeanor",110,92,18,29,21,8,139,8113
+"San Miguel",170,2015,143,30,173,"Misdemeanor",114,102,12,31,26,5,145,8113
+"San Miguel",171,2016,209,25,234,"Misdemeanor",179,162,17,22,20,2,201,8113
+"San Miguel",361,2014,28,7,35,"Felony",20,14,6,7,5,2,27,8113
+"San Miguel",362,2015,48,6,54,"Felony",37,31,6,9,6,3,46,8113
+"San Miguel",363,2016,46,12,58,"Felony",40,32,8,8,7,1,48,8113
+"Sedgwick",172,2014,36,7,43,"Misdemeanor",20,19,1,6,6,NA,26,8115
+"Sedgwick",173,2015,56,15,71,"Misdemeanor",25,24,1,15,12,3,40,8115
+"Sedgwick",174,2016,62,7,69,"Misdemeanor",31,29,2,7,7,NA,38,8115
+"Sedgwick",364,2014,8,2,10,"Felony",7,4,3,2,1,1,9,8115
+"Sedgwick",365,2015,13,7,20,"Felony",10,6,4,7,7,NA,17,8115
+"Sedgwick",366,2016,21,9,30,"Felony",13,12,1,8,8,NA,21,8115
+"Summit",175,2014,862,63,925,"Misdemeanor",647,573,74,69,61,8,716,8117
+"Summit",176,2015,938,110,1048,"Misdemeanor",709,616,93,107,89,18,816,8117
+"Summit",177,2016,820,112,932,"Misdemeanor",570,511,59,108,84,24,678,8117
+"Summit",367,2014,209,13,222,"Felony",144,126,18,16,12,4,160,8117
+"Summit",368,2015,230,19,249,"Felony",164,128,36,20,14,6,184,8117
+"Summit",369,2016,264,19,283,"Felony",189,160,29,20,13,7,209,8117
+"Teller",178,2014,529,139,668,"Misdemeanor",406,367,39,127,114,13,533,8119
+"Teller",179,2015,504,121,625,"Misdemeanor",341,302,39,111,100,11,452,8119
+"Teller",180,2016,461,119,580,"Misdemeanor",278,244,34,114,110,4,392,8119
+"Teller",370,2014,169,14,183,"Felony",110,93,17,9,8,1,119,8119
+"Teller",371,2015,167,21,188,"Felony",101,96,5,18,16,2,119,8119
+"Teller",372,2016,205,27,232,"Felony",134,113,21,27,24,3,161,8119
+"Washington",181,2014,67,29,96,"Misdemeanor",43,42,1,31,29,2,74,8121
+"Washington",182,2015,80,37,117,"Misdemeanor",54,47,7,36,33,3,90,8121
+"Washington",183,2016,97,25,122,"Misdemeanor",46,44,2,23,22,1,69,8121
+"Washington",373,2014,11,4,15,"Felony",5,3,2,4,3,1,9,8121
+"Washington",374,2015,8,6,14,"Felony",6,5,1,6,6,NA,12,8121
+"Washington",375,2016,21,12,33,"Felony",13,12,1,13,12,1,26,8121
+"Weld",184,2014,3329,1343,4672,"Misdemeanor",2227,1839,388,1092,967,125,3319,8123
+"Weld",185,2015,3200,2156,5356,"Misdemeanor",2037,1631,406,1911,1658,253,3948,8123
+"Weld",186,2016,2677,2747,5424,"Misdemeanor",1627,1301,326,2256,1972,284,3883,8123
+"Weld",376,2014,1648,468,2116,"Felony",824,659,165,483,391,92,1307,8123
+"Weld",377,2015,1591,596,2187,"Felony",789,601,188,609,536,73,1398,8123
+"Weld",378,2016,1887,647,2534,"Felony",877,679,198,655,533,122,1532,8123
+"Yuma",187,2014,90,22,112,"Misdemeanor",65,60,5,21,20,1,86,8125
+"Yuma",188,2015,121,30,151,"Misdemeanor",85,73,12,31,25,6,116,8125
+"Yuma",189,2016,107,39,146,"Misdemeanor",74,62,12,33,27,6,107,8125
+"Yuma",379,2014,32,3,35,"Felony",22,19,3,3,3,NA,25,8125
+"Yuma",380,2015,43,10,53,"Felony",34,19,15,9,6,3,43,8125
+"Yuma",381,2016,47,14,61,"Felony",32,26,6,14,12,2,46,8125
+"Denver",238,2014,3817,1271,5088,"Felony",1936,1632,304,1313,1186,127,3249,8031
+"Denver",239,2015,4036,1319,5355,"Felony",2069,1751,318,1446,1291,155,3515,8031
+"Denver",240,2016,4037,2572,6609,"Felony",1902,1621,281,2619,2286,333,4521,8031
