@@ -15,12 +15,13 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE NoMonomorphismRestriction #-}
-{-# LANGUAGE ApplicativeDo #-}
+{-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
 module Frames.Aggregations
   (
     RescaleType (..)
-  , BinsWithRescale (..)
+  , FType
+  , DblX
+  , DblY
   , goodDataCount
   , goodDataByKey
   , filterField
@@ -28,18 +29,22 @@ module Frames.Aggregations
   , aggregateToMap
   , aggregateGeneral
   , aggregateFiltered
+  , aggregateFM
   , aggregateF
-  , Binnable (..)
-  , binField
+  , aggregateFsM
+  , aggregateFs
+  , transformEachM
+  , transformEach
   , rescale
-  , ThreeDTransformable (..)
-  , scatterMerge
-  , kMeans
-  , forgyCentroids
-  , euclidSq
-  , scatterMergeOne
-  , scatterMerge'
-  , buildScatterMerge
+  , ScaleAndUnscale(..)
+  , scaleAndUnscale
+  , weightedScaleAndUnscale
+  , DataField
+  , DataFieldOf
+  , TwoColData
+  , ThreeColData
+  , ThreeDTransformable
+  , KeyedRecord
   , reshapeRowSimple
   ) where
 
@@ -187,9 +192,6 @@ data RescaleType a where
   RescaleNormalize :: RealFloat a => Double -> RescaleType a
   RescaleGiven :: (a, Double) -> RescaleType a
 
--- NB: Bins are unscaled; scaling function to be applied after binning  
-data BinsWithRescale a = BinsWithRescale { bins :: [a],  shift :: a, scale :: Double} -- left in a form where a need not be a type that supports division 
-
 rescale :: Num a  => RescaleType a -> FL.Fold a (a, Double)
 rescale RescaleNone = pure (0,1)
 rescale (RescaleGiven x) = pure x
@@ -203,70 +205,59 @@ rescale (RescaleMedian s) = (,) <$> pure 0 <*> (fmap ((/s) . listToMedian) FL.li
       0 -> 1
       _ -> let m = n `div` 2 in if (odd n) then realToFrac (l !! m) else realToFrac (l List.!! m + l List.!! (m - 1))/2.0
 
+
+wgt :: (Real a, Real w) => (a , w) -> Double
+wgt  (x,y) = realToFrac x * realToFrac y
+
+weightedRescale :: forall a w. (Real a, Real w)  => RescaleType a -> FL.Fold (a,w) (a, Double)
+weightedRescale RescaleNone = pure (0,1)
+weightedRescale (RescaleGiven x) = pure x
+weightedRescale (RescaleMean s) =
+  let folds = (,) <$> PF.lmap wgt FL.mean <*> PF.lmap snd FL.sum
+      f (wm, tw) = (0, wm/(s * realToFrac tw))
+  in f <$> folds 
+weightedRescale (RescaleNormalize s) =
+  let folds = (,,) <$> PF.lmap wgt FL.mean <*> PF.lmap wgt FL.std <*> PF.lmap snd FL.sum
+      f (wm, ws, tw) = (realToFrac (wm/realToFrac tw), ws/realToFrac tw)
+  in f <$> folds
+weightedRescale (RescaleMedian s) = (,) <$> pure 0 <*> (fmap ((/s) . realToFrac . listToMedian) FL.list) where
+  listToMedian :: [(a,w)] -> a
+  listToMedian unsorted =
+    let l = List.sortBy (compare `on` fst) unsorted
+        tw = FL.fold (PF.lmap snd FL.sum) l
+    in case (List.length l) of
+      0 -> 1
+      _ -> go 0 l where
+        mw = (realToFrac tw)/2
+        go :: w -> [(a,w)] -> a
+        go _ [] = 0 -- this shouldn't happen
+        go wgtSoFar ((a,w) : was) = let wgtSoFar' = wgtSoFar + w in if realToFrac wgtSoFar' > mw then a else go wgtSoFar' was
+        
+
+data ScaleAndUnscale a = ScaleAndUnscale { from :: (a -> Double), backTo :: (Double -> a) }
+
+
+scaleAndUnscaleHelper :: Real a => (Double -> a) -> ((a, Double), (a,Double)) -> ScaleAndUnscale a
+scaleAndUnscaleHelper toA s = ScaleAndUnscale (csF s) (osF s) where
+  csF ((csShift,csScale),_) a = realToFrac (a - csShift)/csScale
+  uncsF ((csShift, csScale),_) x = (x * csScale) + realToFrac csShift
+  osF s@((csShift,csSCale),(osShift, osScale)) x = toA $ (uncsF s x - realToFrac osShift)/osScale
+
+scaleAndUnscale :: Real a => RescaleType a -> RescaleType a -> (Double -> a) -> FL.Fold a (ScaleAndUnscale a)
+scaleAndUnscale computeScale outScale toA = fmap (scaleAndUnscaleHelper toA) shifts where 
+  shifts = (,) <$> rescale computeScale <*> rescale outScale
+
+weightedScaleAndUnscale :: (Real a, Real w) => RescaleType a -> RescaleType a -> (Double -> a) -> FL.Fold (a,w) (ScaleAndUnscale a)
+weightedScaleAndUnscale computeScale outScale toA = fmap (scaleAndUnscaleHelper toA) shifts where
+  shifts = (,) <$> weightedRescale computeScale <*> weightedRescale outScale
+
+
+
+
 type FType x = V.Snd x
 
-type Binnable x w =  (V.KnownField x, Real (FType x),
-                      V.KnownField w, Real (FType w))
-                     
-binField :: forall x w. Binnable x w => Int -> RescaleType (FType x) -> FL.Fold (F.Record '[x,w]) (BinsWithRescale (FType x))
-binField numBins rt =
-  let process :: [(FType x, FType w)] -> F.Record '[x,w] -> [(FType x, FType w)]  
-      process l r  = V.runcurryX (\x w -> (x, w) : l) r
-      extract :: RescaleType (FType x) -> [(FType x, FType w)] -> BinsWithRescale (FType x)
-      extract rt l =
-        let compFst (x,_) (x',_) = compare x x'
-            scaleInfo = FL.fold (rescale rt) (fst <$> l)
-            (totalWeight, listWithSummedWeights) = List.mapAccumL (\sw (x,w) -> (sw+w, (x,w,sw+w))) 0 $ List.sortBy compFst l
-            weightPerBin :: Double = (realToFrac totalWeight)/(fromIntegral numBins)
-            lowerBounds :: [(b, FType w, FType w)] -> [b] -> [b]
-            lowerBounds x bs = case List.null x of
-              True -> bs
-              False ->
-                let nextLB = (\(x,_,_) -> x) . head $ x
-                    newX = List.dropWhile (\(_,_,sw) -> (realToFrac sw) < weightPerBin * (fromIntegral $ List.length bs + 1)) x
-                    newBS = bs ++ [nextLB]
-                in lowerBounds newX newBS
-        in BinsWithRescale (lowerBounds listWithSummedWeights []) (fst scaleInfo) (snd scaleInfo)
-  in FL.Fold process [] (extract rt)
-
-type KeyedRecord ks rs = (ks F.⊆ rs, Ord (F.Record ks))
-type BinnableKeyedRecord rs ks x w = (TwoColData x w, KeyedRecord ks rs, '[x,w] F.⊆ rs)
-  
-binFields :: forall rs ks x w. BinnableKeyedRecord rs ks x w
-           => Int -> Proxy ks -> Proxy '[x,w] -> RescaleType (FType x) -> FL.Fold (F.Record rs) (M.Map (F.Record ks) (BinsWithRescale (FType x)))
-binFields n _ _ rt =
-  let unpack = V.Identity
-      combine :: [F.Record '[x,w]] -> F.Record rs -> [F.Record '[x,w]]
-      combine l r = F.rcast r : l
-  in FL.Fold (aggregateGeneral unpack (F.rcast @ks) combine []) M.empty (fmap (FL.fold (binField n rt)))
-
-{-
-listToBinLookup :: Ord a => [a] - > (a -> Int)
-listToBinLookup = sortedListToBinLookup . List.sort
-
-data BinData a = BinData { val :: a, bin :: Int }
-instance Ord a => Ord (BinData a) where
-  compare = compare . val
-  
-data BinLookupTree a = Leaf | Node (BinLookupTree a) (BinData a) (BinLookupTree a) 
-
-sortedListToBinLookup :: Ord a => [a] -> a -> Int
-sortedListToBinLookup as a =
-  let tree xs = case List.length of
-        0 -> Leaf
-        l -> let (left,right) = List.splitAt (l `quot` 2) xs in Node (tree left) (head right) (tree $ tail right)
-      searchTree = tree $ fmap (\(a,n) -> BinData a n) $ List.zip as [1..]
-      findBin :: Int -> a -> BinLookupTree a -> Int
-      findBin n a Leaf = n
-      findBin n a (Node l (BinData a' m) r) = if (a > a') then findBin m a r else findBin n a l
-  in findBin 0 a searchTree
--}
--- NB: a can't be less than the 0th element because we build it that way.  So we drop it
-sortedListToBinLookup' :: Ord a => [a] -> a -> Int
-sortedListToBinLookup' as a = let xs = tail as in 1 + (fromMaybe (List.length xs) $ List.findIndex (>a) xs)
-
-type X = "x" F.:-> Double
-type Y = "y" F.:-> Double
+type DblX = "double_x" F.:-> Double
+type DblY = "double_y" F.:-> Double
 
 type UseCols ks x y w = ks V.++ '[x,y,w]
 type DataField x = (V.KnownField x, Real (FType x))
@@ -278,11 +269,12 @@ instance (DataField x, x ∈ rs) => DataFieldOf rs x
 type TwoColData x y = F.AllConstrained (DataFieldOf [x,y]) '[x, y]
 type ThreeColData x y z = ([x,z] F.⊆ [x,y,z], [y,z] F.⊆ [x,y,z], [x,y] F.⊆ [x,y,z], F.AllConstrained (DataFieldOf [x,y,z]) '[x, y, z])
 
+type KeyedRecord ks rs = (ks F.⊆ rs, Ord (F.Record ks))
+
 type ThreeDTransformable rs ks x y w = (ThreeColData x y w, FI.RecVec (ks V.++ [x,y,w]),
                                         KeyedRecord ks rs,
                                         ks F.⊆ (ks V.++ [x,y,w]), (ks V.++ [x,y,w]) F.⊆ rs,
                                         F.ElemOf (ks V.++ [x,y,w]) x, F.ElemOf (ks V.++ [x,y,w]) y, F.ElemOf (ks V.++ [x,y,w]) w)
-
 
 transformEachM :: forall rs ks x y w m. (ThreeDTransformable rs ks x y w, Applicative m)
                => Proxy ks
@@ -303,251 +295,3 @@ transformEach proxy_ks proxy_xyw doOne = FL.simplify $ transformEachM proxy_ks p
 --  in aggregateFs proxy_ks (V.Identity . (F.rcast @(ks V.++ [x,y,w]))) combine [] doOne
 
 
-scatterMerge :: forall rs ks x y w. ThreeDTransformable rs ks x y w
-              => Proxy ks
-              -> Proxy '[x,y,w]
-              -> (Double -> FType x) -- when we put the averaged data back in the record with original types we need to convert back
-              -> (Double -> FType y)
-              -> Int
-              -> Int
-              -> RescaleType (FType x)
-              -> RescaleType (FType y)
-              -> FL.Fold (F.Record rs) (F.FrameRec (UseCols ks x y w))
-scatterMerge proxy_ks proxy_xyw toX toY numBinsX numBinsY rtX rtY =
-  let doOne = scatterMergeOne numBinsX numBinsY rtX rtY
-      toRecord (x', y', w') = toX x' &: toY y' &: w' &: V.RNil
-  in transformEach proxy_ks proxy_xyw (fmap toRecord . doOne)
-
-{-
-scatterMerge :: forall rs ks x y w. TwoDTransformable rs ks x y w
-              => Proxy ks
-              -> Proxy '[x,y,w]
-              -> (Double -> FType x) -- when we put the averaged data back in the record with original types we need to convert back
-              -> (Double -> FType y)
-              -> Int
-              -> Int
-              -> RescaleType (FType x)
-              -> RescaleType (FType y)
-              -> FL.Fold (F.Record rs) (F.FrameRec (UseCols ks x y w))
-scatterMerge proxy_ks _ toX toY numBinsX numBinsY rtX rtY =
-  let combine l r = F.rcast @[x,y,w] r : l
-      toRecord :: (Double, Double, FType w) -> F.Record '[x,y,w]
-      toRecord (x', y', w) = toX x' &: toY y' &: w &: V.RNil 
-  in aggregateFs proxy_ks (V.Identity . (F.rcast @(ks V.++ [x,y,w]))) combine [] (fmap toRecord . scatterMergeOne numBinsX numBinsY rtX rtY)
--}
-
-  
-scatterMergeOne :: forall x y w f. (ThreeColData x y w, Foldable f)
-                => Int -> Int -> RescaleType (FType x) -> RescaleType (FType y) -> f (F.Record '[x,y,w]) -> [(Double, Double, FType w)]
-scatterMergeOne numBinsX numBinsY rtX rtY dataRows =
-  let xBinF = PF.lmap (F.rcast @[x,w]) $ binField numBinsX rtX
-      yBinF = PF.lmap (F.rcast @[y,w]) $ binField numBinsY rtY
-      (xBins, yBins) = FL.fold ((,) <$> xBinF <*> yBinF) dataRows
-      binningInfo (BinsWithRescale bs shift scale) = (sortedListToBinLookup' bs, (\x -> realToFrac (x - shift)/scale))
-      (binX, scaleX) = binningInfo xBins
-      (binY, scaleY) = binningInfo yBins
-      binAndScale :: F.Record '[x,y,w] -> ((Int, Int), Double, Double, FType w)
-      binAndScale = V.runcurryX (\x y w -> ((binX x, binY y),scaleX x, scaleY y, w))
-      getKey (k,_,_,_) = k
-      getData (_,x,y,w) = (x,y,w)
-      combine l x = getData x : l
-      wgtdSumF :: FL.Fold (Double, Double, FType w) (Double, Double, FType w)
-      wgtdSumF =
-        let f (wX, wY, totW) (x, y, w) = let w' = realToFrac w in (wX + w' * x, wY + w' * y, totW + w)
-        in FL.Fold f (0, 0 , 0) (\(wX, wY, totW) -> let tw = realToFrac totW in (wX/tw, wY/tw, totW))
-  in FL.fold (FL.Fold (aggregateGeneral (V.Identity . binAndScale) getKey combine []) M.empty (fmap (FL.fold wgtdSumF . snd) . M.toList)) dataRows
-        
-
--- k-means
--- use the weights when computing the centroid location
--- initialize with random centers (Forgy) for now.
-
-data Weighted a w = Weighted { dimension :: Int, location :: a -> U.Vector Double, weight :: a -> w } 
-newtype Cluster a = Cluster { members :: [a] } deriving (Eq, Show)
-newtype Clusters a = Clusters (V.Vector (Cluster a))  deriving (Show, Eq)
-newtype Centroids = Centroids { centers :: V.Vector (U.Vector Double) } deriving (Show)
-type Distance = U.Vector Double -> U.Vector Double -> Double
-
-emptyCluster :: Cluster a 
-emptyCluster = Cluster []
-
--- compute some initial random locations
--- TODO: use normal dist around mean and std-dev
-forgyCentroids :: forall x y w f m. (F.AllConstrained (DataFieldOf [x,y,w]) '[x, y, w], Foldable f, R.MonadRandom m)
-               => Int -- number of clusters
-               -> f (F.Record '[x,y,w])
-               -> m [(Double, Double)]
-forgyCentroids n dataRows = do
-  let h = fromMaybe (0 :: Double) . fmap realToFrac   
-      (xMin, xMax, yMin, yMax) = FL.fold ((,,,)
-                                           <$> PF.dimap (F.rgetField @x) h FL.minimum
-                                           <*> PF.dimap (F.rgetField @x) h FL.maximum
-                                           <*> PF.dimap (F.rgetField @y) h FL.minimum
-                                           <*> PF.dimap (F.rgetField @y) h FL.maximum) dataRows
-      uniformPair = do
-        ux <- R.uniform xMin xMax -- TODO: this is not a good way to deal with the Maybe here
-        uy <- R.uniform yMin yMax
-        return (ux,uy)
-  R.sample $ mapM (const uniformPair) $ replicate n ()
-
-weighted2DRecord :: forall x y w. (DataField x, DataField y, DataField w, F.ElemOf [x,y,w] w) => Weighted (F.Record '[x,y,w]) (FType w)
-weighted2DRecord = Weighted 2 (V.runcurryX (\x y _ -> U.fromList [realToFrac x, realToFrac y])) (F.rgetField @w)
-
--- compute the centroid of the data.  Useful for the kMeans algo and computing the centroid of the final clusters
-centroid :: forall g w a. (Foldable g, Real w) => Weighted a w -> g a -> (U.Vector Double, w)
-centroid weighted as =
-  let addOne :: (U.Vector Double, w) -> a -> (U.Vector Double, w)
-      addOne (sumV, sumW) x =
-        let w = weight weighted $ x
-            v = location weighted $ x
-        in (U.zipWith (+) sumV (U.map (* (realToFrac w)) v), sumW + w)
-      finishOne (sumV, sumW) = U.map (/(realToFrac sumW)) sumV
-  in FL.fold ((,) <$> FL.Fold addOne (U.replicate (dimension weighted) 0, 0) finishOne <*> FL.premap (weight weighted) FL.sum) as
-
-euclidSq :: Distance
-euclidSq v1 v2 = U.sum $ U.zipWith diffsq v1 v2
-  where diffsq a b = (a-b)^(2::Int)
-
--- TODOS:
--- Fix scaling.
-kMeans :: forall rs ks x y w m f. (ThreeDTransformable rs ks x y w, F.ElemOf [X,Y,w] w, R.MonadRandom m)
-       => Proxy ks
-       -> Proxy '[x,y,w]
-       -> (Double -> FType x) -- when we put the averaged data back in the record with original types we need to convert back
-       -> (Double -> FType y)
-       -> RescaleType (FType x)
-       -> RescaleType (FType y)
-       -> Int
-       -> (Int -> [F.Record '[X,Y,w]] -> m [(Double, Double)])  -- initial centroids
-       -> Distance
-       -> FL.FoldM m (F.Record rs) (F.FrameRec (UseCols ks x y w))
-kMeans proxy_ks proxy_xyw toX toY rtX rtY numClusters makeInitial distance =
-  let toRecord (x', y', w) = toX x' &: toY y' &: w &: V.RNil
-      computeOne = kMeansOne rtX rtY numClusters makeInitial weighted2DRecord distance
-  in transformEachM proxy_ks proxy_xyw (fmap (fmap toRecord) . computeOne)
-
-kMeansOne :: forall x y w f m. (ThreeColData x y w, Foldable f, Functor f, R.MonadRandom m)
-          => RescaleType (FType x)
-          -> RescaleType (FType y)
-          -> Int 
-          -> (Int -> f (F.Record '[X,Y,w]) -> m [(Double, Double)])  -- initial centroids, monadic because may need randomness
-          -> Weighted (F.Record '[X,Y,w]) (FType w) 
-          -> Distance
-          -> f (F.Record '[x,y,w])
-          -> m [(Double, Double, FType w)]
-kMeansOne rtX rtY numClusters makeInitial weighted distance dataRows = do
-  let ((xShift, xScale), (yShift, yScale)) = FL.fold ((,) <$> PF.lmap (F.rgetField @x) (rescale rtX) <*> PF.lmap (F.rgetField @y) (rescale rtY)) dataRows
-      scaledRows = fmap (V.runcurryX (\x y w -> realToFrac (x - xShift)/xScale &: realToFrac (y - yShift)/yScale &: w &: V.RNil)) dataRows  
-  initial <- makeInitial numClusters scaledRows 
-  let initialCentroids = Centroids $ V.fromList $ fmap (\(x,y) -> U.fromList [x,y]) initial
-      (Clusters clusters) = weightedKMeans initialCentroids weighted distance scaledRows
-      fix :: (U.Vector Double, FType w) -> (Double, Double, FType w)
-      fix (v, wgt) = (v U.! 0, v U.! 1, wgt)
-  return $ V.toList $ fmap (fix . centroid weighted . members) clusters
-        
-weightedKMeans :: forall a w f. (Foldable f, Real w, Eq a)
-               => Centroids -- initial guesses at centers 
-               -> Weighted a w -- location/weight from data
-               -> Distance
-               -> f a
-               -> Clusters a 
-weightedKMeans initial weighted distF as = 
-  -- put them all in one cluster just to start.  Doesn't matter since we have initial centroids
-  let k = V.length (centers initial) -- number of clusters
-      d = U.length (V.head $ centers initial) -- number of dimensions
-      clusters0 = Clusters (V.fromList $ Cluster (Foldable.toList as) : (List.replicate (k - 1) emptyCluster))
-      nearest :: Centroids -> a -> Int
-      nearest cs a = V.minIndexBy (compare `on` distF (location weighted a)) (centers cs)
-      updateClusters :: Centroids -> Clusters a -> Clusters a
-      updateClusters centroids (Clusters oldCs) =
-        let doOne :: [(Int, a)] -> Cluster a -> [(Int, a)]
-            doOne soFar (Cluster as) = FL.fold (FL.Fold (\l x -> (nearest centroids x, x) : l) soFar id) as
-            repackage :: [(Int, a)] -> Clusters a
-            repackage = Clusters . V.unsafeAccum (\(Cluster l) x -> Cluster (x : l)) (V.replicate k emptyCluster)
-        in FL.fold (FL.Fold doOne [] repackage) oldCs
-      centroids :: Clusters a -> Centroids
-      centroids (Clusters cs) = Centroids $ fmap (fst. centroid weighted . members) cs
-      doStep cents clusters = let newClusters = updateClusters cents clusters in (newClusters, centroids newClusters) 
-      go oldClusters (newClusters, centroids) =
-        case (oldClusters == newClusters) of
-          True -> newClusters
-          False -> go newClusters (doStep centroids newClusters)
-  in go clusters0 (doStep initial clusters0)
-
--- All unused below but might be useful to have around.
-
-data Bin2DT = Bin2D (Int, Int) deriving (Show, Eq, Ord)
-
-F.declareColumn "Bin2D" ''Bin2DT
-
-type instance FI.VectorFor Bin2DT = V.Vector
-instance F.ShowCSV Bin2DT where
-  showCSV = T.pack . show
-
-
-type OutKeyCols ks = ks V.++ '[Bin2D]
-type BinnedDblCols ks w = ks V.++ '[Bin2D, X, Y, w]
-type BinnedDblColsC ks w = (Bin2D ∈ BinnedDblCols ks w, X ∈ BinnedDblCols ks w, Y ∈ BinnedDblCols ks w, w ∈ BinnedDblCols ks w)
-type BinnedResultCols ks x y w = ks V.++ '[Bin2D, x, y, w]
-type UseColsC ks x y w = (ks F.⊆ UseCols ks x y w, x ∈ UseCols ks x y w, y ∈ UseCols ks x y w, w ∈ UseCols ks x y w)
-
-type ScatterMergeable' rs ks x y w = (ks F.⊆ rs,
-                                      Ord (F.Record ks),
-                                      FI.RecVec (BinnedResultCols ks x y w),
-                                       F.AllConstrained (DataFieldOf rs) '[x, y, w],
-                                       BinnedDblColsC ks w,
-                                       UseCols ks x y w F.⊆ rs, UseColsC ks x y w,
-                                       OutKeyCols ks F.⊆ BinnedDblCols ks w,
-                                       Ord (F.Record (OutKeyCols ks)),
-                                       UseCols ks x y w F.⊆ BinnedResultCols ks x y w,
-                                       ((OutKeyCols ks) V.++ '[x,y,w]) ~ (BinnedResultCols ks x y w))
-
-scatterMerge' :: forall rs ks x y w. ScatterMergeable' rs ks x y w
-             => Proxy ks
-             -> Proxy '[x,y,w]
-             -> (Double -> FType x) -- when we put the averaged data back in the record with original types we need to convert back
-             -> (Double -> FType y)
-             -> M.Map (F.Record ks) (BinsWithRescale (FType x))
-             -> M.Map (F.Record ks) (BinsWithRescale (FType y))
-             -> FL.Fold (F.Record rs) (F.FrameRec (UseCols ks x y w))
-scatterMerge' _ _ toX toY xBins yBins =
-  let binningInfo :: Real c => BinsWithRescale c -> (c -> Int, c -> Double)
-      binningInfo (BinsWithRescale bs shift scale) = (sortedListToBinLookup' bs, (\x -> realToFrac (x - shift)/scale))
-      xBinF = binningInfo <$> xBins
-      yBinF = binningInfo <$> yBins
-      binRow :: F.Record (UseCols ks x y w) -> F.Record (BinnedDblCols ks w) -- 'ks ++ [Bin2D,X,Y,w]
-      binRow r =
-        let key = F.rcast @ks r
-            xyw = F.rcast @[x,y,w] r
-            (xBF, xSF) = fromMaybe (const 0, realToFrac) $ M.lookup key xBinF
-            (yBF, ySF) = fromMaybe (const 0, realToFrac) $ M.lookup key yBinF
-            binnedAndScaled :: F.Record '[Bin2D, X, Y, w] = V.runcurryX (\x y w -> Bin2D (xBF x, yBF y) &: xSF x &: ySF y &: w &: V.RNil) xyw
-        in key V.<+> binnedAndScaled 
-      wgtdSum :: (Double, Double, FType w) -> F.Record (BinnedDblCols ks w) -> (Double, Double, FType w)
-      wgtdSum (wX, wY, totW) r =
-        let xyw :: F.Record '[X,Y,w] = F.rcast r
-        in  V.runcurryX (\x y w -> let w' = realToFrac w in (wX + (w' * x), wY + (w' * y), totW + w)) xyw
-      extract :: [F.Record (BinnedDblCols ks w)] -> F.Record '[x,y,w]  
-      extract = FL.fold (FL.Fold wgtdSum (0, 0, 0) (\(wX, wY, totW) -> let totW' = realToFrac totW in toX (wX/totW') &:  toY (wY/totW') &: totW &: V.RNil))
-  in fmap (fmap (F.rcast @(UseCols ks x y w))) $ aggregateF (Proxy @(OutKeyCols ks)) (V.Identity . binRow . (F.rcast @(UseCols ks x y w))) (\l a -> a : l) [] extract     
-
-
-type BinMap ks x = M.Map (F.Record ks) (BinsWithRescale (FType x))
-buildScatterMerge :: forall rs ks x y w. (BinnableKeyedRecord rs ks x w, BinnableKeyedRecord rs ks y w, ScatterMergeable' rs ks x y w)
-                  => Proxy ks
-                  -> Proxy '[x,y,w]
-                  -> Int
-                  -> Int
-                  -> RescaleType (FType x)
-                  -> RescaleType (FType y)
-                  -> (Double -> FType x)
-                  -> (Double -> FType y)
-                  -> (FL.Fold (F.Record rs) (BinMap ks x, BinMap ks y),
-                      (BinMap ks x, BinMap ks y) -> FL.Fold (F.Record rs) (F.FrameRec (UseCols ks x y w)))
-buildScatterMerge proxy_ks proxy_xyw xNumBins yNumBins rtX rtY toX toY =
-  let binXFold = binFields xNumBins proxy_ks (Proxy @[x,w]) rtX
-      binYFold = binFields yNumBins proxy_ks (Proxy @[y,w]) rtY
-      smFold (xBins, yBins) = scatterMerge' proxy_ks proxy_xyw toX toY xBins yBins
-  in ((,) <$> binXFold <*> binYFold, smFold)
-                      
-  

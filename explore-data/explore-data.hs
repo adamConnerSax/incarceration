@@ -14,7 +14,9 @@
 module Main where
 
 import           DataSources
-import           Frames.Aggregations       as FA
+import qualified Frames.Aggregations       as FA
+import qualified Frames.KMeans             as KM
+import qualified Frames.ScatterMerge       as SM
 
 import qualified Control.Foldl             as FL
 import           Control.Lens              ((^.))
@@ -79,8 +81,6 @@ ratesByGenderAndYear =
       emptyRow = 0 &: 0 &: 0 &: V.RNil
   in FA.aggregateF (Proxy @[Year, Gender]) unpack (flip $ V.recAdd . F.rcast) emptyRow gRates
 
-
-
 type TrendsPovRow = '[Year, Fips, State, CountyName, Urbanicity, TotalPop, CrimeRate, IncarcerationRate, ImprisonedPerCrimeRate]
 --TotalPop, TotalPop15To64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]
 
@@ -126,9 +126,13 @@ incomePovertyJoinData trendsData povertyData = do
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
   let dataProxy = Proxy @[MedianHI, IncarcerationRate, TotalPop]
-      kmIncarcerationRatevsIncome proxy_ks = kMeans proxy_ks dataProxy round id (RescaleMedian 100) (RescaleGiven (0,0.01)) 10 forgyCentroids euclidSq
+      sunXF :: FL.Fold (F.Record [MedianHI, IncarcerationRate, TotalPop]) (FA.ScaleAndUnscale Int)
+      sunXF = FL.premap (runcurryX (\x _ w -> (x,w))) $ FA.weightedScaleAndUnscale (FA.RescaleMedian 100) (FA.RescaleMedian 100) round
+      sunYF :: FL.Fold (F.Record [MedianHI, IncarcerationRate, TotalPop]) (FA.ScaleAndUnscale Double)
+      sunYF = FL.premap (runcurryX (\_ y w -> (y,w))) $ FA.weightedScaleAndUnscale (FA.RescaleGiven (0,0.01)) FA.RescaleNone id
+      kmIncarcerationRatevsIncome proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 10 KM.partitionCentroids KM.euclidSq
       (kmYrFrame, kmStateYrFrame, kmUrbYrFrame) =
-        runIdentity $ flip evalStateT (pureMT 1) $ FL.foldM ((,,)
+        runIdentity {- $ flip evalStateT (pureMT 1)-} $ FL.foldM ((,,)
                                                              <$> kmIncarcerationRatevsIncome proxyYear
                                                              <*> kmIncarcerationRatevsIncome (Proxy @[State,Year])
                                                              <*> kmIncarcerationRatevsIncome (Proxy @[Urbanicity,Year])) trendsWithPovertyF
