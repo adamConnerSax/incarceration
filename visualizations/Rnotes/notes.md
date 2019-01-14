@@ -54,6 +54,10 @@ A quick look at the joined data...
 
     ## Warning: Removed 1 rows containing missing values (geom_point).
 
+    ## Warning: Removed 7 rows containing missing values (geom_point).
+
+![](notes_files/figure-markdown_github/CO%20data%20kmeans-1.png)
+
 From call
 =========
 

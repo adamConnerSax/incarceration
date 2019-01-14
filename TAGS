@@ -59,17 +59,25 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-joins.hs,320
+./explore-data/colorado-joins.hs,654
 module Main Main15,16
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols55,56
-F.tableTypes' F.tableTypes'57,58
-type instance instance59,60
-type instance FI.VectorFor FI.VectorFor59,60
-justsFromRec justsFromRec62,63
-justsFromRec justsFromRec63,64
-type MoneyPct MoneyPct65,66
-main main67,68
-main main68,69
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols64,65
+F.tableTypes' F.tableTypes'66,67
+type instance instance68,69
+type instance FI.VectorFor FI.VectorFor68,69
+justsFromRec justsFromRec71,72
+justsFromRec justsFromRec72,73
+main main76,77
+main main77,78
+type IndexCrimeRate IndexCrimeRate106,107
+type TotalBondRate TotalBondRate107,108
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis108,109
+type MoneyPct MoneyPct120,121
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis121,122
+testVisId testVisId134,135
+testVisId testVisId134,135
+makeHtmlReport makeHtmlReport136,137
+testVis testVis152,153
 
 ./colorado-joins.hs,24
 module Main Main13,14
@@ -84,63 +92,63 @@ filterMaybeField filterMaybeField97,98
 filterMaybeField filterMaybeField99,100
 filterField filterField103,104
 filterField filterField105,106
+aggregateToMap aggregateToMap107,108
 aggregateToMap aggregateToMap108,109
-aggregateToMap aggregateToMap109,110
+aggregateGeneral aggregateGeneral114,115
 aggregateGeneral aggregateGeneral115,116
-aggregateGeneral aggregateGeneral116,117
+aggregateFiltered aggregateFiltered120,121
 aggregateFiltered aggregateFiltered121,122
-aggregateFiltered aggregateFiltered122,123
+liftCombine liftCombine123,124
 liftCombine liftCombine124,125
-liftCombine liftCombine125,126
-aggregateFsM aggregateFsM129,130
-aggregateFsM aggregateFsM137,138
-aggregateFs aggregateFs144,145
-aggregateFs aggregateFs151,152
-aggregateFM aggregateFM155,156
-aggregateFM aggregateFM162,163
-aggregateF aggregateF165,166
-aggregateF aggregateF172,173
-reshapeRowSimple reshapeRowSimple176,177
-reshapeRowSimple reshapeRowSimple182,183
-data RescaleType RescaleType187,188
-  RescaleNone RescaleNone188,189
-  RescaleMean RescaleMean189,190
-  RescaleMedian RescaleMedian190,191
-  RescaleNormalize RescaleNormalize191,192
-  RescaleGiven RescaleGiven192,193
+aggregateFsM aggregateFsM128,129
+aggregateFsM aggregateFsM136,137
+aggregateFs aggregateFs143,144
+aggregateFs aggregateFs150,151
+aggregateFM aggregateFM154,155
+aggregateFM aggregateFM161,162
+aggregateF aggregateF164,165
+aggregateF aggregateF171,172
+reshapeRowSimple reshapeRowSimple175,176
+reshapeRowSimple reshapeRowSimple181,182
+data RescaleType RescaleType186,187
+  RescaleNone RescaleNone187,188
+  RescaleMean RescaleMean188,189
+  RescaleMedian RescaleMedian189,190
+  RescaleNormalize RescaleNormalize190,191
+  RescaleGiven RescaleGiven191,192
+rescale rescale193,194
 rescale rescale194,195
-rescale rescale195,196
-wgt wgt208,209
-wgt wgt209,210
-weightedRescale weightedRescale211,212
-weightedRescale weightedRescale212,213
-data ScaleAndUnscale ScaleAndUnscale237,238
-data ScaleAndUnscale a = ScaleAndUnscale ScaleAndUnscale237,238
-data ScaleAndUnscale a = ScaleAndUnscale { from from237,238
-data ScaleAndUnscale a = ScaleAndUnscale { from :: (a -> Double), backTo backTo237,238
-scaleAndUnscaleHelper scaleAndUnscaleHelper239,240
-scaleAndUnscaleHelper scaleAndUnscaleHelper240,241
-scaleAndUnscale scaleAndUnscale245,246
-scaleAndUnscale scaleAndUnscale246,247
-weightedScaleAndUnscale weightedScaleAndUnscale249,250
-weightedScaleAndUnscale weightedScaleAndUnscale250,251
-type FType FType256,257
-type FType x x256,257
-type DblX DblX258,259
-type DblY DblY259,260
-type UseCols UseCols261,262
-type UseCols ks ks261,262
-type DataField DataField262,263
-class (DataField x, x â rs) => DataFieldOf DataFieldOf265,266
-type TwoColData TwoColData268,269
-type ThreeColData ThreeColData269,270
-type KeyedRecord KeyedRecord271,272
-type ThreeDTransformable ThreeDTransformable273,274
-type ThreeDTransformable rs rs273,274
-transformEachM transformEachM278,279
-transformEachM transformEachM283,284
-transformEach transformEach287,288
-transformEach transformEach292,293
+wgt wgt211,212
+wgt wgt212,213
+weightedRescale weightedRescale214,215
+weightedRescale weightedRescale215,216
+data ScaleAndUnscale ScaleAndUnscale240,241
+data ScaleAndUnscale a = ScaleAndUnscale ScaleAndUnscale240,241
+data ScaleAndUnscale a = ScaleAndUnscale { from from240,241
+data ScaleAndUnscale a = ScaleAndUnscale { from :: (a -> Double), backTo backTo240,241
+scaleAndUnscaleHelper scaleAndUnscaleHelper242,243
+scaleAndUnscaleHelper scaleAndUnscaleHelper243,244
+scaleAndUnscale scaleAndUnscale248,249
+scaleAndUnscale scaleAndUnscale249,250
+weightedScaleAndUnscale weightedScaleAndUnscale252,253
+weightedScaleAndUnscale weightedScaleAndUnscale253,254
+type FType FType259,260
+type FType x x259,260
+type DblX DblX261,262
+type DblY DblY262,263
+type UseCols UseCols264,265
+type UseCols ks ks264,265
+type DataField DataField265,266
+class (DataField x, x â rs) => DataFieldOf DataFieldOf268,269
+type TwoColData TwoColData271,272
+type ThreeColData ThreeColData272,273
+type KeyedRecord KeyedRecord274,275
+type ThreeDTransformable ThreeDTransformable276,277
+type ThreeDTransformable rs rs276,277
+transformEachM transformEachM281,282
+transformEachM transformEachM286,287
+transformEach transformEach290,291
+transformEach transformEach295,296
 
 ./src/Frames/KMeans.hs,1435
 module Frames.KMeansFrames.KMeans19,20

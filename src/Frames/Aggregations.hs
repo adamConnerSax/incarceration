@@ -105,7 +105,6 @@ filterField :: forall k rs. (F.ElemOf rs k, Eq (V.HKD F.ElField k), (V.IsoHKD F.
                  => Proxy k -> V.HKD F.ElField k -> F.Record rs -> Bool
 filterField _ kv = (== kv) . V.toHKD . F.rget @k
 
-
 aggregateToMap :: Ord k => (a -> k) -> (b -> a -> b) -> b -> M.Map k b -> a -> M.Map k b
 aggregateToMap getKey combine initial m r =
   let key = getKey r
@@ -187,16 +186,20 @@ reshapeRowSimple _ classifiers newDataF r =
 -- We use a GADT here so that each constructor can carry the proofs of numerical type.  E.g., We don't want RescaleNone to require RealFloat. 
 data RescaleType a where
   RescaleNone :: RescaleType a
-  RescaleMean :: RealFloat a => Double -> RescaleType a
+  RescaleMean :: RealFrac a => Double -> RescaleType a
   RescaleMedian :: (Ord a, Real a) => Double -> RescaleType a
   RescaleNormalize :: RealFloat a => Double -> RescaleType a
   RescaleGiven :: (a, Double) -> RescaleType a
 
-rescale :: Num a  => RescaleType a -> FL.Fold a (a, Double)
+rescale :: forall a. Num a  => RescaleType a -> FL.Fold a (a, Double)
 rescale RescaleNone = pure (0,1)
 rescale (RescaleGiven x) = pure x
 rescale (RescaleMean s) = (,) <$> pure 0 <*> (fmap ((/s) . realToFrac) FL.mean)
-rescale (RescaleNormalize s) = (,) <$> FL.mean <*> (fmap ((/s) . realToFrac) FL.std)
+rescale (RescaleNormalize s) =
+  let folds = (,,) <$> FL.mean <*> FL.std <*> FL.length
+      sc (_,sd,n) = if n == 1 then 1 else realToFrac sd
+      g f@(m,_,_) = (realToFrac m, (sc f)/s)
+  in  g <$> folds
 rescale (RescaleMedian s) = (,) <$> pure 0 <*> (fmap ((/s) . listToMedian) FL.list) where
   listToMedian unsorted =
     let l = List.sort unsorted
@@ -218,9 +221,9 @@ weightedRescale (RescaleMean s) =
   in f <$> folds 
 weightedRescale (RescaleNormalize s) =
   let folds = (,,,) <$> PF.lmap wgt FL.mean <*> PF.lmap wgt FL.std <*> PF.lmap snd FL.sum <*> FL.length
-      weightedMean x n tw = realToFrac x/realToFrac tw
-      weightedSD s n tw = sqrt (realToFrac n) * s/realToFrac tw
-      f (wm, ws, tw, n) = (weightedMean wm n tw, weightedSD ws n tw)
+      weightedMean x n tw =realToFrac n * realToFrac x/realToFrac tw
+      weightedSD sd n tw = if n == 1 then 1 else sqrt (realToFrac n) * sd/realToFrac tw
+      f (wm, ws, tw, n) = (weightedMean wm n tw, (weightedSD ws n tw)/s)
   in f <$> folds
 weightedRescale (RescaleMedian s) = (,) <$> pure 0 <*> (fmap ((/s) . realToFrac . listToMedian) FL.list) where
   listToMedian :: [(a,w)] -> a
@@ -241,7 +244,7 @@ scaleAndUnscaleHelper :: Real a => (Double -> a) -> ((a, Double), (a,Double)) ->
 scaleAndUnscaleHelper toA s = ScaleAndUnscale (csF s) (osF s) where
   csF ((csShift,csScale),_) a = realToFrac (a - csShift)/csScale
   uncsF ((csShift, csScale),_) x = (x * csScale) + realToFrac csShift
-  osF s@((csShift,csSCale),(osShift, osScale)) x = toA $ (uncsF s x - realToFrac osShift)/osScale
+  osF s@(_q,(osShift, osScale)) x = toA $ (uncsF s x - realToFrac osShift)/osScale
 
 scaleAndUnscale :: Real a => RescaleType a -> RescaleType a -> (Double -> a) -> FL.Fold a (ScaleAndUnscale a)
 scaleAndUnscale computeScale outScale toA = fmap (scaleAndUnscaleHelper toA) shifts where 

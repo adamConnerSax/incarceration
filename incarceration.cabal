@@ -28,6 +28,7 @@ library
                      , dhall
                      , discrimination
                      , foldl
+                     , groups
                      , Frames
                      , lens
                      , mtl
@@ -54,6 +55,7 @@ executable explore-data
                      , foldl
                      , Frames
                      , Frames-dsv
+                     , hvega
                      , lens
                      , mtl
                      , pipes
@@ -73,14 +75,18 @@ executable colorado-joins
                      , DataSources
   -- other-extensions:
   build-depends:       base >=4.11.1.0
+                     , aeson-pretty
+                     , bytestring
                      , incarceration
                      , containers
                      , foldl
                      , Frames
                      , Frames-dsv
+                     , hvega
                      , lens
                      , pipes
                      , text
+                     , type-of-html
                      , vector
                      , vinyl >= 0.10.0.1
   hs-source-dirs:      explore-data
