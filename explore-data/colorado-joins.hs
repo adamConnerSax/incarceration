@@ -51,7 +51,6 @@ import           Data.Vinyl.XRec            as V
 import           Frames                     ((:.), (&:))
 import qualified Frames                     as F
 import qualified Frames.CSV                 as F
-import qualified Frames.Dsv                 as F
 import qualified Frames.InCore              as FI
 import qualified Frames.ShowCSV             as F
 import qualified Frames.TH                  as F
@@ -79,15 +78,15 @@ main = do
   -- create streams which are filtered to CO
   let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
       veraData :: F.MonadSafe m => P.Producer (MaybeRow IncarcerationTrends)  m ()
-      veraData = F.readDsvTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (filterMaybeField (Proxy @State) "CO")
+      veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (filterMaybeField (Proxy @State) "CO")
       povertyData :: F.MonadSafe m => P.Producer SAIPE m ()
-      povertyData = F.readDsvTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (filterField (Proxy @Abbreviation) "\"CO\"")
+      povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (filterField (Proxy @Abbreviation) "\"CO\"")
       fipsByCountyData :: F.MonadSafe m => P.Producer FIPSByCountyRenamed m ()
-      fipsByCountyData = F.readDsvTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (filterField (Proxy @State) "CO")
+      fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (filterField (Proxy @State) "CO")
       countyBondCO_Data :: F.MonadSafe m => P.Producer (MaybeRow CountyBondCO) m ()
-      countyBondCO_Data = F.readDsvTableMaybeOpt parserOptions countyBondCO_FP
+      countyBondCO_Data = F.readTableMaybeOpt parserOptions countyBondCO_FP
       countyDistrictCO_Data :: F.MonadSafe m => P.Producer CountyDistrictCO m ()
-      countyDistrictCO_Data = F.readDsvTableOpt parserOptions countyDistrictCrosswalkCO_FP
+      countyDistrictCO_Data = F.readTableOpt parserOptions countyDistrictCrosswalkCO_FP
   -- load streams into memory for joins, subsetting as we go
   fipsByCountyFrame <- F.inCoreAoS $ fipsByCountyData P.>-> P.map (F.rcast @[Fips,County]) -- get rid of state col
   povertyFrame <- F.inCoreAoS $ povertyData P.>-> P.map (F.rcast @[Fips, Year, MedianHI,MedianHIMOE,PovertyR])

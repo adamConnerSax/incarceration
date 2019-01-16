@@ -64,7 +64,6 @@ executable explore-data
                      , dhall
                      , foldl
                      , Frames
-                     , Frames-dsv
                      , hvega
                      , lens
                      , mtl
@@ -91,7 +90,6 @@ executable colorado-joins
                      , containers
                      , foldl
                      , Frames
-                     , Frames-dsv
                      , hvega
                      , lens
                      , pipes
