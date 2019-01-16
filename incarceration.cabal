@@ -8,7 +8,7 @@ version:             0.1.0.0
 synopsis:            Explore incarceration stats from Vera Incarceration Trends dataset.
 -- description:
 -- bug-reports:
-license:             BSD-3-Clause
+license:             BSD3
 license-file:        LICENSE
 author:              Adam Conner-Sax
 maintainer:          adam_conner_sax@yahoo.com
