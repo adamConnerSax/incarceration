@@ -39,7 +39,7 @@ library
                      , random-source
                      , text
                      , vector
-                     , vinyl
+                     , vinyl >= 0.10.0.1
                      , hvega
 
   hs-source-dirs:      src
