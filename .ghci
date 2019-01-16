@@ -1,0 +1,3 @@
+:set -fwarn-unused-binds -fwarn-unused-imports -fwarn-unrecognised-pragmas -fwarn-dodgy-exports -fwarn-dodgy-imports -fwarn-incomplete-patterns -fwarn-incomplete-uni-patterns -fwarn-orphans
+:set -isrc
+

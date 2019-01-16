@@ -22,39 +22,28 @@ import           Frames.MaybeUtils          as FM
 
 import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
-import           Control.Lens               ((^.))
-import           Control.Monad.IO.Class     (MonadIO, liftIO)
+--import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import qualified Data.Aeson.Encode.Pretty   as A
 import qualified Data.ByteString.Lazy.Char8 as BS
-import qualified Data.Foldable              as Foldable
 import           Data.Functor.Identity      (runIdentity)
 import qualified Data.List                  as List
-import qualified Data.Map                   as M
-import           Data.Maybe                 (catMaybes, fromJust, fromMaybe,
-                                             isJust)
+import           Data.Maybe                 (catMaybes)
 import           Data.Monoid                ((<>))
 import           Data.Proxy                 (Proxy (..))
 import           Data.Text                  (Text)
-import qualified Data.Text                  as T
 import qualified Data.Text.Encoding         as T
 import qualified Data.Text.IO               as T
 import qualified Data.Text.Lazy             as T
 import qualified Data.Vector                as V
 import qualified Data.Vinyl                 as V
-import qualified Data.Vinyl.Class.Method    as V
-import qualified Data.Vinyl.Core            as V
 import           Data.Vinyl.Curry           (runcurryX)
-import qualified Data.Vinyl.Derived         as V
 import qualified Data.Vinyl.Functor         as V
-import qualified Data.Vinyl.TypeLevel       as V
-import           Data.Vinyl.XRec            as V
 import           Frames                     ((:.), (&:))
 import qualified Frames                     as F
 import qualified Frames.CSV                 as F
 import qualified Frames.InCore              as FI
 import qualified Frames.ShowCSV             as F
 import qualified Frames.TH                  as F
-import           GHC.TypeLits               (KnownSymbol, Symbol)
 import qualified Graphics.Vega.VegaLite     as GV
 import qualified Html                       as H
 import qualified Html.Attribute             as HA
@@ -67,23 +56,20 @@ F.tableTypes' (F.rowGen fipsByCountyFP) { F.rowTypeName = "FIPSByCountyRenamed",
 
 type instance FI.VectorFor (Maybe a) = V.Vector
 
-
 justsFromRec :: V.RMap fs => F.Record fs -> F.Rec (Maybe :. F.ElField) fs
 justsFromRec = V.rmap (V.Compose . Just)
-
-
 
 main :: IO ()
 main = do
   -- create streams which are filtered to CO
   let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
-      veraData :: F.MonadSafe m => P.Producer (MaybeRow IncarcerationTrends)  m ()
+      veraData :: F.MonadSafe m => P.Producer (FM.MaybeRow IncarcerationTrends)  m ()
       veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (filterMaybeField (Proxy @State) "CO")
       povertyData :: F.MonadSafe m => P.Producer SAIPE m ()
-      povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (filterField (Proxy @Abbreviation) "\"CO\"")
+      povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (filterField (Proxy @Abbreviation) "CO")
       fipsByCountyData :: F.MonadSafe m => P.Producer FIPSByCountyRenamed m ()
       fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (filterField (Proxy @State) "CO")
-      countyBondCO_Data :: F.MonadSafe m => P.Producer (MaybeRow CountyBondCO) m ()
+      countyBondCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CountyBondCO) m ()
       countyBondCO_Data = F.readTableMaybeOpt parserOptions countyBondCO_FP
       countyDistrictCO_Data :: F.MonadSafe m => P.Producer CountyDistrictCO m ()
       countyDistrictCO_Data = F.readTableOpt parserOptions countyDistrictCrosswalkCO_FP
@@ -93,6 +79,11 @@ main = do
   countyBondFrameM <- fmap F.boxedFrame $ F.runSafeEffect $ P.toListM countyBondCO_Data
   veraFrameM <- fmap F.boxedFrame $ F.runSafeEffect $ P.toListM $ veraData P.>-> P.map (F.rcast @[Fips,Year,TotalPop,Urbanicity,IndexCrime])
   countyDistrictFrame <- F.inCoreAoS countyDistrictCO_Data
+  putStrLn $ (show $ FL.fold FL.length fipsByCountyFrame) ++ " rows in fipsByCountyFrame."
+  putStrLn $ (show $ FL.fold FL.length povertyFrame) ++ " rows in povertyFrame."
+  putStrLn $ (show $ FL.fold FL.length countyBondFrameM) ++ " rows in countyBondFrameM."
+  putStrLn $ (show $ FL.fold FL.length veraFrameM) ++ " rows in veraFrameM."
+  putStrLn $ (show $ FL.fold FL.length countyDistrictFrame) ++ " rows in countyDistrictFrame."
   -- do joins
   let countyBondPlusFIPS = FM.leftJoinMaybe (Proxy @'[County]) countyBondFrameM (justsFromRec <$> fipsByCountyFrame)
       countyBondPlusFIPSAndDistrict = FM.leftJoinMaybe (Proxy @'[County]) (F.boxedFrame countyBondPlusFIPS) (justsFromRec <$> countyDistrictFrame)

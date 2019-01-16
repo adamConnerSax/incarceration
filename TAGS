@@ -2,13 +2,9 @@
 ./Setup.hs,15
 main main1,2
 
-./explore-data/DataSources.hs,438
+./explore-data/DataSources.hs,326
 module DataSourcesDataSources7,8
-type Row Row33,34
-type MaybeCols MaybeCols34,35
-type MaybeCols c c34,35
-type MaybeRow MaybeRow35,36
-type MaybeRow r r35,36
+--type --type35,36
 type MaybeITrends MaybeITrends36,37
 data GenderT GenderT38,39
 data GenderT = Male Male38,39
@@ -59,187 +55,25 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-joins.hs,654
+./explore-data/colorado-joins.hs,648
 module Main Main15,16
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols63,64
-F.tableTypes' F.tableTypes'65,66
-type instance instance67,68
-type instance FI.VectorFor FI.VectorFor67,68
-justsFromRec justsFromRec70,71
-justsFromRec justsFromRec71,72
-main main75,76
-main main76,77
-type IndexCrimeRate IndexCrimeRate105,106
-type TotalBondRate TotalBondRate106,107
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis107,108
-type MoneyPct MoneyPct119,120
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis120,121
-testVisId testVisId133,134
-testVisId testVisId133,134
-makeHtmlReport makeHtmlReport135,136
-testVis testVis151,152
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols52,53
+F.tableTypes' F.tableTypes'54,55
+type instance instance56,57
+type instance FI.VectorFor FI.VectorFor56,57
+justsFromRec justsFromRec58,59
+justsFromRec justsFromRec59,60
+main main61,62
+main main62,63
+type IndexCrimeRate IndexCrimeRate96,97
+type TotalBondRate TotalBondRate97,98
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis98,99
+type MoneyPct MoneyPct110,111
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis111,112
+testVisId testVisId124,125
+testVisId testVisId124,125
+makeHtmlReport makeHtmlReport126,127
+testVis testVis142,143
 
 ./colorado-joins.hs,24
 module Main Main13,14
-
-./src/Frames/Aggregations.hs,2588
-module Frames.AggregationsFrames.Aggregations18,19
-goodDataByKey goodDataByKey89,90
-goodDataByKey goodDataByKey90,91
-goodDataCount goodDataCount94,95
-goodDataCount goodDataCount95,96
-filterMaybeField filterMaybeField97,98
-filterMaybeField filterMaybeField99,100
-filterField filterField103,104
-filterField filterField105,106
-aggregateToMap aggregateToMap107,108
-aggregateToMap aggregateToMap108,109
-aggregateGeneral aggregateGeneral114,115
-aggregateGeneral aggregateGeneral115,116
-aggregateFiltered aggregateFiltered120,121
-aggregateFiltered aggregateFiltered121,122
-liftCombine liftCombine123,124
-liftCombine liftCombine124,125
-aggregateFsM aggregateFsM128,129
-aggregateFsM aggregateFsM136,137
-aggregateFs aggregateFs143,144
-aggregateFs aggregateFs150,151
-aggregateFM aggregateFM154,155
-aggregateFM aggregateFM161,162
-aggregateF aggregateF164,165
-aggregateF aggregateF171,172
-reshapeRowSimple reshapeRowSimple175,176
-reshapeRowSimple reshapeRowSimple181,182
-data RescaleType RescaleType186,187
-  RescaleNone RescaleNone187,188
-  RescaleMean RescaleMean188,189
-  RescaleMedian RescaleMedian189,190
-  RescaleNormalize RescaleNormalize190,191
-  RescaleGiven RescaleGiven191,192
-rescale rescale193,194
-rescale rescale194,195
-wgt wgt211,212
-wgt wgt212,213
-weightedRescale weightedRescale214,215
-weightedRescale weightedRescale215,216
-data ScaleAndUnscale ScaleAndUnscale240,241
-data ScaleAndUnscale a = ScaleAndUnscale ScaleAndUnscale240,241
-data ScaleAndUnscale a = ScaleAndUnscale { from from240,241
-data ScaleAndUnscale a = ScaleAndUnscale { from :: (a -> Double), backTo backTo240,241
-scaleAndUnscaleHelper scaleAndUnscaleHelper242,243
-scaleAndUnscaleHelper scaleAndUnscaleHelper243,244
-scaleAndUnscale scaleAndUnscale248,249
-scaleAndUnscale scaleAndUnscale249,250
-weightedScaleAndUnscale weightedScaleAndUnscale252,253
-weightedScaleAndUnscale weightedScaleAndUnscale253,254
-type FType FType259,260
-type FType x x259,260
-type DblX DblX261,262
-type DblY DblY262,263
-type UseCols UseCols264,265
-type UseCols ks ks264,265
-type DataField DataField265,266
-class (DataField x, x â rs) => DataFieldOf DataFieldOf268,269
-type TwoColData TwoColData271,272
-type ThreeColData ThreeColData272,273
-type KeyedRecord KeyedRecord274,275
-type ThreeDTransformable ThreeDTransformable276,277
-type ThreeDTransformable rs rs276,277
-transformEachM transformEachM281,282
-transformEachM transformEachM286,287
-transformEach transformEach290,291
-transformEach transformEach295,296
-
-./src/Frames/KMeans.hs,1435
-module Frames.KMeansFrames.KMeans19,20
-data Weighted Weighted75,76
-data Weighted a w = Weighted Weighted75,76
-data Weighted a w = Weighted { dimension dimension75,76
-data Weighted a w = Weighted { dimension :: Int, location location75,76
-data Weighted a w = Weighted { dimension :: Int, location :: a -> U.Vector Double, weight weight75,76
-newtype Cluster Cluster76,77
-newtype Cluster a = Cluster Cluster76,77
-newtype Cluster a = Cluster { members members76,77
-newtype Clusters Clusters77,78
-newtype Clusters a = Clusters Clusters77,78
-newtype Centroids Centroids78,79
-newtype Centroids = Centroids Centroids78,79
-newtype Centroids = Centroids { centers centers78,79
-type Distance Distance79,80
-emptyCluster emptyCluster81,82
-emptyCluster emptyCluster82,83
-forgyCentroids forgyCentroids86,87
-forgyCentroids forgyCentroids90,91
-partitionCentroids partitionCentroids103,104
-partitionCentroids partitionCentroids107,108
-weighted2DRecord weighted2DRecord114,115
-weighted2DRecord weighted2DRecord115,116
-centroid centroid118,119
-centroid centroid119,120
-euclidSq euclidSq130,131
-euclidSq euclidSq131,132
-l1dist l1dist136,137
-l1dist l1dist137,138
-linfdist linfdist142,143
-linfdist linfdist143,144
-kMeans kMeans149,150
-kMeans kMeans158,159
-kMeansOne kMeansOne163,164
-kMeansOne kMeansOne172,173
-weightedKMeans weightedKMeans182,183
-weightedKMeans weightedKMeans188,189
-
-./src/Frames/MaybeUtils.hs,589
-module Frames.MaybeUtils Frames.MaybeUtils12,13
-instance instance36,37
-type AddMaybe AddMaybe39,40
-type AddMaybe rs rs39,40
-unMaybeKeys unMaybeKeys41,42
-unMaybeKeys unMaybeKeys43,44
-joinMaybeOne joinMaybeOne48,49
-joinMaybeOne joinMaybeOne49,50
-class JoinMaybe JoinMaybe51,52
-class JoinMaybe JoinMaybe51,52
-  joinMaybe joinMaybe52,53
-leftJoinMaybe leftJoinMaybe61,62
-leftJoinMaybe leftJoinMaybe90,91
-produceCSV_Maybe produceCSV_Maybe106,107
-produceCSV_Maybe produceCSV_Maybe110,111
-writeCSV_Maybe writeCSV_Maybe113,114
-writeCSV_Maybe writeCSV_Maybe117,118
-
-./src/Frames/ScatterMerge.hs,1292
-module Frames.ScatterMergeFrames.ScatterMerge19,20
-type Binnable Binnable72,73
-type Binnable x x72,73
-data BinsWithRescale BinsWithRescale76,77
-binField binField78,79
-binField binField79,80
-type BinnableKeyedRecord BinnableKeyedRecord100,101
-type BinnableKeyedRecord rs rs100,101
-binFields binFields102,103
-binFields binFields104,105
-sortedListToBinLookup' sortedListToBinLookup'132,133
-sortedListToBinLookup' sortedListToBinLookup'133,134
-scatterMerge scatterMerge135,136
-scatterMerge scatterMerge145,146
-scatterMergeOne scatterMergeOne169,170
-scatterMergeOne scatterMergeOne171,172
-data Bin2DT Bin2DT193,194
-data Bin2DT = Bin2D Bin2D193,194
-type instance instance197,198
-type instance FI.VectorFor FI.VectorFor197,198
-instance instance198,199
-type OutKeyCols OutKeyCols202,203
-type OutKeyCols ks ks202,203
-type BinnedDblCols BinnedDblCols203,204
-type BinnedDblColsC BinnedDblColsC204,205
-type BinnedResultCols BinnedResultCols205,206
-type UseCols UseCols206,207
-type UseColsC UseColsC207,208
-type ScatterMergeable' ScatterMergeable'209,210
-scatterMerge' scatterMerge'220,221
-scatterMerge' scatterMerge'228,229
-type BinMap BinMap250,251
-buildScatterMerge buildScatterMerge251,252
-buildScatterMerge buildScatterMerge262,263
