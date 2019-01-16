@@ -72,7 +72,7 @@ executable explore-data
                      , random-source
                      , text
                      , vector
-                     , vinyl >= 0.10.0
+                     , vinyl
   hs-source-dirs:      explore-data
   default-language:    Haskell2010
 
@@ -97,7 +97,7 @@ executable colorado-joins
                      , text
                      , type-of-html
                      , vector
-                     , vinyl >= 0.10.0.1
+                     , vinyl
   hs-source-dirs:      explore-data
   default-language:    Haskell2010
   
