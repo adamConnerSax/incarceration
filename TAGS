@@ -61,23 +61,23 @@ yearFilter yearFilter153,154
 
 ./explore-data/colorado-joins.hs,654
 module Main Main15,16
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols64,65
-F.tableTypes' F.tableTypes'66,67
-type instance instance68,69
-type instance FI.VectorFor FI.VectorFor68,69
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols63,64
+F.tableTypes' F.tableTypes'65,66
+type instance instance67,68
+type instance FI.VectorFor FI.VectorFor67,68
+justsFromRec justsFromRec70,71
 justsFromRec justsFromRec71,72
-justsFromRec justsFromRec72,73
+main main75,76
 main main76,77
-main main77,78
-type IndexCrimeRate IndexCrimeRate106,107
-type TotalBondRate TotalBondRate107,108
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis108,109
-type MoneyPct MoneyPct120,121
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis121,122
-testVisId testVisId134,135
-testVisId testVisId134,135
-makeHtmlReport makeHtmlReport136,137
-testVis testVis152,153
+type IndexCrimeRate IndexCrimeRate105,106
+type TotalBondRate TotalBondRate106,107
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis107,108
+type MoneyPct MoneyPct119,120
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis120,121
+testVisId testVisId133,134
+testVisId testVisId133,134
+makeHtmlReport makeHtmlReport135,136
+testVis testVis151,152
 
 ./colorado-joins.hs,24
 module Main Main13,14

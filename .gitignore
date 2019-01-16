@@ -12,3 +12,8 @@ cabal.project.local
 .Rproj.user
 .RData
 .Rhistory
+notebooks/
+*.ipynb
+*.ipynb_checkpoints
+Rnotes/*.pdf
+.stack-work/
