@@ -39,6 +39,7 @@ import qualified Data.Text.IO               as T
 import qualified Data.Text.Lazy             as TL
 import qualified Data.Vector                as V
 import qualified Data.Vinyl                 as V
+import qualified Data.Vinyl.TypeLevel       as V
 import           Data.Vinyl.Curry           (runcurryX)
 import qualified Data.Vinyl.Functor         as V
 import           Data.Vinyl.Lens            (type (∈))
@@ -54,13 +55,20 @@ import qualified Html.Attribute             as HA
 import qualified Pipes                      as P
 import qualified Pipes.Prelude              as P
 
+-- for GV utils
+import qualified Data.Time                  as DT
+--import qualified Data.Time.Calendar         as DT
+--import qualified Data.Time.LocalTime        as DT
+import           Data.Fixed                 (div',divMod')  
+
+ 
 
 -- stage restriction means this all has to be up top
 F.tableTypes' (F.rowGen fipsByCountyFP) { F.rowTypeName = "FIPSByCountyRenamed", F.columnNames = ["fips","County","State"]}
-F.declareColumn "MoneyPct" ''Double
+F.declareColumn "moneyPct" ''Double
 
 type CO_AnalysisVERA_Cols = [Year, State, TotalPop, TotalJailAdm, TotalJailPop, TotalPrisonAdm, TotalPrisonPop]
-
+ 
 justsFromRec :: V.RMap fs => F.Record fs -> F.Rec (Maybe :. F.ElField) fs
 justsFromRec = V.rmap (V.Compose . Just)
 
@@ -151,31 +159,21 @@ makeHtmlReport testVisScript =
 testVis dataRecords =
   let desc = "Vega Lite Attempt"
       castRow =  F.rcast @[Year, Urbanicity,PovertyR, MoneyPct,TotalPop]
-      toDataRow :: F.Record [Year, Urbanicity, PovertyR, MoneyPct, TotalPop] -> [GV.DataRow]
-      toDataRow = runcurryX (\y u pr mp tp -> GV.dataRow [("year", GV.Str (T.pack $ show y)),
-                                                          ("urbanicity",GV.Str u),
-                                                          ("povertyR", GV.Number pr),
-                                                          ("moneyPct", GV.Number mp),
-                                                          ("total_pop", GV.Number (realToFrac tp))] [])
-      rows = List.concat $ fmap (toDataRow . transformF @MoneyPct (*100) . castRow) (FL.fold FL.list dataRecords)
-      dat = GV.dataFromRows [] rows
---      dat = GV.dataFromUrl  "file:///Users/adam/DataScience/incarceration/data/kMeansCOMoneyBondRatevsPovertyRateByYearAndUrbanicity.csv"
+      dat = GV.dataFromRows [] $ List.concat $ fmap (recordToVLDataRow . transformF @MoneyPct (*100) . castRow) (FL.fold FL.list dataRecords)
       enc = GV.encoding
         . GV.position GV.X [ GV.PName "povertyR", GV.PmType GV.Quantitative]
         . GV.position GV.Y [ GV.PName "moneyPct", GV.PmType GV.Quantitative]
         . GV.color [ GV.MName "year", GV.MmType GV.Nominal]
         . GV.size [ GV.MName "total_pop", GV.MmType GV.Quantitative]
         . GV.column [GV.FName "urbanicity", GV.FmType GV.Nominal]
-      title = GV.name "% of money bonds (out of money and personal recognizance bonds) by year and urbanicity in CO"
       vl = GV.toVegaLite
-        [ GV.description desc
-        , title
+        [ GV.description "Vega-Lite Attempt"
+        , GV.name "% of money bonds (out of money and personal recognizance bonds) by year and urbanicity in CO"
         , GV.background "white"
         , GV.mark GV.Point []
         , enc []
-        , GV.height 300
-        , GV.width 200
-        , dat -- always last so script is more readable
+        , GV.height 300, GV.width 200
+        , dat 
         ]
       vegaScript :: Text = T.decodeUtf8 $ BS.toStrict $ A.encodePretty $ GV.fromVL vl
       script = "var vlSpec=\n" <> vegaScript <> ";\n" <> "vegaEmbed(\'#" <> testVisId <> "\',vlSpec);"
@@ -184,16 +182,21 @@ testVis dataRecords =
 transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (FType x -> FType x) -> F.Record rs -> F.Record rs
 transformF f r = F.rputField @x (f $ F.rgetField @x r) r
 
-class ToVLDateTime x where
-  toVLDateTime :: x -> [GV.DateTime]
+recordToVLDataRow' :: (V.RMap rs, V.ReifyConstraint ToVLDataValue F.ElField rs, V.RecordToList rs) => F.Record rs -> [(Text, GV.DataValue)]
+recordToVLDataRow' xs = V.recordToList . V.rmap (\(V.Compose (V.Dict x)) -> V.Const $ toVLDataValue x) $ V.reifyConstraint @ToVLDataValue xs
 
---instance ToVLDateTime   
+recordToVLDataRow :: (V.RMap rs, V.ReifyConstraint ToVLDataValue F.ElField rs, V.RecordToList rs) => F.Record rs -> [GV.DataRow]
+recordToVLDataRow r = GV.dataRow (recordToVLDataRow' r) []
+
 
 class ToVLDataValue x where
   toVLDataValue :: x -> (Text, GV.DataValue)
 
 instance ToVLDataValue (F.ElField '(s, Int)) where
   toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)
+
+instance ToVLDataValue (F.ElField '(s, Integer)) where
+  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)      
 
 instance ToVLDataValue (F.ElField '(s, Double)) where
   toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ V.getField x)
@@ -209,6 +212,82 @@ instance ToVLDataValue (F.ElField '(s, Text)) where
 
 instance ToVLDataValue (F.ElField '(s, Bool)) where
   toVLDataValue x = (T.pack $ V.getLabel x, GV.Boolean $ V.getField x)
+
+{-
+instance ToVLDataValue (F.ElField '(s, Int32)) where
+  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)
+
+instance ToVLDataValue (F.ElField '(s, Int64)) where
+  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)
+-}
+
+instance ToVLDataValue (F.ElField '(s, DT.Day)) where
+  toVLDataValue x = (T.pack $ V.getLabel x, GV.DateTime $ toVLDateTime $ V.getField x)
+
+instance ToVLDataValue (F.ElField '(s, DT.TimeOfDay)) where
+  toVLDataValue x = (T.pack $ V.getLabel x, GV.DateTime $ toVLDateTime $ V.getField x)
+
+instance ToVLDataValue (F.ElField '(s, DT.LocalTime)) where
+  toVLDataValue x = (T.pack $ V.getLabel x, GV.DateTime $ toVLDateTime $ V.getField x)    
+
+
+vegaLiteMonth :: Int -> GV.MonthName
+vegaLiteMonth 1 = GV.Jan
+vegaLiteMonth 2 = GV.Feb
+vegaLiteMonth 3 = GV.Mar
+vegaLiteMonth 4 = GV.Apr
+vegaLiteMonth 5 = GV.May
+vegaLiteMonth 6 = GV.Jun
+vegaLiteMonth 7 = GV.Jul
+vegaLiteMonth 8 = GV.Aug
+vegaLiteMonth 9 = GV.Sep
+vegaLiteMonth 10 = GV.Oct
+vegaLiteMonth 11 = GV.Nov
+vegaLiteMonth 12 = GV.Dec
+vegaLiteMonth _ = undefined
+
+{-
+--this is what we should do once we can use time >= 1.9
+vegaLiteDay :: DT.DayOfWeek -> GV.DayName
+vegaLiteDay DT.Monday = GV.Mon
+vegaLiteDay DT.Tuesday = GV.Tue
+vegaLiteDay DT.Wednesday = GV.Wed
+vegaLiteDay DT.Thursday = GV.Thu
+vegaLiteDay DT.Friday = GV.Fri
+vegaLiteDay DT.Saturday = GV.Sat
+vegaLiteDay DT.Sunday = GV.Mon
+-}
+
+vegaLiteDay :: Int -> GV.DayName
+vegaLiteDay 1 = GV.Mon
+vegaLiteDay 2 = GV.Tue
+vegaLiteDay 3 = GV.Wed
+vegaLiteDay 4 = GV.Thu
+vegaLiteDay 5 = GV.Fri
+vegaLiteDay 6 = GV.Sat
+vegaLiteDay 7 = GV.Mon
+vegaLiteDay _ = undefined
+
+vegaLiteDate :: DT.Day -> [GV.DateTime]
+vegaLiteDate x = let (y,m,d) = DT.toGregorian x in [GV.DTYear (fromIntegral y), GV.DTMonth (vegaLiteMonth m), GV.DTDay (vegaLiteDay d)]
+
+vegaLiteTime :: DT.TimeOfDay -> [GV.DateTime]
+vegaLiteTime x =
+  let (sec, rem) = (DT.todSec x) `divMod'` 1
+      ms = (1000 * rem) `div'` 1
+  in [GV.DTHours (DT.todHour x), GV.DTMinutes (DT.todMin x), GV.DTSeconds sec, GV.DTMilliseconds ms]
+
+class ToVLDateTime x where
+  toVLDateTime :: x -> [GV.DateTime]
+
+instance ToVLDateTime DT.Day where
+  toVLDateTime = vegaLiteDate
+
+instance ToVLDateTime DT.TimeOfDay where
+  toVLDateTime = vegaLiteTime
+
+instance ToVLDateTime DT.LocalTime where
+  toVLDateTime (DT.LocalTime day timeOfDay) = vegaLiteDate day ++ vegaLiteTime timeOfDay 
 
 
 

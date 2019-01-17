@@ -55,33 +55,45 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-joins.hs,955
+./explore-data/colorado-joins.hs,1419
 module Main Main17,18
-F.tableTypes' F.tableTypes'58,59
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols61,62
-justsFromRec justsFromRec63,64
-justsFromRec justsFromRec64,65
-type instance instance66,67
-type instance FI.VectorFor FI.VectorFor66,67
-main main69,70
-main main70,71
-type IndexCrimeRate IndexCrimeRate104,105
-type TotalBondRate TotalBondRate105,106
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis106,107
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis119,120
-testVisId testVisId132,133
-testVisId testVisId132,133
-makeHtmlReport makeHtmlReport134,135
-testVis testVis150,151
-transformF transformF183,184
-transformF transformF184,185
-class ToVLDateTime ToVLDateTime186,187
-class ToVLDateTime ToVLDateTime186,187
-  toVLDateTime toVLDateTime187,188
+F.tableTypes' F.tableTypes'66,67
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols69,70
+justsFromRec justsFromRec71,72
+justsFromRec justsFromRec72,73
+type instance instance74,75
+type instance FI.VectorFor FI.VectorFor74,75
+main main77,78
+main main78,79
+type IndexCrimeRate IndexCrimeRate112,113
+type TotalBondRate TotalBondRate113,114
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis114,115
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis127,128
+testVisId testVisId140,141
+testVisId testVisId140,141
+makeHtmlReport makeHtmlReport142,143
+testVis testVis158,159
+transformF transformF181,182
+transformF transformF182,183
+recordToVLDataRow' recordToVLDataRow'184,185
+recordToVLDataRow' recordToVLDataRow'185,186
+recordToVLDataRow recordToVLDataRow187,188
+recordToVLDataRow recordToVLDataRow188,189
 class ToVLDataValue ToVLDataValue191,192
 class ToVLDataValue ToVLDataValue191,192
   toVLDataValue toVLDataValue192,193
 instance instance194,195
+vegaLiteMonth vegaLiteMonth233,234
+vegaLiteMonth vegaLiteMonth234,235
+vegaLiteDay vegaLiteDay260,261
+vegaLiteDay vegaLiteDay261,262
+vegaLiteDate vegaLiteDate270,271
+vegaLiteDate vegaLiteDate271,272
+vegaLiteTime vegaLiteTime273,274
+vegaLiteTime vegaLiteTime274,275
+class ToVLDateTime ToVLDateTime279,280
+class ToVLDateTime ToVLDateTime279,280
+  toVLDateTime toVLDateTime280,281
 
 ./colorado-joins.hs,24
 module Main Main13,14

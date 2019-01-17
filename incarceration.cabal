@@ -95,6 +95,7 @@ executable colorado-joins
                      , pipes
                      , prettyprinter
                      , text
+                     , time
                      , type-of-html
                      , vector
                      , vinyl
