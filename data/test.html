@@ -1,6 +1,9 @@
 <html><head><title>Test Html Report</title><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><body><div id="vis"></div><script type="text/javascript">var vlSpec=
 {
-    "height": 300,
+    "autosize": {
+        "resize": true,
+        "type": "fit"
+    },
     "mark": "point",
     "data": {
         "values": [
@@ -342,9 +345,8 @@
             }
         ]
     },
-    "width": 200,
-    "name": "% of money bonds (out of money and personal recognizance bonds) by year and urbanicity in CO",
     "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+    "title": "% of money bonds (out of money and personal recognizance bonds) by year and urbanicity in CO",
     "encoding": {
         "color": {
             "field": "year",
@@ -356,7 +358,10 @@
         },
         "x": {
             "field": "povertyR",
-            "type": "quantitative"
+            "type": "quantitative",
+            "axis": {
+                "title": "Poverty Rate (%)"
+            }
         },
         "column": {
             "field": "urbanicity",
@@ -364,7 +369,10 @@
         },
         "y": {
             "field": "moneyPct",
-            "type": "quantitative"
+            "type": "quantitative",
+            "axis": {
+                "title": "% Money Bonds"
+            }
         }
     },
     "background": "white",

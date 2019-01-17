@@ -18,9 +18,12 @@
 module Main where
 
 import           DataSources
-import           Frames.Aggregations        as FA
-import           Frames.KMeans              as KM
-import           Frames.MaybeUtils          as FM
+import qualified Frames.Aggregations        as FA
+import qualified Frames.KMeans              as KM
+import qualified Frames.MaybeUtils          as FM
+import qualified Frames.VegaLite            as FV
+import qualified Html.Report                as H
+
 
 import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
@@ -55,14 +58,6 @@ import qualified Html.Attribute             as HA
 import qualified Pipes                      as P
 import qualified Pipes.Prelude              as P
 
--- for GV utils
-import qualified Data.Time                  as DT
---import qualified Data.Time.Calendar         as DT
---import qualified Data.Time.LocalTime        as DT
-import           Data.Fixed                 (div',divMod')  
-
- 
-
 -- stage restriction means this all has to be up top
 F.tableTypes' (F.rowGen fipsByCountyFP) { F.rowTypeName = "FIPSByCountyRenamed", F.columnNames = ["fips","County","State"]}
 F.declareColumn "moneyPct" ''Double
@@ -80,11 +75,11 @@ main = do
   -- create streams which are filtered to CO
   let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
       veraData :: F.MonadSafe m => P.Producer (FM.MaybeRow IncarcerationTrends)  m ()
-      veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (filterMaybeField (Proxy @State) "CO")
+      veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (FA.filterMaybeField (Proxy @State) "CO")
       povertyData :: F.MonadSafe m => P.Producer SAIPE m ()
-      povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (filterField (Proxy @Abbreviation) "CO")
+      povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (FA.filterField (Proxy @Abbreviation) "CO")
       fipsByCountyData :: F.MonadSafe m => P.Producer FIPSByCountyRenamed m ()
-      fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (filterField (Proxy @State) "CO")
+      fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (FA.filterField (Proxy @State) "CO")
       countyBondCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CountyBondCO) m ()
       countyBondCO_Data = F.readTableMaybeOpt parserOptions countyBondCO_FP
       countyDistrictCO_Data :: F.MonadSafe m => P.Producer CountyDistrictCO m ()
@@ -136,8 +131,13 @@ kmMoneyBondPctAnalysis joinedData = do
       kmMoneyBondRatevsPovertyRate proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 5 KM.partitionCentroids KM.euclidSq
       kmByYearUrb = runIdentity $ FL.foldM (kmMoneyBondRatevsPovertyRate (Proxy @[Year,Urbanicity])) kmData
   F.writeCSV "data/kMeansCOMoneyBondRatevsPovertyRateByYearAndUrbanicity.csv" kmByYearUrb
-  T.writeFile "data/test.html" $ TL.toStrict $ H.renderText $ makeHtmlReport $ testVis kmByYearUrb
+--  htmlBody :: Monad m => H.HtmlT m H.Body ('H.Body > a)  
+  htmlToRender <- H.makeReport "Test Report" $ do
+     $ H.body_ $ addChild $ do
+      placeVisualization "mBondsVspRate" $ moneyBondPctVsPovertyRateVL kmByYearUrb
+  T.writeFile "data/test.html" $ TL.toStrict $ H.renderText $ htmlToRender
 
+{-
 testVisId :: Text = "vis"
 
 makeHtmlReport testVisScript =
@@ -151,144 +151,40 @@ makeHtmlReport testVisScript =
       )
     H.# H.body_
     (
-      H.div_A (HA.id_ testVisId) ()
-      H.# testVisScript
+
+--      H.div_A (HA.id_ testVisId) ()
+--      H.# testVisScript
     )
   )
+-}
 
-testVis dataRecords =
-  let desc = "Vega Lite Attempt"
-      castRow =  F.rcast @[Year, Urbanicity,PovertyR, MoneyPct,TotalPop]
-      dat = GV.dataFromRows [] $ List.concat $ fmap (recordToVLDataRow . transformF @MoneyPct (*100) . castRow) (FL.fold FL.list dataRecords)
+moneyBondPctVsPovertyRateVL dataRecords =
+  let dat = FV.recordsToVLData (transformF @MoneyPct (*100) . F.rcast @[Year, Urbanicity,PovertyR, MoneyPct,TotalPop]) dataRecords
       enc = GV.encoding
-        . GV.position GV.X [ GV.PName "povertyR", GV.PmType GV.Quantitative]
-        . GV.position GV.Y [ GV.PName "moneyPct", GV.PmType GV.Quantitative]
-        . GV.color [ GV.MName "year", GV.MmType GV.Nominal]
-        . GV.size [ GV.MName "total_pop", GV.MmType GV.Quantitative]
-        . GV.column [GV.FName "urbanicity", GV.FmType GV.Nominal]
+        . GV.position GV.X [FV.pName @PovertyR, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Poverty Rate (%)"]]
+        . GV.position GV.Y [FV.pName @MoneyPct, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "% Money Bonds"]]
+        . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
+        . GV.size [FV.mName @TotalPop, GV.MmType GV.Quantitative]
+        . GV.column [FV.fName @Urbanicity, GV.FmType GV.Nominal]
       vl = GV.toVegaLite
         [ GV.description "Vega-Lite Attempt"
-        , GV.name "% of money bonds (out of money and personal recognizance bonds) by year and urbanicity in CO"
+        , GV.title "% of money bonds (out of money and personal recognizance bonds) by year and urbanicity in CO"
         , GV.background "white"
         , GV.mark GV.Point []
         , enc []
-        , GV.height 300, GV.width 200
+        , GV.autosize [GV.AFit, GV.AResize]
+--        , GV.height 300, GV.width 200
         , dat 
         ]
-      vegaScript :: Text = T.decodeUtf8 $ BS.toStrict $ A.encodePretty $ GV.fromVL vl
-      script = "var vlSpec=\n" <> vegaScript <> ";\n" <> "vegaEmbed(\'#" <> testVisId <> "\',vlSpec);"
-  in H.script_A (HA.type_ ("text/javascript" :: Text) ) (H.Raw script)
+  in vl
+  
+placeVisualization id vl =
+  let vegaScript :: Text = T.decodeUtf8 $ BS.toStrict $ A.encodePretty $ GV.fromVL vl
+      script = "var vlSpec=\n" <> vegaScript <> ";\n" <> "vegaEmbed(\'#" <> id <> "\',vlSpec);"      
+  in H.div_A (HA.id_ id) H.# H.script_A (HA.type_ ("text/javascript" :: Text) ) (H.Raw script)
 
-transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (FType x -> FType x) -> F.Record rs -> F.Record rs
+transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (FA.FType x -> FA.FType x) -> F.Record rs -> F.Record rs
 transformF f r = F.rputField @x (f $ F.rgetField @x r) r
-
-recordToVLDataRow' :: (V.RMap rs, V.ReifyConstraint ToVLDataValue F.ElField rs, V.RecordToList rs) => F.Record rs -> [(Text, GV.DataValue)]
-recordToVLDataRow' xs = V.recordToList . V.rmap (\(V.Compose (V.Dict x)) -> V.Const $ toVLDataValue x) $ V.reifyConstraint @ToVLDataValue xs
-
-recordToVLDataRow :: (V.RMap rs, V.ReifyConstraint ToVLDataValue F.ElField rs, V.RecordToList rs) => F.Record rs -> [GV.DataRow]
-recordToVLDataRow r = GV.dataRow (recordToVLDataRow' r) []
-
-
-class ToVLDataValue x where
-  toVLDataValue :: x -> (Text, GV.DataValue)
-
-instance ToVLDataValue (F.ElField '(s, Int)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)
-
-instance ToVLDataValue (F.ElField '(s, Integer)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)      
-
-instance ToVLDataValue (F.ElField '(s, Double)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ V.getField x)
-
-instance ToVLDataValue (F.ElField '(s, Float)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)
-
-instance ToVLDataValue (F.ElField '(s, String)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Str $ T.pack $ V.getField x)
-
-instance ToVLDataValue (F.ElField '(s, Text)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Str $ V.getField x)
-
-instance ToVLDataValue (F.ElField '(s, Bool)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Boolean $ V.getField x)
-
-{-
-instance ToVLDataValue (F.ElField '(s, Int32)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)
-
-instance ToVLDataValue (F.ElField '(s, Int64)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.Number $ realToFrac $ V.getField x)
--}
-
-instance ToVLDataValue (F.ElField '(s, DT.Day)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.DateTime $ toVLDateTime $ V.getField x)
-
-instance ToVLDataValue (F.ElField '(s, DT.TimeOfDay)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.DateTime $ toVLDateTime $ V.getField x)
-
-instance ToVLDataValue (F.ElField '(s, DT.LocalTime)) where
-  toVLDataValue x = (T.pack $ V.getLabel x, GV.DateTime $ toVLDateTime $ V.getField x)    
-
-
-vegaLiteMonth :: Int -> GV.MonthName
-vegaLiteMonth 1 = GV.Jan
-vegaLiteMonth 2 = GV.Feb
-vegaLiteMonth 3 = GV.Mar
-vegaLiteMonth 4 = GV.Apr
-vegaLiteMonth 5 = GV.May
-vegaLiteMonth 6 = GV.Jun
-vegaLiteMonth 7 = GV.Jul
-vegaLiteMonth 8 = GV.Aug
-vegaLiteMonth 9 = GV.Sep
-vegaLiteMonth 10 = GV.Oct
-vegaLiteMonth 11 = GV.Nov
-vegaLiteMonth 12 = GV.Dec
-vegaLiteMonth _ = undefined
-
-{-
---this is what we should do once we can use time >= 1.9
-vegaLiteDay :: DT.DayOfWeek -> GV.DayName
-vegaLiteDay DT.Monday = GV.Mon
-vegaLiteDay DT.Tuesday = GV.Tue
-vegaLiteDay DT.Wednesday = GV.Wed
-vegaLiteDay DT.Thursday = GV.Thu
-vegaLiteDay DT.Friday = GV.Fri
-vegaLiteDay DT.Saturday = GV.Sat
-vegaLiteDay DT.Sunday = GV.Mon
--}
-
-vegaLiteDay :: Int -> GV.DayName
-vegaLiteDay 1 = GV.Mon
-vegaLiteDay 2 = GV.Tue
-vegaLiteDay 3 = GV.Wed
-vegaLiteDay 4 = GV.Thu
-vegaLiteDay 5 = GV.Fri
-vegaLiteDay 6 = GV.Sat
-vegaLiteDay 7 = GV.Mon
-vegaLiteDay _ = undefined
-
-vegaLiteDate :: DT.Day -> [GV.DateTime]
-vegaLiteDate x = let (y,m,d) = DT.toGregorian x in [GV.DTYear (fromIntegral y), GV.DTMonth (vegaLiteMonth m), GV.DTDay (vegaLiteDay d)]
-
-vegaLiteTime :: DT.TimeOfDay -> [GV.DateTime]
-vegaLiteTime x =
-  let (sec, rem) = (DT.todSec x) `divMod'` 1
-      ms = (1000 * rem) `div'` 1
-  in [GV.DTHours (DT.todHour x), GV.DTMinutes (DT.todMin x), GV.DTSeconds sec, GV.DTMilliseconds ms]
-
-class ToVLDateTime x where
-  toVLDateTime :: x -> [GV.DateTime]
-
-instance ToVLDateTime DT.Day where
-  toVLDateTime = vegaLiteDate
-
-instance ToVLDateTime DT.TimeOfDay where
-  toVLDateTime = vegaLiteTime
-
-instance ToVLDateTime DT.LocalTime where
-  toVLDateTime (DT.LocalTime day timeOfDay) = vegaLiteDate day ++ vegaLiteTime timeOfDay 
-
 
 
 --  FM.writeCSV_Maybe "data/countyBondPlusFIPS.csv" countyBondPlusFIPS

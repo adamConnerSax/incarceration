@@ -1,9 +1,9 @@
-packages: .
+packages: . ../Frames-utils
 jobs: 4
 with-compiler: /usr/local/bin/ghc
 
-source-repository-package
-    type: git
-    location: https://github.com/adamConnerSax/Frames-utils
-    tag: dbf13bce3906568acd22322d53444515f5675e55
+--source-repository-package
+--    type: git
+--    location: https://github.com/adamConnerSax/Frames-utils
+--    tag: dbf13bce3906568acd22322d53444515f5675e55
 

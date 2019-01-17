@@ -55,45 +55,39 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-joins.hs,1419
+./explore-data/colorado-joins.hs,674
 module Main Main17,18
-F.tableTypes' F.tableTypes'66,67
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols69,70
-justsFromRec justsFromRec71,72
-justsFromRec justsFromRec72,73
-type instance instance74,75
-type instance FI.VectorFor FI.VectorFor74,75
-main main77,78
-main main78,79
-type IndexCrimeRate IndexCrimeRate112,113
-type TotalBondRate TotalBondRate113,114
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis114,115
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis127,128
-testVisId testVisId140,141
-testVisId testVisId140,141
-makeHtmlReport makeHtmlReport142,143
-testVis testVis158,159
-transformF transformF181,182
-transformF transformF182,183
-recordToVLDataRow' recordToVLDataRow'184,185
-recordToVLDataRow' recordToVLDataRow'185,186
-recordToVLDataRow recordToVLDataRow187,188
-recordToVLDataRow recordToVLDataRow188,189
-class ToVLDataValue ToVLDataValue191,192
-class ToVLDataValue ToVLDataValue191,192
-  toVLDataValue toVLDataValue192,193
-instance instance194,195
-vegaLiteMonth vegaLiteMonth233,234
-vegaLiteMonth vegaLiteMonth234,235
-vegaLiteDay vegaLiteDay260,261
-vegaLiteDay vegaLiteDay261,262
-vegaLiteDate vegaLiteDate270,271
-vegaLiteDate vegaLiteDate271,272
-vegaLiteTime vegaLiteTime273,274
-vegaLiteTime vegaLiteTime274,275
-class ToVLDateTime ToVLDateTime279,280
-class ToVLDateTime ToVLDateTime279,280
-  toVLDateTime toVLDateTime280,281
+F.tableTypes' F.tableTypes'61,62
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols64,65
+justsFromRec justsFromRec66,67
+justsFromRec justsFromRec67,68
+type instance instance69,70
+type instance FI.VectorFor FI.VectorFor69,70
+main main72,73
+main main73,74
+type IndexCrimeRate IndexCrimeRate107,108
+type TotalBondRate TotalBondRate108,109
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis109,110
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis122,123
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL160,161
+placeVisualization placeVisualization180,181
+transformF transformF185,186
+transformF transformF186,187
 
 ./colorado-joins.hs,24
 module Main Main13,14
+
+./src/Html/Report.hs,441
+module Html.ReportHtml.Report5,6
+newtype HtmlT HtmlT25,26
+newtype HtmlT m i j a = HtmlT HtmlT25,26
+newtype HtmlT m i j a = HtmlT { unHtmlT unHtmlT25,26
+addSeqElement addSeqElement28,29
+addSeqElement addSeqElement29,30
+addChild addChild31,32
+addChild addChild32,33
+--startReport --startReport34,35
+--startReport --startReport35,36
+makeReportG makeReportG37,38
+makeReportG makeReportG38,39
+makeReport makeReport42,43
