@@ -41,7 +41,6 @@ import qualified Data.Vector                as V
 import qualified Data.Vinyl                 as V
 import           Data.Vinyl.Curry           (runcurryX)
 import qualified Data.Vinyl.Functor         as V
---import qualified Data.Vinyl.Derived       as V
 import           Data.Vinyl.Lens            (type (∈))
 import           Frames                     ((:.), (&:))
 import qualified Frames                     as F
@@ -62,10 +61,11 @@ F.declareColumn "MoneyPct" ''Double
 
 type CO_AnalysisVERA_Cols = [Year, State, TotalPop, TotalJailAdm, TotalJailPop, TotalPrisonAdm, TotalPrisonPop]
 
-type instance FI.VectorFor (Maybe a) = V.Vector
-
 justsFromRec :: V.RMap fs => F.Record fs -> F.Rec (Maybe :. F.ElField) fs
 justsFromRec = V.rmap (V.Compose . Just)
+
+type instance FI.VectorFor (Maybe a) = V.Vector
+  
 
 main :: IO ()
 main = do
@@ -167,7 +167,6 @@ testVis dataRecords =
         . GV.size [ GV.MName "total_pop", GV.MmType GV.Quantitative]
         . GV.column [GV.FName "urbanicity", GV.FmType GV.Nominal]
       title = GV.name "% of money bonds (out of money and personal recognizance bonds) by year and urbanicity in CO"
---      xScale = GV.configuration GV.Scale [
       vl = GV.toVegaLite
         [ GV.description desc
         , title

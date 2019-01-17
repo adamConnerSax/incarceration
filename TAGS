@@ -57,12 +57,12 @@ yearFilter yearFilter153,154
 
 ./explore-data/colorado-joins.hs,955
 module Main Main17,18
-F.tableTypes' F.tableTypes'59,60
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols62,63
-type instance instance64,65
-type instance FI.VectorFor FI.VectorFor64,65
-justsFromRec justsFromRec66,67
-justsFromRec justsFromRec67,68
+F.tableTypes' F.tableTypes'58,59
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols61,62
+justsFromRec justsFromRec63,64
+justsFromRec justsFromRec64,65
+type instance instance66,67
+type instance FI.VectorFor FI.VectorFor66,67
 main main69,70
 main main70,71
 type IndexCrimeRate IndexCrimeRate104,105
@@ -73,15 +73,15 @@ testVisId testVisId132,133
 testVisId testVisId132,133
 makeHtmlReport makeHtmlReport134,135
 testVis testVis150,151
+transformF transformF183,184
 transformF transformF184,185
-transformF transformF185,186
-class ToVLDateTime ToVLDateTime187,188
-class ToVLDateTime ToVLDateTime187,188
-  toVLDateTime toVLDateTime188,189
-class ToVLDataValue ToVLDataValue192,193
-class ToVLDataValue ToVLDataValue192,193
-  toVLDataValue toVLDataValue193,194
-instance instance195,196
+class ToVLDateTime ToVLDateTime186,187
+class ToVLDateTime ToVLDateTime186,187
+  toVLDateTime toVLDateTime187,188
+class ToVLDataValue ToVLDataValue191,192
+class ToVLDataValue ToVLDataValue191,192
+  toVLDataValue toVLDataValue192,193
+instance instance194,195
 
 ./colorado-joins.hs,24
 module Main Main13,14
