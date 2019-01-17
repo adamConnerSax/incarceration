@@ -15,14 +15,16 @@ where
 -- NB: required for TH stage restriction
 import           DataSourcePaths
 
-import qualified Frames          as F
-import qualified Frames.CSV      as F
-import qualified Frames.InCore   as FI
-import qualified Frames.ShowCSV  as F
+import           Frames.MaybeUtils (MaybeRow)
+
+import qualified Frames            as F
+--import qualified Frames.CSV        as F
+import qualified Frames.InCore     as FI
+import qualified Frames.ShowCSV    as F
 -- we may need some of the inferred types
-import           Data.Text       (Text)
-import qualified Data.Text       as T
-import qualified Data.Vector     as V
+import           Data.Text         (Text)
+import qualified Data.Text         as T
+import qualified Data.Vector       as V
 
 F.tableTypes "IncarcerationTrends" veraTrendsFP
 F.tableTypes "SAIPE" censusSAIPE_FP
@@ -31,9 +33,7 @@ F.tableTypes "CrimeStatsCO" crimeStatsCO_FP
 F.tableTypes "CountyDistrictCO" countyDistrictCrosswalkCO_FP
 F.tableTypes "CountyBondCO" countyBondCO_FP
 
-type Row = IncarcerationTrends
-type MaybeCols c = F.Rec (Maybe F.:. F.ElField) c
-type MaybeRow r = MaybeCols (F.RecordColumns r)
+--type Row = IncarcerationTrends
 type MaybeITrends = MaybeRow IncarcerationTrends
 
 data GenderT = Male | Female deriving (Show,Enum,Bounded,Ord, Eq) -- we ought to have NonBinary here as well, but the data doesn't.
