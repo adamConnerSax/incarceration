@@ -1,4 +1,4 @@
-<html><head><title>Test Html Report</title><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><body><div id="vis"></div><script type="text/javascript">var vlSpec=
+<html><head><title>Colorado Money Bonds vs Personal Recognizance Bonds</title><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><div><h1>Colorado Money Bond Analysis</h1><p>Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a &quot;money bond&quot; (MB) and sometimes on a personal recognizance bond (PR). We have county-level data of all bonds issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to look at the percentage of bonds which are MB.  We look at all the data together, then split by type of county.</p></div><div id="mBondsVspRate"><script type="text/javascript">var vlSpec=
 {
     "autosize": {
         "resize": true,
@@ -378,4 +378,4 @@
     "background": "white",
     "description": "Vega-Lite Attempt"
 };
-vegaEmbed('#vis',vlSpec);</script></body></html>
+vegaEmbed('#mBondsVspRate',vlSpec);</script></div></html>

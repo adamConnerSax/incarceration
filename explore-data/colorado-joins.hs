@@ -27,22 +27,17 @@ import qualified Html.Report                as H
 
 import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
---import           Control.Monad.IO.Class     (MonadIO, liftIO)
-import qualified Data.Aeson.Encode.Pretty   as A
-import qualified Data.ByteString.Lazy.Char8 as BS
+import           Control.Monad.IO.Class     (liftIO)
 import           Data.Functor.Identity      (runIdentity)
-import qualified Data.List                  as List
 import           Data.Maybe                 (catMaybes)
 import           Data.Monoid                ((<>))
 import           Data.Proxy                 (Proxy (..))
 import           Data.Text                  (Text)
 import qualified Data.Text                  as T
-import qualified Data.Text.Encoding         as T
 import qualified Data.Text.IO               as T
 import qualified Data.Text.Lazy             as TL
 import qualified Data.Vector                as V
 import qualified Data.Vinyl                 as V
-import qualified Data.Vinyl.TypeLevel       as V
 import           Data.Vinyl.Curry           (runcurryX)
 import qualified Data.Vinyl.Functor         as V
 import           Data.Vinyl.Lens            (type (∈))
@@ -50,11 +45,10 @@ import           Frames                     ((:.), (&:))
 import qualified Frames                     as F
 import qualified Frames.CSV                 as F
 import qualified Frames.InCore              as FI
-import qualified Frames.ShowCSV             as F
 import qualified Frames.TH                  as F
 import qualified Graphics.Vega.VegaLite     as GV
-import qualified Html                       as H
-import qualified Html.Attribute             as HA
+--import qualified Html                       as H
+--import qualified Html.Attribute             as HA
 import qualified Pipes                      as P
 import qualified Pipes.Prelude              as P
 import qualified Lucid                      as HL
@@ -122,21 +116,22 @@ kmBondRatevsCrimeRateAnalysis joinedData = do
 
 
 kmMoneyBondPctAnalysis joinedData = do
+  htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bonds vs Personal Recognizance Bonds" $ do
       -- this does two things.  Creates the type for rcast to infer and then mutates it.  Those should likely be separate.
-  let mutateData :: F.Record [Year,County,Urbanicity,PovertyR, MoneyBondFreq,TotalBondFreq,TotalPop] -> F.Record [Year,County,Urbanicity,PovertyR,MoneyPct,TotalPop]
-      mutateData  = runcurryX (\y c u pr mbf tbf tp -> y &: c &: u &: pr &: (realToFrac mbf)/(realToFrac tbf) &: tp &: V.RNil)
-      kmData = fmap mutateData . catMaybes $ fmap (F.recMaybe . F.rcast) joinedData --countyBondPlusFIPSAndSAIPEAndVera
-      dataProxy = Proxy @[PovertyR,MoneyPct,TotalPop]
-      sunXF = FL.premap (F.rgetField @PovertyR &&& F.rgetField @TotalPop) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
-      sunYF = FL.premap (F.rgetField @MoneyPct &&& F.rgetField @TotalPop) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
-      kmMoneyBondRatevsPovertyRate proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 5 KM.partitionCentroids KM.euclidSq
-      kmByYearUrb = runIdentity $ FL.foldM (kmMoneyBondRatevsPovertyRate (Proxy @[Year,Urbanicity])) kmData
-  F.writeCSV "data/kMeansCOMoneyBondRatevsPovertyRateByYearAndUrbanicity.csv" kmByYearUrb
---  htmlBody :: Monad m => H.HtmlT m H.Body ('H.Body > a)  
-  htmlToRender <- H.makeReport "Test Report" $ do
-     $ H.body_ $ addChild $ do
-      placeVisualization "mBondsVspRate" $ moneyBondPctVsPovertyRateVL kmByYearUrb
-  T.writeFile "data/test.html" $ TL.toStrict $ H.renderText $ htmlToRender
+    let mutateData :: F.Record [Year,County,Urbanicity,PovertyR, MoneyBondFreq,TotalBondFreq,TotalPop] -> F.Record [Year,County,Urbanicity,PovertyR,MoneyPct,TotalPop]
+        mutateData  = runcurryX (\y c u pr mbf tbf tp -> y &: c &: u &: pr &: (realToFrac mbf)/(realToFrac tbf) &: tp &: V.RNil)
+        kmData = fmap mutateData . catMaybes $ fmap (F.recMaybe . F.rcast) joinedData --countyBondPlusFIPSAndSAIPEAndVera
+        dataProxy = Proxy @[PovertyR,MoneyPct,TotalPop]
+        sunXF = FL.premap (F.rgetField @PovertyR &&& F.rgetField @TotalPop) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
+        sunYF = FL.premap (F.rgetField @MoneyPct &&& F.rgetField @TotalPop) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
+        kmMoneyBondRatevsPovertyRate proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 5 KM.partitionCentroids KM.euclidSq
+        kmByYearUrb = runIdentity $ FL.foldM (kmMoneyBondRatevsPovertyRate (Proxy @[Year,Urbanicity])) kmData
+--    liftIO $ F.writeCSV "data/kMeansCOMoneyBondRatevsPovertyRateByYearAndUrbanicity.csv" kmByYearUrb
+    H.placeTextSection $ do
+      HL.h1_ "Colorado Money Bond Analysis"
+      HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" (MB) and sometimes on a personal recognizance bond (PR). We have county-level data of all bonds issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to look at the percentage of bonds which are MB.  We look at all the data together, then split by type of county."
+    H.placeVisualization "mBondsVspRate" $ moneyBondPctVsPovertyRateVL kmByYearUrb
+  T.writeFile "data/test.html" $ TL.toStrict $ htmlAsText
 
 {-
 testVisId :: Text = "vis"
@@ -178,13 +173,13 @@ moneyBondPctVsPovertyRateVL dataRecords =
         , dat 
         ]
   in vl
-
-placeVisualizaton :: Text -> GV.VegaLite -> HL.HtmlT m ()  
+{-
+placeVisualization :: Monad m => Text -> GV.VegaLite -> HL.HtmlT m ()  
 placeVisualization id vl =
   let vegaScript :: Text = T.decodeUtf8 $ BS.toStrict $ A.encodePretty $ GV.fromVL vl
       script = "var vlSpec=\n" <> vegaScript <> ";\n" <> "vegaEmbed(\'#" <> id <> "\',vlSpec);"      
-  in HL.div_ [HL.id_ id]  $ HL.script_ [HL.type_ "text/javascript"]  $ HL.toHtmlRaw script
-
+  in HL.div_ [HL.id_ id] (HL.script_ [HL.type_ "text/javascript"]  (HL.toHtmlRaw script))
+-}
 transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (FA.FType x -> FA.FType x) -> F.Record rs -> F.Record rs
 transformF f r = F.rputField @x (f $ F.rgetField @x r) r
 
