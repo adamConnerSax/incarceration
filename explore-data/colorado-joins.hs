@@ -57,6 +57,7 @@ import qualified Html                       as H
 import qualified Html.Attribute             as HA
 import qualified Pipes                      as P
 import qualified Pipes.Prelude              as P
+import qualified Lucid                      as HL
 
 -- stage restriction means this all has to be up top
 F.tableTypes' (F.rowGen fipsByCountyFP) { F.rowTypeName = "FIPSByCountyRenamed", F.columnNames = ["fips","County","State"]}
@@ -177,11 +178,12 @@ moneyBondPctVsPovertyRateVL dataRecords =
         , dat 
         ]
   in vl
-  
+
+placeVisualizaton :: Text -> GV.VegaLite -> HL.HtmlT m ()  
 placeVisualization id vl =
   let vegaScript :: Text = T.decodeUtf8 $ BS.toStrict $ A.encodePretty $ GV.fromVL vl
       script = "var vlSpec=\n" <> vegaScript <> ";\n" <> "vegaEmbed(\'#" <> id <> "\',vlSpec);"      
-  in H.div_A (HA.id_ id) H.# H.script_A (HA.type_ ("text/javascript" :: Text) ) (H.Raw script)
+  in HL.div_ [HL.id_ id]  $ HL.script_ [HL.type_ "text/javascript"]  $ HL.toHtmlRaw script
 
 transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (FA.FType x -> FA.FType x) -> F.Record rs -> F.Record rs
 transformF f r = F.rputField @x (f $ F.rgetField @x r) r

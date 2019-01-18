@@ -55,29 +55,30 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-joins.hs,674
+./explore-data/colorado-joins.hs,719
 module Main Main17,18
-F.tableTypes' F.tableTypes'61,62
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols64,65
-justsFromRec justsFromRec66,67
+F.tableTypes' F.tableTypes'62,63
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols65,66
 justsFromRec justsFromRec67,68
-type instance instance69,70
-type instance FI.VectorFor FI.VectorFor69,70
-main main72,73
+justsFromRec justsFromRec68,69
+type instance instance70,71
+type instance FI.VectorFor FI.VectorFor70,71
 main main73,74
-type IndexCrimeRate IndexCrimeRate107,108
-type TotalBondRate TotalBondRate108,109
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis109,110
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis122,123
-moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL160,161
-placeVisualization placeVisualization180,181
-transformF transformF185,186
-transformF transformF186,187
+main main74,75
+type IndexCrimeRate IndexCrimeRate108,109
+type TotalBondRate TotalBondRate109,110
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis110,111
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis123,124
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL161,162
+placeVisualizaton placeVisualizaton181,182
+placeVisualization placeVisualization182,183
+transformF transformF187,188
+transformF transformF188,189
 
 ./colorado-joins.hs,24
 module Main Main13,14
 
-./src/Html/Report.hs,441
+./src/Html/ReportTypeOfHtml.hs,441
 module Html.ReportHtml.Report5,6
 newtype HtmlT HtmlT25,26
 newtype HtmlT m i j a = HtmlT HtmlT25,26
@@ -91,3 +92,8 @@ addChild addChild32,33
 makeReportG makeReportG37,38
 makeReportG makeReportG38,39
 makeReport makeReport42,43
+
+./src/Html/Report.hs,133
+module Html.ReportHtml.Report2,3
+makeReportHtmlAsText makeReportHtmlAsText13,14
+makeReportHtmlAsText makeReportHtmlAsText14,15
