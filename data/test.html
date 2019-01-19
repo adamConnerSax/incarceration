@@ -1,4 +1,135 @@
-<html><head><title>Colorado Money Bonds vs Personal Recognizance Bonds</title><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><div><h1>Colorado Money Bond Analysis</h1><p>Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a &quot;money bond&quot; (MB) and sometimes on a personal recognizance bond (PR). We have county-level data of all bonds issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to look at the percentage of bonds which are MB.  We look at all the data together, then split by type of county.</p></div><div id="mBondsVspRate"><script type="text/javascript">var vlSpec=
+<html><head><title>Colorado Money Bonds vs Personal Recognizance Bonds</title><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><div><h1>Colorado Money Bond Analysis</h1><p>Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a &quot;money bond&quot; and sometimes on a personal recognizance bond. We have county-level data of all bonds issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to look at the percentage of all bonds which are money bonds.</p></div><div id="mBondsVspRateByYr"><script type="text/javascript">var vlSpec=
+{
+    "height": 300,
+    "autosize": {
+        "type": "fit"
+    },
+    "mark": "point",
+    "data": {
+        "values": [
+            {
+                "year": 2014,
+                "moneyPct": 81.78410845176785,
+                "total_pop": 1283987,
+                "povertyR": 13.514223820023101
+            },
+            {
+                "year": 2014,
+                "moneyPct": 70.38930143100715,
+                "total_pop": 1696822,
+                "povertyR": 17.680414150688755
+            },
+            {
+                "year": 2014,
+                "moneyPct": 55.578082246806694,
+                "total_pop": 1331902,
+                "povertyR": 11.436189974938095
+            },
+            {
+                "year": 2014,
+                "moneyPct": 83.96384427306216,
+                "total_pop": 2156259,
+                "povertyR": 6.688967744598401
+            },
+            {
+                "year": 2014,
+                "moneyPct": 90.42204884730803,
+                "total_pop": 3408093,
+                "povertyR": 11.909842923887346
+            },
+            {
+                "year": 2015,
+                "moneyPct": 76.828540152163,
+                "total_pop": 1040431,
+                "povertyR": 16.06043562715836
+            },
+            {
+                "year": 2015,
+                "moneyPct": 65.97804557280337,
+                "total_pop": 559803,
+                "povertyR": 21.292655273372958
+            },
+            {
+                "year": 2015,
+                "moneyPct": 50.54659141544195,
+                "total_pop": 1730205,
+                "povertyR": 11.08799026704928
+            },
+            {
+                "year": 2015,
+                "moneyPct": 81.17061604282438,
+                "total_pop": 2892140,
+                "povertyR": 7.082260644367147
+            },
+            {
+                "year": 2015,
+                "moneyPct": 86.69392852441845,
+                "total_pop": 3798061,
+                "povertyR": 11.799598795280012
+            },
+            {
+                "year": 2016,
+                "moneyPct": 52.7285600497038,
+                "total_pop": 1811567,
+                "povertyR": 13.35156281826728
+            },
+            {
+                "year": 2016,
+                "moneyPct": 70.33787272536175,
+                "total_pop": 746538,
+                "povertyR": 20.566193817327452
+            },
+            {
+                "year": 2016,
+                "moneyPct": 79.98636248082899,
+                "total_pop": 1986120,
+                "povertyR": 5.697123235252654
+            },
+            {
+                "year": 2016,
+                "moneyPct": 76.8428696992579,
+                "total_pop": 1760547,
+                "povertyR": 8.845113081332109
+            },
+            {
+                "year": 2016,
+                "moneyPct": 82.73527093716437,
+                "total_pop": 3894500,
+                "povertyR": 11.467255334446014
+            }
+        ]
+    },
+    "width": 600,
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+    "title": "% of money bonds (out of money and personal recognizance bonds) by year in CO",
+    "encoding": {
+        "color": {
+            "field": "year",
+            "type": "nominal"
+        },
+        "size": {
+            "field": "total_pop",
+            "type": "quantitative"
+        },
+        "x": {
+            "field": "povertyR",
+            "type": "quantitative",
+            "axis": {
+                "title": "Poverty Rate (%)"
+            }
+        },
+        "y": {
+            "field": "moneyPct",
+            "type": "quantitative",
+            "axis": {
+                "title": "% Money Bonds"
+            }
+        }
+    },
+    "background": "white",
+    "description": "Vega-Lite Attempt"
+};
+vegaEmbed('#mBondsVspRateByYr',vlSpec);</script></div><div><p>Broken down by &quot;urbanicity&quot;:</p></div><div id="mBondsVspRateByYrUrb"><script type="text/javascript">var vlSpec=
 {
     "autosize": {
         "resize": true,
@@ -378,4 +509,4 @@
     "background": "white",
     "description": "Vega-Lite Attempt"
 };
-vegaEmbed('#mBondsVspRate',vlSpec);</script></div></html>
+vegaEmbed('#mBondsVspRateByYrUrb',vlSpec);</script></div></html>

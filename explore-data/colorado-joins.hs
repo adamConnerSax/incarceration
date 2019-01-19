@@ -15,6 +15,7 @@
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 module Main where
 
 import           DataSources
@@ -124,37 +125,38 @@ kmMoneyBondPctAnalysis joinedData = do
         dataProxy = Proxy @[PovertyR,MoneyPct,TotalPop]
         sunXF = FL.premap (F.rgetField @PovertyR &&& F.rgetField @TotalPop) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
         sunYF = FL.premap (F.rgetField @MoneyPct &&& F.rgetField @TotalPop) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
-        kmMoneyBondRatevsPovertyRate proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 5 KM.partitionCentroids KM.euclidSq
-        kmByYearUrb = runIdentity $ FL.foldM (kmMoneyBondRatevsPovertyRate (Proxy @[Year,Urbanicity])) kmData
---    liftIO $ F.writeCSV "data/kMeansCOMoneyBondRatevsPovertyRateByYearAndUrbanicity.csv" kmByYearUrb
+        kmMoneyBondRatevsPovertyRate proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 5 KM.partitionCentroids KM.euclidSq        
+        (kmByYear, kmByYearUrb) = runIdentity $ FL.foldM ((,)
+                                                          <$> kmMoneyBondRatevsPovertyRate proxyYear
+                                                          <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,Urbanicity])) kmData
     H.placeTextSection $ do
       HL.h1_ "Colorado Money Bond Analysis"
-      HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" (MB) and sometimes on a personal recognizance bond (PR). We have county-level data of all bonds issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to look at the percentage of bonds which are MB.  We look at all the data together, then split by type of county."
-    H.placeVisualization "mBondsVspRate" $ moneyBondPctVsPovertyRateVL kmByYearUrb
+      HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" and sometimes on a personal recognizance bond. We have county-level data of all bonds issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to look at the percentage of all bonds which are money bonds."
+    H.placeVisualization "mBondsVspRateByYr" $ moneyBondPctVsPovertyRateByYearVL kmByYear
+    H.placeTextSection $ HL.p_ "Broken down by \"urbanicity\":"
+    H.placeVisualization "mBondsVspRateByYrUrb" $ moneyBondPctVsPovertyRateByYearUrbVL kmByYearUrb
   T.writeFile "data/test.html" $ TL.toStrict $ htmlAsText
 
-{-
-testVisId :: Text = "vis"
+moneyBondPctVsPovertyRateByYearVL dataRecords =
+  let dat = FV.recordsToVLData (transformF @MoneyPct (*100) . F.rcast @[Year,PovertyR, MoneyPct,TotalPop]) dataRecords
+      enc = GV.encoding
+        . GV.position GV.X [FV.pName @PovertyR, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Poverty Rate (%)"]]
+        . GV.position GV.Y [FV.pName @MoneyPct, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "% Money Bonds"]]
+        . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
+        . GV.size [FV.mName @TotalPop, GV.MmType GV.Quantitative]
+      vl = GV.toVegaLite
+        [ GV.description "Vega-Lite Attempt"
+        , GV.title "% of money bonds (out of money and personal recognizance bonds) by year in CO"
+        , GV.background "white"
+        , GV.mark GV.Point []
+        , enc []
+        , GV.autosize [GV.AFit]
+        , GV.height 300, GV.width 600
+        , dat 
+        ]
+  in vl
 
-makeHtmlReport testVisScript =
-  H.html_
-  ( H.head_
-      (
-        H.title_ ("Test Html Report" :: Text)
-        H.# H.script_A (HA.src_ ("https://cdn.jsdelivr.net/npm/vega@4.4.0" :: Text)) ()
-        H.# H.script_A (HA.src_ ("https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11" :: Text)) ()
-        H.# H.script_A (HA.src_ ("https://cdn.jsdelivr.net/npm/vega-embed@3.28.0" :: Text)) ()
-      )
-    H.# H.body_
-    (
-
---      H.div_A (HA.id_ testVisId) ()
---      H.# testVisScript
-    )
-  )
--}
-
-moneyBondPctVsPovertyRateVL dataRecords =
+moneyBondPctVsPovertyRateByYearUrbVL dataRecords =
   let dat = FV.recordsToVLData (transformF @MoneyPct (*100) . F.rcast @[Year, Urbanicity,PovertyR, MoneyPct,TotalPop]) dataRecords
       enc = GV.encoding
         . GV.position GV.X [FV.pName @PovertyR, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Poverty Rate (%)"]]
@@ -169,7 +171,6 @@ moneyBondPctVsPovertyRateVL dataRecords =
         , GV.mark GV.Point []
         , enc []
         , GV.autosize [GV.AFit, GV.AResize]
---        , GV.height 300, GV.width 200
         , dat 
         ]
   in vl
