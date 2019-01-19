@@ -131,7 +131,7 @@ kmMoneyBondPctAnalysis joinedData = do
                                                           <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,Urbanicity])) kmData
     H.placeTextSection $ do
       HL.h1_ "Colorado Money Bond Analysis"
-      HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" and sometimes on a personal recognizance bond. We have county-level data of all bonds issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to look at the percentage of all bonds which are money bonds."
+      HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" and sometimes on a personal recognizance bond. We have county-level data of all bonds issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to look at the percentage of all bonds which are money bonds. In the plots below, each circle represents one cluster of counties and the circle's size represents the total population of all the counties included in the cluster."
     H.placeVisualization "mBondsVspRateByYr" $ moneyBondPctVsPovertyRateByYearVL kmByYear
     H.placeTextSection $ HL.p_ "Broken down by \"urbanicity\":"
     H.placeVisualization "mBondsVspRateByYrUrb" $ moneyBondPctVsPovertyRateByYearUrbVL kmByYearUrb
