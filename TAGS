@@ -14,18 +14,19 @@ type instance FI.VectorFor FI.VectorFor39,40
 instance instance40,41
 proxyYear proxyYear49,50
 
-./explore-data/DataSourcePaths.hs,420
+./explore-data/DataSourcePaths.hs,468
 module DataSourcePaths DataSourcePaths1,2
 veraDir veraDir4,5
 externalDataDir externalDataDir5,6
 d4dRepoDir d4dRepoDir6,7
-veraTrendsFP veraTrendsFP8,9
-crimeStatsCO_FP crimeStatsCO_FP11,12
---countyBondCO_FP --countyBondCO_FP12,13
-countyDistrictCrosswalkCO_FP countyDistrictCrosswalkCO_FP14,15
-countyBondCO_FP countyBondCO_FP17,18
-fipsByCountyFP fipsByCountyFP18,19
-censusSAIPE_FP censusSAIPE_FP19,20
+coloradoMoneyBailDir coloradoMoneyBailDir7,8
+veraTrendsFP veraTrendsFP9,10
+crimeStatsCO_FP crimeStatsCO_FP12,13
+countyDistrictCrosswalkCO_FP countyDistrictCrosswalkCO_FP13,14
+countyBondCO_FP countyBondCO_FP16,17
+fipsByCountyFP fipsByCountyFP17,18
+censusSAIPE_FP censusSAIPE_FP18,19
+--countyBondCO_FP --countyBondCO_FP19,20
 
 ./explore-data/explore-data.hs,1023
 module Main Main13,14
@@ -55,24 +56,28 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-joins.hs,722
+./explore-data/colorado-analysis.hs,819
 module Main Main18,19
-F.tableTypes' F.tableTypes'57,58
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols60,61
-justsFromRec justsFromRec62,63
-justsFromRec justsFromRec63,64
-type instance instance65,66
-type instance FI.VectorFor FI.VectorFor65,66
-main main68,69
-main main69,70
-type IndexCrimeRate IndexCrimeRate103,104
-type TotalBondRate TotalBondRate104,105
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis105,106
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis118,119
-moneyBondPctVsPovertyRateByYearVL moneyBondPctVsPovertyRateByYearVL139,140
-moneyBondPctVsPovertyRateByYearUrbVL moneyBondPctVsPovertyRateByYearUrbVL158,159
-transformF transformF183,184
-transformF transformF184,185
+F.tableTypes' F.tableTypes'60,61
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols63,64
+justsFromRec justsFromRec65,66
+justsFromRec justsFromRec66,67
+type instance instance68,69
+type instance FI.VectorFor FI.VectorFor68,69
+main main71,72
+main main72,73
+type IndexCrimeRate IndexCrimeRate121,122
+type TotalBondRate TotalBondRate122,123
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis123,124
+type BondRate BondRate134,135
+type CRate CRate135,136
+bondVsCrimeAnalysis bondVsCrimeAnalysis136,137
+bondRateVsCrimeRateVL bondRateVsCrimeRateVL157,158
+type MoneyPct MoneyPct179,180
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis180,181
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL213,214
+transformF transformF234,235
+transformF transformF235,236
 
 ./colorado-joins.hs,24
 module Main Main13,14

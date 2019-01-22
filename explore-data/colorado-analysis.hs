@@ -29,9 +29,10 @@ import qualified Html.Report                as H
 import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
 import           Control.Monad.IO.Class     (liftIO)
+import           Control.Lens ((%~),(^.))
 import           Data.Functor.Identity      (runIdentity)
 import qualified Data.List                  as  List
-import           Data.Maybe                 (catMaybes)
+import           Data.Maybe                 (catMaybes, fromMaybe)
 import           Data.Monoid                ((<>))
 import           Data.Proxy                 (Proxy (..))
 import           Data.Text                  (Text)
@@ -40,6 +41,7 @@ import qualified Data.Text.IO               as T
 import qualified Data.Text.Lazy             as TL
 import qualified Data.Vector                as V
 import qualified Data.Vinyl                 as V
+import qualified Data.Vinyl.XRec            as V
 import           Data.Vinyl.Curry           (runcurryX)
 import qualified Data.Vinyl.Functor         as V
 import           Data.Vinyl.Lens            (type (∈))
@@ -82,27 +84,41 @@ main = do
       countyBondCO_Data = F.readTableMaybeOpt parserOptions countyBondCO_FP
       countyDistrictCO_Data :: F.MonadSafe m => P.Producer CountyDistrictCO m ()
       countyDistrictCO_Data = F.readTableOpt parserOptions countyDistrictCrosswalkCO_FP
+      crimeStatsCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CrimeStatsCO) m ()
+      crimeStatsCO_Data = F.readTableMaybeOpt parserOptions crimeStatsCO_FP
   -- load streams into memory for joins, subsetting as we go
   fipsByCountyFrame <- F.inCoreAoS $ fipsByCountyData P.>-> P.map (F.rcast @[Fips,County]) -- get rid of state col
   povertyFrame <- F.inCoreAoS $ povertyData P.>-> P.map (F.rcast @[Fips, Year, MedianHI,MedianHIMOE,PovertyR])
   countyBondFrameM <- fmap F.boxedFrame $ F.runSafeEffect $ P.toListM countyBondCO_Data
   veraFrameM <- fmap F.boxedFrame $ F.runSafeEffect $ P.toListM $ veraData P.>-> P.map (F.rcast @[Fips,Year,TotalPop,Urbanicity,IndexCrime])
   countyDistrictFrame <- F.inCoreAoS countyDistrictCO_Data
+  -- turn Nothing into 0, sequence the Maybes out, use concat to "fold" over those maybes, removing any nothings
+  let blanksToZeroes :: F.Rec (Maybe :. F.ElField) '[Crimes,Offenses] -> F.Rec (Maybe :. F.ElField) '[Crimes,Offenses]
+      blanksToZeroes = FM.fromMaybeMono 0
+  crimeStatsList <- F.runSafeEffect $ P.toListM $ crimeStatsCO_Data P.>-> P.map (F.recMaybe . (F.rsubset %~ blanksToZeroes)) P.>-> P.concat
+  let mergeTypes :: F.Record '[Crimes,Offenses,EstPopulation] -> CrimeStatsCO -> F.Record '[Crimes, Offenses, EstPopulation] 
+      mergeTypes soFar = runcurryX (\c o p -> (soFar ^. crimes + c) &: (soFar ^. offenses) + o &: p &: V.RNil) . F.rcast @[Crimes,Offenses,EstPopulation]
+      foldAllCrimes :: FL.Fold (F.Record (F.RecordColumns CrimeStatsCO)) (F.FrameRec [County,Year,Crimes,Offenses,EstPopulation])
+      foldAllCrimes = FA.aggregateFs (Proxy @[County,Year]) V.Identity mergeTypes (0 &: 0 &: 0 &: V.RNil) V.Identity
+      mergedCrimeStatsFrame = FL.fold foldAllCrimes crimeStatsList
   putStrLn $ (show $ FL.fold FL.length fipsByCountyFrame) ++ " rows in fipsByCountyFrame."
   putStrLn $ (show $ FL.fold FL.length povertyFrame) ++ " rows in povertyFrame."
   putStrLn $ (show $ FL.fold FL.length countyBondFrameM) ++ " rows in countyBondFrameM."
   putStrLn $ (show $ FL.fold FL.length veraFrameM) ++ " rows in veraFrameM."
   putStrLn $ (show $ FL.fold FL.length countyDistrictFrame) ++ " rows in countyDistrictFrame."
+  putStrLn $ (show $ FL.fold FL.length crimeStatsList) ++ " rows in crimeStatsList (unmerged)."
+  putStrLn $ (show $ FL.fold FL.length mergedCrimeStatsFrame) ++ " rows in crimeStatsFrame(merged)."
   -- do joins
   let countyBondPlusFIPS = FM.leftJoinMaybe (Proxy @'[County]) countyBondFrameM (justsFromRec <$> fipsByCountyFrame)
       countyBondPlusFIPSAndDistrict = FM.leftJoinMaybe (Proxy @'[County]) (F.boxedFrame countyBondPlusFIPS) (justsFromRec <$> countyDistrictFrame)
       countyBondPlusFIPSAndSAIPE = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndDistrict) (justsFromRec <$> povertyFrame)
       countyBondPlusFIPSAndSAIPEAndVera = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndSAIPE) veraFrameM
   kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
+  let countyBondAndCrime = FM.leftJoinMaybe (Proxy @'[County,Year]) countyBondFrameM (justsFromRec <$> mergedCrimeStatsFrame)
+  bondVsCrimeAnalysis countyBondAndCrime
+--  FM.writeCSV_Maybe "data/countyBondAndCrime.csv" countyBondAndCrime 
+  
 --  kmBondRatevsCrimeRateAnalysis countyBondPlusFIPSAndSAIPEAndVera
-
-
-
 type IndexCrimeRate = "index_crime_rate" F.:-> Double
 type TotalBondRate = "total_bond_rate" F.:-> Double
 kmBondRatevsCrimeRateAnalysis joinedData = do
@@ -116,9 +132,50 @@ kmBondRatevsCrimeRateAnalysis joinedData = do
       yScaling = FL.premap (F.rgetField @IndexCrimeRate &&& F.rgetField @TotalPop) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
 -}
 
---reoffenseAnalysis joinedData = do
-  
+type BondRate = "bond_rate" F.:-> Double
+type CRate = "crime_rate" F.:-> Double 
+bondVsCrimeAnalysis joinedData = do
+  htmlAsText <- H.makeReportHtmlAsText "Colorado Bond Rate vs Crime rate" $ do
+    let mutateData :: F.Record [Year,County,OffType,TotalBondFreq,Crimes,Offenses,EstPopulation]
+                   -> F.Record [Year,County,OffType,BondRate,CRate,EstPopulation]
+        mutateData = runcurryX (\yr cnty offType bonds crimes offenses pop ->
+                                  case crimes of
+                                    0 -> yr &: cnty &: offType &: 0 &: (realToFrac crimes/ realToFrac pop) &: pop &: V.RNil
+                                    _ -> yr &: cnty &: offType &: (realToFrac bonds/realToFrac crimes) &: (realToFrac crimes/ realToFrac pop) &: pop &: V.RNil
+                               )
+        kmData = fmap mutateData . catMaybes $ fmap (F.recMaybe . F.rcast) joinedData
+        dataProxy = Proxy @[BondRate, CRate, EstPopulation]
+        sunXF = FL.premap (F.rgetField @CRate &&& F.rgetField @EstPopulation) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
+        sunYF = FL.premap (F.rgetField @BondRate &&& F.rgetField @EstPopulation) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
+        kmBondRatevsCrimeRate proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 5 KM.partitionCentroids KM.euclidSq
+        kmByYear = runIdentity $ FL.foldM (kmBondRatevsCrimeRate (Proxy @[Year,OffType])) kmData
+    H.placeTextSection $ do
+      HL.h1_ "Colorado Crime Rate vs. Bond Rate analysis"
+    H.placeVisualization "crimeRateVsBondRate" $ bondRateVsCrimeRateVL kmByYear
+    H.placeTextSection $ HL.p_ "Notes:"
+  T.writeFile "analysis/bondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
 
+bondRateVsCrimeRateVL dataRecords =
+  let dat = FV.recordsToVLData (transformF @BondRate (*100) . transformF @CRate (*100)) dataRecords
+      enc = GV.encoding
+        . GV.position GV.X [FV.pName @BondRate, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Bond Rate (%)"], GV.PScale [GV.SDomain $ GV.DNumbers [0,100]]]
+        . GV.position GV.Y [FV.pName @CRate, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Crime Rate (%)"]]
+        . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
+        . GV.size [FV.mName @EstPopulation, GV.MmType GV.Quantitative]
+        . GV.row [FV.fName @OffType, GV.FmType GV.Nominal, GV.FHeader [GV.HTitle "Type of Offense"]]
+      transform = GV.transform . GV.filter (GV.FRange "bond_rate" (GV.NumberRange 0 100)) 
+      sizing = [GV.autosize [GV.AFit], GV.height 300, GV.width 700]
+      vl = GV.toVegaLite $
+        [ GV.description "Vega-lite"
+        , GV.title ("Crime rate vs. Bond rate")
+        , GV.background "white"
+        , GV.mark GV.Point []
+        , enc []
+        , transform []
+        , dat] <> sizing
+  in vl
+
+        
 -- NB: The data has two rows for each county and year, one for misdemeanors and one for felonies.
 type MoneyPct = "moneyPct" F.:-> Double --F.declareColumn "moneyPct" ''Double
 kmMoneyBondPctAnalysis joinedData = do
@@ -140,7 +197,7 @@ kmMoneyBondPctAnalysis joinedData = do
                                                            <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType,Urbanicity])) kmData
     H.placeTextSection $ do
       HL.h1_ "Colorado Money Bond Analysis"
-      HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" and sometimes on a personal recognizance bond. We have county-level data of all bonds (?) issued in 2014, 2015 and 2016.  Plotting it all is very noisy so we use a population-weighted k-means clustering technique to combine similar counties into clusters. In the plots below, each circle represents one cluster of counties and the circle's size represents the total population of all the counties included in the cluster.  We consider felonies and misdemeanors separately."
+      HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" and sometimes on a personal recognizance bond. We have county-level data of all bonds (?) issued in 2014, 2015 and 2016.  Plotting it all is very noisy (since there are 64 counties in CO) so we use a population-weighted k-means clustering technique to combine similar counties into clusters. In the plots below, each circle represents one cluster of counties and the circle's size represents the total population of all the counties included in the cluster.  We consider felonies and misdemeanors separately."
     H.placeVisualization "mBondsVspRateByYrFelonies" $ moneyBondPctVsPovertyRateVL False kmByYear
     H.placeTextSection $ HL.p_ "Broken down by \"urbanicity\":"
     H.placeVisualization "mBondsVspRateByYrUrbFelonies" $ moneyBondPctVsPovertyRateVL True kmByYearUrb
@@ -149,9 +206,8 @@ kmMoneyBondPctAnalysis joinedData = do
       HL.h2_ "Some notes on weighted k-means"
       HL.ul_ $ do
         HL.li_ "k-means works by choosing random starting locations for cluster centers, assigning each data-point to the nearest cluster center, moving the center of each cluster to the weighted average of the data-points assigned to the same cluster and then repeating until no data-points move to a new cluster."
-        HL.li_ "One subtlety comes around defining distance between points.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the x and y data so each has mean 0 and std-deviation 1.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original."
+        HL.li_ "But how do you define distance between points?  On one axis we have money bond % and the other is poverty rate and it's not clear how to combine differences in each into an overall distance.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the money bond percentages and the poverty rates so that the set of data points has mean 0 and std-deviation 1 in each variable.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original."
         HL.li_ "This clustering happens for each combination of year and offense type (in the upper plots) and then each combination of year, offense type and urbanicity (in the plots below)."
-        
 
   T.writeFile "analysis/moneyBonds.html" $ TL.toStrict $ htmlAsText
 

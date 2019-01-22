@@ -1,0 +1,1921 @@
+County,Year,CrimeAgainst,Crimes,Offenses,EstPopulation
+Adams,2008,Person,8252,7298,746640
+Adams,2008,Property,37103,37058,746640
+Adams,2008,Society,7714,7714,746640
+Adams,2009,Person,8077,7114,761319
+Adams,2009,Property,35576,35523,761319
+Adams,2009,Society,7369,7369,761319
+Adams,2010,Person,7975,7085,766734
+Adams,2010,Property,33264,33216,766734
+Adams,2010,Society,7030,7030,766734
+Adams,2011,Person,8036,7055,780087
+Adams,2011,Property,31542,31507,780087
+Adams,2011,Society,7150,7150,780087
+Adams,2012,Person,10000,8688,794180
+Adams,2012,Property,36892,36856,794180
+Adams,2012,Society,8883,8883,794180
+Adams,2013,Person,9109,8091,809848
+Adams,2013,Property,37982,37943,809848
+Adams,2013,Society,6069,6069,809848
+Adams,2014,Person,9849,8735,828003
+Adams,2014,Property,38159,38112,828003
+Adams,2014,Society,6151,6151,828003
+Adams,2015,Person,10295,9096,849660
+Adams,2015,Property,39905,39871,849660
+Adams,2015,Society,6721,6721,849660
+Adams,2016,Person,11437,9958,849660
+Adams,2016,Property,44336,44256,849660
+Adams,2016,Society,7294,7294,849660
+Adams,2017,Person,12507,10784,870650
+Adams,2017,Property,43539,43455,870650
+Adams,2017,Society,7840,7840,870650
+Alamosa,2008,Person,22,22,15366
+Alamosa,2008,Property,71,71,15366
+Alamosa,2008,Society,4,4,15366
+Alamosa,2009,Person,20,16,15494
+Alamosa,2009,Property,92,92,15494
+Alamosa,2009,Society,4,4,15494
+Alamosa,2010,Person,9,9,15445
+Alamosa,2010,Property,55,55,15445
+Alamosa,2010,Society,1,1,15445
+Alamosa,2011,Person,15,13,15714
+Alamosa,2011,Property,54,54,15714
+Alamosa,2011,Society,1,1,15714
+Alamosa,2012,Person,21,17,15927
+Alamosa,2012,Property,62,62,15927
+Alamosa,2012,Society,6,6,15927
+Alamosa,2013,Person,27,25,16331
+Alamosa,2013,Property,107,107,16331
+Alamosa,2013,Society,8,8,16331
+Alamosa,2014,Person,7,7,16436
+Alamosa,2014,Property,136,136,16436
+Alamosa,2014,Society,18,18,16436
+Alamosa,2015,Person,55,44,16307
+Alamosa,2015,Property,281,281,16307
+Alamosa,2015,Society,44,44,16307
+Alamosa,2016,Person,48,48,16307
+Alamosa,2016,Property,200,200,16307
+Alamosa,2016,Society,24,24,16307
+Alamosa,2017,Person,281,264,16716
+Alamosa,2017,Property,1140,1140,16716
+Alamosa,2017,Society,242,242,16716
+Arapahoe,2008,Person,1438,1264,285050
+Arapahoe,2008,Property,8739,8726,285050
+Arapahoe,2008,Society,1004,1004,285050
+Arapahoe,2009,Person,1375,1187,291023
+Arapahoe,2009,Property,7855,7841,291023
+Arapahoe,2009,Society,1008,1008,291023
+Arapahoe,2010,Person,1544,1356,293244
+Arapahoe,2010,Property,7798,7795,293244
+Arapahoe,2010,Society,881,881,293244
+Arapahoe,2011,Person,2252,1954,297288
+Arapahoe,2011,Property,12468,12455,297288
+Arapahoe,2011,Society,1953,1953,297288
+Arapahoe,2012,Person,2117,1864,303738
+Arapahoe,2012,Property,12208,12201,303738
+Arapahoe,2012,Society,2219,2219,303738
+Arapahoe,2013,Person,2022,1777,312492
+Arapahoe,2013,Property,11221,11208,312492
+Arapahoe,2013,Society,1523,1523,312492
+Arapahoe,2014,Person,2151,1864,315711
+Arapahoe,2014,Property,11543,11525,315711
+Arapahoe,2014,Society,1808,1808,315711
+Arapahoe,2015,Person,2267,2004,322928
+Arapahoe,2015,Property,11925,11899,322928
+Arapahoe,2015,Society,1932,1932,322928
+Arapahoe,2016,Person,2299,2028,320358
+Arapahoe,2016,Property,12771,12754,320358
+Arapahoe,2016,Society,1709,1709,320358
+Arapahoe,2017,Person,2533,2254,215606
+Arapahoe,2017,Property,14648,14610,215606
+Arapahoe,2017,Society,1734,1734,215606
+Archuleta,2008,Person,37,35,12940
+Archuleta,2008,Property,218,214,12940
+Archuleta,2008,Society,31,31,12940
+Archuleta,2009,Person,85,77,13000
+Archuleta,2009,Property,238,238,13000
+Archuleta,2009,Society,45,45,13000
+Archuleta,2010,Person,48,43,12084
+Archuleta,2010,Property,136,135,12084
+Archuleta,2010,Society,16,16,12084
+Archuleta,2011,Person,127,117,12294
+Archuleta,2011,Property,242,242,12294
+Archuleta,2011,Society,36,36,12294
+Archuleta,2012,Person,93,85,12179
+Archuleta,2012,Property,238,238,12179
+Archuleta,2012,Society,37,37,12179
+Archuleta,2013,Person,107,99,12148
+Archuleta,2013,Property,293,293,12148
+Archuleta,2013,Society,21,21,12148
+Archuleta,2014,Person,98,95,12297
+Archuleta,2014,Property,279,279,12297
+Archuleta,2014,Society,42,42,12297
+Archuleta,2015,Person,121,111,12334
+Archuleta,2015,Property,249,249,12334
+Archuleta,2015,Society,53,53,12334
+Archuleta,2016,Person,115,114,12334
+Archuleta,2016,Property,214,214,12334
+Archuleta,2016,Society,42,42,12334
+Archuleta,2017,Person,162,145,12944
+Archuleta,2017,Property,259,259,12944
+Archuleta,2017,Society,27,27,12944
+Baca,2008,Person,6,6,3781
+Baca,2008,Property,4,4,3781
+Baca,2008,Society,2,2,3781
+Baca,2009,Person,32,22,3752
+Baca,2009,Property,14,14,3752
+Baca,2009,Society,17,17,3752
+Baca,2010,Person,26,25,3783
+Baca,2010,Property,26,26,3783
+Baca,2010,Society,19,19,3783
+Baca,2011,Person,16,15,3845
+Baca,2011,Property,19,19,3845
+Baca,2011,Society,8,8,3845
+Baca,2012,Person,15,13,3848
+Baca,2012,Property,18,18,3848
+Baca,2012,Society,33,33,3848
+Baca,2013,Person,33,26,3765
+Baca,2013,Property,33,32,3765
+Baca,2013,Society,7,7,3765
+Baca,2014,Person,17,13,3677
+Baca,2014,Property,32,32,3677
+Baca,2014,Society,7,7,3677
+Baca,2015,Person,23,17,3624
+Baca,2015,Property,29,29,3624
+Baca,2015,Society,10,10,3624
+Baca,2016,Person,31,30,3624
+Baca,2016,Property,36,36,3624
+Baca,2016,Society,5,5,3624
+Baca,2017,Person,7,5,3519
+Baca,2017,Property,6,6,3519
+Baca,2017,Society,,,3519
+Bent,2008,Person,47,47,5834
+Bent,2008,Property,208,208,5834
+Bent,2008,Society,9,9,5834
+Bent,2009,Person,34,31,5907
+Bent,2009,Property,97,97,5907
+Bent,2009,Society,22,22,5907
+Bent,2010,Person,10,8,6499
+Bent,2010,Property,77,77,6499
+Bent,2010,Society,10,10,6499
+Bent,2011,Person,21,20,6612
+Bent,2011,Property,68,68,6612
+Bent,2011,Society,9,9,6612
+Bent,2012,Person,50,47,8738
+Bent,2012,Property,147,147,8738
+Bent,2012,Society,3,3,8738
+Bent,2013,Person,32,27,7852
+Bent,2013,Property,161,161,7852
+Bent,2013,Society,10,10,7852
+Bent,2014,Person,30,22,7748
+Bent,2014,Property,106,106,7748
+Bent,2014,Society,11,11,7748
+Bent,2015,Person,19,15,7599
+Bent,2015,Property,86,86,7599
+Bent,2015,Society,8,8,7599
+Bent,2016,Person,29,27,7599
+Bent,2016,Property,194,194,7599
+Bent,2016,Society,4,4,7599
+Bent,2017,Person,26,23,7916
+Bent,2017,Property,162,162,7916
+Bent,2017,Society,15,15,7916
+Boulder,2008,Person,972,858,283211
+Boulder,2008,Property,5217,5215,283211
+Boulder,2008,Society,911,911,283211
+Boulder,2009,Person,1067,903,286362
+Boulder,2009,Property,5120,5114,286362
+Boulder,2009,Society,1099,1099,286362
+Boulder,2010,Person,1834,1603,286249
+Boulder,2010,Property,9127,9123,286249
+Boulder,2010,Society,1507,1507,286249
+Boulder,2011,Person,2105,1853,291236
+Boulder,2011,Property,9163,9148,291236
+Boulder,2011,Society,2294,2294,291236
+Boulder,2012,Person,2188,1902,294946
+Boulder,2012,Property,9609,9591,294946
+Boulder,2012,Society,2346,2346,294946
+Boulder,2013,Person,2307,2002,301345
+Boulder,2013,Property,9492,9485,301345
+Boulder,2013,Society,1351,1351,301345
+Boulder,2014,Person,2265,1999,306291
+Boulder,2014,Property,9252,9218,306291
+Boulder,2014,Society,1343,1343,306291
+Boulder,2015,Person,2701,2285,309565
+Boulder,2015,Property,10621,10587,309565
+Boulder,2015,Society,1570,1570,309565
+Boulder,2016,Person,2896,2502,309565
+Boulder,2016,Property,12149,12106,309565
+Boulder,2016,Society,1972,1972,309565
+Boulder,2017,Person,2619,2270,315082
+Boulder,2017,Property,10129,10098,315082
+Boulder,2017,Society,2163,2163,315082
+Chaffee,2008,Person,87,76,16850
+Chaffee,2008,Property,445,445,16850
+Chaffee,2008,Society,116,116,16850
+Chaffee,2009,Person,73,63,17101
+Chaffee,2009,Property,429,428,17101
+Chaffee,2009,Society,120,120,17101
+Chaffee,2010,Person,86,79,17809
+Chaffee,2010,Property,365,364,17809
+Chaffee,2010,Society,64,64,17809
+Chaffee,2011,Person,95,81,18119
+Chaffee,2011,Property,427,425,18119
+Chaffee,2011,Society,70,70,18119
+Chaffee,2012,Person,96,82,18180
+Chaffee,2012,Property,383,383,18180
+Chaffee,2012,Society,117,117,18180
+Chaffee,2013,Person,87,72,18385
+Chaffee,2013,Property,419,418,18385
+Chaffee,2013,Society,62,62,18385
+Chaffee,2014,Person,80,74,18797
+Chaffee,2014,Property,406,402,18797
+Chaffee,2014,Society,94,94,18797
+Chaffee,2015,Person,85,74,18574
+Chaffee,2015,Property,391,390,18574
+Chaffee,2015,Society,84,84,18574
+Chaffee,2016,Person,103,90,18574
+Chaffee,2016,Property,460,460,18574
+Chaffee,2016,Society,106,106,18574
+Chaffee,2017,Person,127,115,19204
+Chaffee,2017,Property,410,410,19204
+Chaffee,2017,Society,124,124,19204
+Cheyenne,2008,Person,1,1,1714
+Cheyenne,2008,Property,,,1714
+Cheyenne,2008,Society,,,1714
+Cheyenne,2009,Person,2,1,1707
+Cheyenne,2009,Property,8,8,1707
+Cheyenne,2009,Society,1,1,1707
+Cheyenne,2010,Person,2,2,1836
+Cheyenne,2010,Property,6,6,1836
+Cheyenne,2010,Society,,,1836
+Cheyenne,2011,Person,,,1868
+Cheyenne,2011,Property,7,7,1868
+Cheyenne,2011,Society,1,1,1868
+Cheyenne,2012,Person,6,6,1902
+Cheyenne,2012,Property,39,39,1902
+Cheyenne,2012,Society,6,6,1902
+Cheyenne,2013,Person,11,11,1900
+Cheyenne,2013,Property,25,25,1900
+Cheyenne,2013,Society,3,3,1900
+Cheyenne,2014,Person,2,2,1915
+Cheyenne,2014,Property,,,1915
+Cheyenne,2014,Society,4,4,1915
+Cheyenne,2015,Person,8,6,1887
+Cheyenne,2015,Property,1,1,1887
+Cheyenne,2015,Society,,,1887
+Cheyenne,2016,Person,6,6,1887
+Cheyenne,2016,Property,5,5,1887
+Cheyenne,2016,Society,,,1887
+Cheyenne,2017,Person,9,9,1844
+Cheyenne,2017,Property,7,7,1844
+Cheyenne,2017,Society,,,1844
+Clear Creek,2008,Person,102,96,8918
+Clear Creek,2008,Property,332,332,8918
+Clear Creek,2008,Society,62,62,8918
+Clear Creek,2009,Person,105,91,8880
+Clear Creek,2009,Property,256,255,8880
+Clear Creek,2009,Society,71,71,8880
+Clear Creek,2010,Person,144,104,9088
+Clear Creek,2010,Property,297,294,9088
+Clear Creek,2010,Society,56,56,9088
+Clear Creek,2011,Person,100,77,9246
+Clear Creek,2011,Property,240,237,9246
+Clear Creek,2011,Society,57,57,9246
+Clear Creek,2012,Person,120,96,9137
+Clear Creek,2012,Property,299,299,9137
+Clear Creek,2012,Society,102,102,9137
+Clear Creek,2013,Person,140,114,9059
+Clear Creek,2013,Property,242,242,9059
+Clear Creek,2013,Society,22,22,9059
+Clear Creek,2014,Person,151,120,9064
+Clear Creek,2014,Property,269,269,9064
+Clear Creek,2014,Society,36,36,9064
+Clear Creek,2015,Person,151,120,9525
+Clear Creek,2015,Property,310,310,9525
+Clear Creek,2015,Society,29,29,9525
+Clear Creek,2016,Person,159,138,9525
+Clear Creek,2016,Property,301,301,9525
+Clear Creek,2016,Society,40,40,9525
+Clear Creek,2017,Person,126,113,9755
+Clear Creek,2017,Property,298,294,9755
+Clear Creek,2017,Society,71,71,9755
+Conejos,2008,Person,,,8777
+Conejos,2008,Property,,,8777
+Conejos,2008,Society,,,8777
+Conejos,2009,Person,,,8776
+Conejos,2009,Property,,,8776
+Conejos,2009,Society,,,8776
+Conejos,2010,Person,,,9135
+Conejos,2010,Property,,,9135
+Conejos,2010,Society,,,9135
+Conejos,2011,Person,11,11,9294
+Conejos,2011,Property,13,13,9294
+Conejos,2011,Society,2,2,9294
+Conejos,2012,Person,54,51,9301
+Conejos,2012,Property,71,71,9301
+Conejos,2012,Society,7,7,9301
+Conejos,2013,Person,35,32,9200
+Conejos,2013,Property,42,42,9200
+Conejos,2013,Society,2,2,9200
+Conejos,2014,Person,27,26,9192
+Conejos,2014,Property,18,18,9192
+Conejos,2014,Society,,,9192
+Conejos,2015,Person,23,23,9159
+Conejos,2015,Property,55,55,9159
+Conejos,2015,Society,,,9159
+Conejos,2016,Person,34,33,8292
+Conejos,2016,Property,69,69,8292
+Conejos,2016,Society,,,8292
+Conejos,2017,Person,55,55,8072
+Conejos,2017,Property,73,73,8072
+Conejos,2017,Society,3,3,8072
+Costilla,2008,Person,,,3269
+Costilla,2008,Property,,,3269
+Costilla,2008,Society,,,3269
+Costilla,2009,Person,,,3192
+Costilla,2009,Property,,,3192
+Costilla,2009,Society,,,3192
+Costilla,2010,Person,,,3524
+Costilla,2010,Property,,,3524
+Costilla,2010,Society,,,3524
+Costilla,2011,Person,,,3585
+Costilla,2011,Property,,,3585
+Costilla,2011,Society,,,3585
+Costilla,2012,Person,25,24,3713
+Costilla,2012,Property,29,28,3713
+Costilla,2012,Society,4,4,3713
+Costilla,2013,Person,35,35,3640
+Costilla,2013,Property,17,17,3640
+Costilla,2013,Society,4,4,3640
+Costilla,2014,Person,42,38,3536
+Costilla,2014,Property,31,31,3536
+Costilla,2014,Society,18,18,3536
+Costilla,2015,Person,12,11,3592
+Costilla,2015,Property,6,6,3592
+Costilla,2015,Society,3,3,3592
+Costilla,2016,Person,,,3592
+Costilla,2016,Property,,,3592
+Costilla,2016,Society,,,3592
+Costilla,2017,Person,,,3742
+Costilla,2017,Property,,,3742
+Costilla,2017,Society,,,3742
+Crowley,2008,Person,19,18,6803
+Crowley,2008,Property,5,5,6803
+Crowley,2008,Society,3,3,6803
+Crowley,2009,Person,14,14,6442
+Crowley,2009,Property,4,4,6442
+Crowley,2009,Society,26,26,6442
+Crowley,2010,Person,20,20,5823
+Crowley,2010,Property,2,2,5823
+Crowley,2010,Society,4,4,5823
+Crowley,2011,Person,19,19,5924
+Crowley,2011,Property,,,5924
+Crowley,2011,Society,,,5924
+Crowley,2012,Person,33,28,5815
+Crowley,2012,Property,7,7,5815
+Crowley,2012,Society,,,5815
+Crowley,2013,Person,27,27,5251
+Crowley,2013,Property,5,5,5251
+Crowley,2013,Society,1,1,5251
+Crowley,2014,Person,24,23,5231
+Crowley,2014,Property,9,9,5231
+Crowley,2014,Society,,,5231
+Crowley,2015,Person,31,27,5267
+Crowley,2015,Property,62,62,5267
+Crowley,2015,Society,59,59,5267
+Crowley,2016,Person,34,34,5267
+Crowley,2016,Property,100,100,5267
+Crowley,2016,Society,12,12,5267
+Crowley,2017,Person,53,45,5651
+Crowley,2017,Property,97,97,5651
+Crowley,2017,Society,34,34,5651
+Custer,2008,Person,36,32,4096
+Custer,2008,Property,74,74,4096
+Custer,2008,Society,25,25,4096
+Custer,2009,Person,28,26,4064
+Custer,2009,Property,89,87,4064
+Custer,2009,Society,14,14,4064
+Custer,2010,Person,49,39,4255
+Custer,2010,Property,45,45,4255
+Custer,2010,Society,2,2,4255
+Custer,2011,Person,34,26,4329
+Custer,2011,Property,51,51,4329
+Custer,2011,Society,5,5,4329
+Custer,2012,Person,26,23,4263
+Custer,2012,Property,81,81,4263
+Custer,2012,Society,9,9,4263
+Custer,2013,Person,30,27,4268
+Custer,2013,Property,73,73,4268
+Custer,2013,Society,6,6,4268
+Custer,2014,Person,28,23,4311
+Custer,2014,Property,56,56,4311
+Custer,2014,Society,2,2,4311
+Custer,2015,Person,59,49,4399
+Custer,2015,Property,136,136,4399
+Custer,2015,Society,18,18,4399
+Custer,2016,Person,73,58,4399
+Custer,2016,Property,192,189,4399
+Custer,2016,Society,29,29,4399
+Custer,2017,Person,73,66,4642
+Custer,2017,Property,196,193,4642
+Custer,2017,Society,26,26,4642
+Delta,2008,Person,,,30670
+Delta,2008,Property,,,30670
+Delta,2008,Society,,,30670
+Delta,2009,Person,,,31330
+Delta,2009,Property,,,31330
+Delta,2009,Society,,,31330
+Delta,2010,Person,,,30952
+Delta,2010,Property,,,30952
+Delta,2010,Society,,,30952
+Delta,2011,Person,15,14,31491
+Delta,2011,Property,37,37,31491
+Delta,2011,Society,8,8,31491
+Delta,2012,Person,280,236,30872
+Delta,2012,Property,937,933,30872
+Delta,2012,Society,60,60,30872
+Delta,2013,Person,248,206,30475
+Delta,2013,Property,842,832,30475
+Delta,2013,Society,57,57,30475
+Delta,2014,Person,165,139,30561
+Delta,2014,Property,791,783,30561
+Delta,2014,Society,39,39,30561
+Delta,2015,Person,205,186,29735
+Delta,2015,Property,825,821,29735
+Delta,2015,Society,44,44,29735
+Delta,2016,Person,194,165,29735
+Delta,2016,Property,766,763,29735
+Delta,2016,Society,54,54,29735
+Delta,2017,Person,237,201,30258
+Delta,2017,Property,896,891,30258
+Delta,2017,Society,89,89,30258
+Denver,2008,Person,5876,4984,592881
+Denver,2008,Property,28583,28561,592881
+Denver,2008,Society,2170,2170,592881
+Denver,2009,Person,6535,5504,604680
+Denver,2009,Property,30440,30416,604680
+Denver,2009,Society,2144,2144,604680
+Denver,2010,Person,6369,5414,600158
+Denver,2010,Property,29508,29471,600158
+Denver,2010,Society,1998,1998,600158
+Denver,2011,Person,6694,5738,610612
+Denver,2011,Property,31823,31787,610612
+Denver,2011,Society,1689,1689,610612
+Denver,2012,Person,7018,5950,628545
+Denver,2012,Property,32743,32693,628545
+Denver,2012,Society,2114,2114,628545
+Denver,2013,Person,8962,7687,648981
+Denver,2013,Property,32797,32771,648981
+Denver,2013,Society,3548,3548,648981
+Denver,2014,Person,10032,8681,665353
+Denver,2014,Property,31670,31647,665353
+Denver,2014,Society,4503,4503,665353
+Denver,2015,Person,10892,9381,682418
+Denver,2015,Property,33420,33395,682418
+Denver,2015,Society,5155,5155,682418
+Denver,2016,Person,11124,9707,682418
+Denver,2016,Property,34432,34345,682418
+Denver,2016,Society,5969,5969,682418
+Denver,2017,Person,11274,9909,706616
+Denver,2017,Property,35964,35833,706616
+Denver,2017,Society,6127,6127,706616
+Dolores,2008,Person,9,9,1924
+Dolores,2008,Property,20,20,1924
+Dolores,2008,Society,3,3,1924
+Dolores,2009,Person,15,14,2006
+Dolores,2009,Property,31,31,2006
+Dolores,2009,Society,1,1,2006
+Dolores,2010,Person,6,6,2064
+Dolores,2010,Property,41,41,2064
+Dolores,2010,Society,4,4,2064
+Dolores,2011,Person,8,8,2100
+Dolores,2011,Property,43,43,2100
+Dolores,2011,Society,1,1,2100
+Dolores,2012,Person,9,8,2084
+Dolores,2012,Property,35,35,2084
+Dolores,2012,Society,,,2084
+Dolores,2013,Person,9,9,1985
+Dolores,2013,Property,13,13,1985
+Dolores,2013,Society,1,1,1985
+Dolores,2014,Person,8,8,2032
+Dolores,2014,Property,23,23,2032
+Dolores,2014,Society,2,2,2032
+Dolores,2015,Person,13,12,1965
+Dolores,2015,Property,25,25,1965
+Dolores,2015,Society,3,3,1965
+Dolores,2016,Person,24,23,1965
+Dolores,2016,Property,28,28,1965
+Dolores,2016,Society,13,13,1965
+Dolores,2017,Person,19,15,2047
+Dolores,2017,Property,30,30,2047
+Dolores,2017,Society,6,6,2047
+Douglas,2008,Person,260,223,286650
+Douglas,2008,Property,2154,2152,286650
+Douglas,2008,Society,268,268,286650
+Douglas,2009,Person,261,215,295015
+Douglas,2009,Property,1711,1708,295015
+Douglas,2009,Society,380,380,295015
+Douglas,2010,Person,201,182,285320
+Douglas,2010,Property,1663,1663,285320
+Douglas,2010,Society,320,320,285320
+Douglas,2011,Person,252,218,290290
+Douglas,2011,Property,1767,1767,290290
+Douglas,2011,Society,403,403,290290
+Douglas,2012,Person,1229,1047,296058
+Douglas,2012,Property,5775,5774,296058
+Douglas,2012,Society,1315,1315,296058
+Douglas,2013,Person,1078,924,303759
+Douglas,2013,Property,5583,5577,303759
+Douglas,2013,Society,941,941,303759
+Douglas,2014,Person,1230,1042,312386
+Douglas,2014,Property,6048,6033,312386
+Douglas,2014,Society,773,773,312386
+Douglas,2015,Person,1521,1323,322839
+Douglas,2015,Property,7975,7962,322839
+Douglas,2015,Society,925,925,322839
+Douglas,2016,Person,1817,1569,322839
+Douglas,2016,Property,8826,8815,322839
+Douglas,2016,Society,1179,1179,322839
+Douglas,2017,Person,1830,1581,333984
+Douglas,2017,Property,9478,9472,333984
+Douglas,2017,Society,1529,1529,333984
+Eagle,2008,Person,404,342,53578
+Eagle,2008,Property,2572,2572,53578
+Eagle,2008,Society,462,462,53578
+Eagle,2009,Person,276,236,54584
+Eagle,2009,Property,2222,2221,54584
+Eagle,2009,Society,301,301,54584
+Eagle,2010,Person,309,258,53128
+Eagle,2010,Property,2005,2005,53128
+Eagle,2010,Society,409,409,53128
+Eagle,2011,Person,281,250,54053
+Eagle,2011,Property,1761,1761,54053
+Eagle,2011,Society,430,430,54053
+Eagle,2012,Person,298,273,53513
+Eagle,2012,Property,1543,1542,53513
+Eagle,2012,Society,527,527,53513
+Eagle,2013,Person,282,256,53069
+Eagle,2013,Property,1604,1600,53069
+Eagle,2013,Society,212,212,53069
+Eagle,2014,Person,365,320,54826
+Eagle,2014,Property,1699,1698,54826
+Eagle,2014,Society,217,217,54826
+Eagle,2015,Person,411,357,55332
+Eagle,2015,Property,1691,1685,55332
+Eagle,2015,Society,240,240,55332
+Eagle,2016,Person,355,320,55332
+Eagle,2016,Property,1532,1530,55332
+Eagle,2016,Society,192,192,55332
+Eagle,2017,Person,358,305,49052
+Eagle,2017,Property,1460,1455,49052
+Eagle,2017,Society,178,178,49052
+Elbert,2008,Person,9,8,23248
+Elbert,2008,Property,88,88,23248
+Elbert,2008,Society,30,30,23248
+Elbert,2009,Person,15,14,23449
+Elbert,2009,Property,72,72,23449
+Elbert,2009,Society,16,16,23449
+Elbert,2010,Person,23,17,23080
+Elbert,2010,Property,62,62,23080
+Elbert,2010,Society,15,15,23080
+Elbert,2011,Person,8,7,23483
+Elbert,2011,Property,54,54,23483
+Elbert,2011,Society,7,7,23483
+Elbert,2012,Person,61,58,23506
+Elbert,2012,Property,177,177,23506
+Elbert,2012,Society,32,32,23506
+Elbert,2013,Person,24,20,23664
+Elbert,2013,Property,41,41,23664
+Elbert,2013,Society,24,24,23664
+Elbert,2014,Person,19,19,24047
+Elbert,2014,Property,29,29,24047
+Elbert,2014,Society,32,32,24047
+Elbert,2015,Person,33,24,24565
+Elbert,2015,Property,28,28,24565
+Elbert,2015,Society,11,11,24565
+Elbert,2016,Person,19,17,24565
+Elbert,2016,Property,13,13,24565
+Elbert,2016,Society,10,10,24565
+Elbert,2017,Person,74,53,24766
+Elbert,2017,Property,21,21,24766
+Elbert,2017,Society,32,32,24766
+El Paso,2008,Person,5422,4942,596785
+El Paso,2008,Property,33187,33126,596785
+El Paso,2008,Society,3890,3890,596785
+El Paso,2009,Person,5448,4957,606312
+El Paso,2009,Property,30295,30249,606312
+El Paso,2009,Society,3590,3590,606312
+El Paso,2010,Person,5314,4888,622291
+El Paso,2010,Property,32649,32595,622291
+El Paso,2010,Society,3641,3641,622291
+El Paso,2011,Person,5503,4949,633133
+El Paso,2011,Property,30943,30905,633133
+El Paso,2011,Society,3087,3087,633133
+El Paso,2012,Person,5492,4984,645802
+El Paso,2012,Property,34720,34665,645802
+El Paso,2012,Society,3089,3089,645802
+El Paso,2013,Person,5624,5090,655331
+El Paso,2013,Property,36766,36709,655331
+El Paso,2013,Society,2556,2556,655331
+El Paso,2014,Person,6242,5601,666136
+El Paso,2014,Property,33929,33875,666136
+El Paso,2014,Society,3230,3230,666136
+El Paso,2015,Person,6661,5948,675511
+El Paso,2015,Property,33191,33131,675511
+El Paso,2015,Society,3369,3369,675511
+El Paso,2016,Person,6668,5959,675511
+El Paso,2016,Property,33232,33150,675511
+El Paso,2016,Society,3747,3747,675511
+El Paso,2017,Person,6898,6105,696492
+El Paso,2017,Property,30490,30417,696492
+El Paso,2017,Society,4133,4133,696492
+Fremont,2008,Person,470,398,47559
+Fremont,2008,Property,1579,1578,47559
+Fremont,2008,Society,195,195,47559
+Fremont,2009,Person,444,383,47475
+Fremont,2009,Property,1210,1210,47475
+Fremont,2009,Society,216,216,47475
+Fremont,2010,Person,411,363,46824
+Fremont,2010,Property,1214,1213,46824
+Fremont,2010,Society,211,211,46824
+Fremont,2011,Person,416,359,47640
+Fremont,2011,Property,1188,1186,47640
+Fremont,2011,Society,212,212,47640
+Fremont,2012,Person,569,468,48002
+Fremont,2012,Property,1361,1359,48002
+Fremont,2012,Society,244,244,48002
+Fremont,2013,Person,496,415,47061
+Fremont,2013,Property,1352,1352,47061
+Fremont,2013,Society,191,191,47061
+Fremont,2014,Person,541,456,46611
+Fremont,2014,Property,1255,1253,46611
+Fremont,2014,Society,218,218,46611
+Fremont,2015,Person,547,456,46580
+Fremont,2015,Property,1237,1232,46580
+Fremont,2015,Society,210,210,46580
+Fremont,2016,Person,216,189,46580
+Fremont,2016,Property,481,482,46580
+Fremont,2016,Society,200,200,46580
+Fremont,2017,Person,579,515,47369
+Fremont,2017,Property,1547,1541,47369
+Fremont,2017,Society,362,362,47369
+Garfield,2008,Person,298,261,54974
+Garfield,2008,Property,1166,1165,54974
+Garfield,2008,Society,228,228,54974
+Garfield,2009,Person,497,427,56932
+Garfield,2009,Property,1701,1698,56932
+Garfield,2009,Society,358,358,56932
+Garfield,2010,Person,411,354,56389
+Garfield,2010,Property,1484,1481,56389
+Garfield,2010,Society,302,302,56389
+Garfield,2011,Person,531,459,57371
+Garfield,2011,Property,1614,1613,57371
+Garfield,2011,Society,377,377,57371
+Garfield,2012,Person,463,414,57048
+Garfield,2012,Property,1732,1731,57048
+Garfield,2012,Society,332,332,57048
+Garfield,2013,Person,530,476,57598
+Garfield,2013,Property,1826,1823,57598
+Garfield,2013,Society,197,197,57598
+Garfield,2014,Person,491,433,57939
+Garfield,2014,Property,1715,1713,57939
+Garfield,2014,Society,186,186,57939
+Garfield,2015,Person,482,443,58026
+Garfield,2015,Property,2084,2083,58026
+Garfield,2015,Society,292,292,58026
+Garfield,2016,Person,601,535,58026
+Garfield,2016,Property,1827,1826,58026
+Garfield,2016,Society,361,361,58026
+Garfield,2017,Person,741,630,59145
+Garfield,2017,Property,2043,2042,59145
+Garfield,2017,Society,511,511,59145
+Gilpin,2008,Person,43,41,5130
+Gilpin,2008,Property,1139,1139,5130
+Gilpin,2008,Society,134,134,5130
+Gilpin,2009,Person,67,60,5201
+Gilpin,2009,Property,1202,1202,5201
+Gilpin,2009,Society,123,123,5201
+Gilpin,2010,Person,68,63,5441
+Gilpin,2010,Property,1106,1106,5441
+Gilpin,2010,Society,163,163,5441
+Gilpin,2011,Person,69,55,5536
+Gilpin,2011,Property,975,975,5536
+Gilpin,2011,Society,226,226,5536
+Gilpin,2012,Person,46,43,5543
+Gilpin,2012,Property,1095,1095,5543
+Gilpin,2012,Society,233,233,5543
+Gilpin,2013,Person,74,71,5536
+Gilpin,2013,Property,1316,1315,5536
+Gilpin,2013,Society,122,122,5536
+Gilpin,2014,Person,93,80,5667
+Gilpin,2014,Property,1353,1350,5667
+Gilpin,2014,Society,93,93,5667
+Gilpin,2015,Person,73,66,5975
+Gilpin,2015,Property,1147,1147,5975
+Gilpin,2015,Society,137,137,5975
+Gilpin,2016,Person,71,66,5975
+Gilpin,2016,Property,968,968,5975
+Gilpin,2016,Society,105,105,5975
+Gilpin,2017,Person,99,94,5992
+Gilpin,2017,Property,898,898,5992
+Gilpin,2017,Society,189,189,5992
+Grand,2008,Person,,,15735
+Grand,2008,Property,,,15735
+Grand,2008,Society,,,15735
+Grand,2009,Person,,,14245
+Grand,2009,Property,,,14245
+Grand,2009,Society,,,14245
+Grand,2010,Person,,,14718
+Grand,2010,Property,,,14718
+Grand,2010,Society,,,14718
+Grand,2011,Person,,,15134
+Grand,2011,Property,,,15134
+Grand,2011,Society,,,15134
+Grand,2012,Person,24,19,14749
+Grand,2012,Property,77,77,14749
+Grand,2012,Society,32,32,14749
+Grand,2013,Person,24,22,14095
+Grand,2013,Property,88,88,14095
+Grand,2013,Society,10,10,14095
+Grand,2014,Person,64,60,14249
+Grand,2014,Property,221,221,14249
+Grand,2014,Society,19,19,14249
+Grand,2015,Person,46,43,14542
+Grand,2015,Property,266,266,14542
+Grand,2015,Society,17,17,14542
+Grand,2016,Person,42,38,14542
+Grand,2016,Property,190,190,14542
+Grand,2016,Society,12,12,14542
+Grand,2017,Person,41,41,12700
+Grand,2017,Property,201,201,12700
+Grand,2017,Society,25,25,12700
+Gunnison,2008,Person,158,137,15108
+Gunnison,2008,Property,593,593,15108
+Gunnison,2008,Society,136,136,15108
+Gunnison,2009,Person,148,116,15305
+Gunnison,2009,Property,729,729,15305
+Gunnison,2009,Society,115,115,15305
+Gunnison,2010,Person,117,99,15324
+Gunnison,2010,Property,632,632,15324
+Gunnison,2010,Society,112,112,15324
+Gunnison,2011,Person,131,108,15591
+Gunnison,2011,Property,570,565,15591
+Gunnison,2011,Society,90,90,15591
+Gunnison,2012,Person,163,137,15621
+Gunnison,2012,Property,476,476,15621
+Gunnison,2012,Society,82,82,15621
+Gunnison,2013,Person,132,105,15602
+Gunnison,2013,Property,434,434,15602
+Gunnison,2013,Society,48,48,15602
+Gunnison,2014,Person,183,143,15628
+Gunnison,2014,Property,355,355,15628
+Gunnison,2014,Society,56,56,15628
+Gunnison,2015,Person,143,118,15873
+Gunnison,2015,Property,385,383,15873
+Gunnison,2015,Society,72,72,15873
+Gunnison,2016,Person,157,126,15873
+Gunnison,2016,Property,377,377,15873
+Gunnison,2016,Society,95,95,15873
+Gunnison,2017,Person,192,157,16528
+Gunnison,2017,Property,353,350,16528
+Gunnison,2017,Society,124,124,16528
+Hinsdale,2008,Person,1,1,846
+Hinsdale,2008,Property,13,13,846
+Hinsdale,2008,Society,,,846
+Hinsdale,2009,Person,4,4,847
+Hinsdale,2009,Property,13,13,847
+Hinsdale,2009,Society,,,847
+Hinsdale,2010,Person,1,1,843
+Hinsdale,2010,Property,22,22,843
+Hinsdale,2010,Society,,,843
+Hinsdale,2011,Person,10,8,858
+Hinsdale,2011,Property,15,15,858
+Hinsdale,2011,Society,1,1,858
+Hinsdale,2012,Person,1,1,841
+Hinsdale,2012,Property,15,15,841
+Hinsdale,2012,Society,2,2,841
+Hinsdale,2013,Person,2,2,804
+Hinsdale,2013,Property,9,9,804
+Hinsdale,2013,Society,,,804
+Hinsdale,2014,Person,,,810
+Hinsdale,2014,Property,8,8,810
+Hinsdale,2014,Society,,,810
+Hinsdale,2015,Person,1,1,775
+Hinsdale,2015,Property,9,9,775
+Hinsdale,2015,Society,,,775
+Hinsdale,2016,Person,6,4,775
+Hinsdale,2016,Property,7,7,775
+Hinsdale,2016,Society,2,2,775
+Hinsdale,2017,Person,2,2,776
+Hinsdale,2017,Property,9,9,776
+Hinsdale,2017,Society,,,776
+Huerfano,2008,Person,41,37,7844
+Huerfano,2008,Property,107,107,7844
+Huerfano,2008,Society,23,23,7844
+Huerfano,2009,Person,13,10,7964
+Huerfano,2009,Property,12,12,7964
+Huerfano,2009,Society,4,4,7964
+Huerfano,2010,Person,51,46,6711
+Huerfano,2010,Property,200,200,6711
+Huerfano,2010,Society,9,9,6711
+Huerfano,2011,Person,103,81,6828
+Huerfano,2011,Property,221,221,6828
+Huerfano,2011,Society,79,79,6828
+Huerfano,2012,Person,135,121,6610
+Huerfano,2012,Property,299,293,6610
+Huerfano,2012,Society,27,27,6610
+Huerfano,2013,Person,146,128,6620
+Huerfano,2013,Property,234,234,6620
+Huerfano,2013,Society,11,11,6620
+Huerfano,2014,Person,153,130,6520
+Huerfano,2014,Property,189,189,6520
+Huerfano,2014,Society,17,17,6520
+Huerfano,2015,Person,182,154,6435
+Huerfano,2015,Property,229,229,6435
+Huerfano,2015,Society,24,24,6435
+Huerfano,2016,Person,200,174,6435
+Huerfano,2016,Property,319,319,6435
+Huerfano,2016,Society,25,25,6435
+Huerfano,2017,Person,81,65,9610
+Huerfano,2017,Property,149,147,9610
+Huerfano,2017,Society,28,28,9610
+Jackson,2008,Person,7,7,1359
+Jackson,2008,Property,9,9,1359
+Jackson,2008,Society,2,2,1359
+Jackson,2009,Person,6,3,1325
+Jackson,2009,Property,24,24,1325
+Jackson,2009,Society,3,3,1325
+Jackson,2010,Person,3,3,1394
+Jackson,2010,Property,15,15,1394
+Jackson,2010,Society,2,2,1394
+Jackson,2011,Person,,,1418
+Jackson,2011,Property,10,10,1418
+Jackson,2011,Society,1,1,1418
+Jackson,2012,Person,6,6,1389
+Jackson,2012,Property,7,7,1389
+Jackson,2012,Society,1,1,1389
+Jackson,2013,Person,4,4,1344
+Jackson,2013,Property,10,10,1344
+Jackson,2013,Society,,,1344
+Jackson,2014,Person,1,1,1369
+Jackson,2014,Property,2,2,1369
+Jackson,2014,Society,,,1369
+Jackson,2015,Person,,,1404
+Jackson,2015,Property,1,1,1404
+Jackson,2015,Society,,,1404
+Jackson,2016,Person,5,5,1404
+Jackson,2016,Property,6,6,1404
+Jackson,2016,Society,,,1404
+Jackson,2017,Person,6,6,1348
+Jackson,2017,Property,9,9,1348
+Jackson,2017,Society,,,1348
+Jefferson,2008,Person,4651,4100,486481
+Jefferson,2008,Property,22155,22129,486481
+Jefferson,2008,Society,4592,4592,486481
+Jefferson,2009,Person,4646,4109,491138
+Jefferson,2009,Property,21539,21514,491138
+Jefferson,2009,Society,3887,3887,491138
+Jefferson,2010,Person,4636,4176,492316
+Jefferson,2010,Property,20746,20727,492316
+Jefferson,2010,Society,3475,3475,492316
+Jefferson,2011,Person,4582,4181,500892
+Jefferson,2011,Property,19773,19763,500892
+Jefferson,2011,Society,3580,3580,500892
+Jefferson,2012,Person,4560,4126,504143
+Jefferson,2012,Property,20826,20814,504143
+Jefferson,2012,Society,3283,3283,504143
+Jefferson,2013,Person,4132,3784,509037
+Jefferson,2013,Property,21045,21034,509037
+Jefferson,2013,Society,2445,2445,509037
+Jefferson,2014,Person,4200,3834,515493
+Jefferson,2014,Property,20682,20665,515493
+Jefferson,2014,Society,2927,2927,515493
+Jefferson,2015,Person,4715,4295,522599
+Jefferson,2015,Property,23298,23268,522599
+Jefferson,2015,Society,3184,3184,522599
+Jefferson,2016,Person,5083,4535,522599
+Jefferson,2016,Property,25376,25343,522599
+Jefferson,2016,Society,3519,3519,522599
+Jefferson,2017,Person,5413,4846,531704
+Jefferson,2017,Property,25311,25294,531704
+Jefferson,2017,Society,4201,4201,531704
+Kiowa,2008,Person,1,1,1302
+Kiowa,2008,Property,1,1,1302
+Kiowa,2008,Society,,,1302
+Kiowa,2009,Person,1,1,1294
+Kiowa,2009,Property,1,1,1294
+Kiowa,2009,Society,,,1294
+Kiowa,2010,Person,5,5,1398
+Kiowa,2010,Property,1,1,1398
+Kiowa,2010,Society,1,1,1398
+Kiowa,2011,Person,4,4,1422
+Kiowa,2011,Property,1,1,1422
+Kiowa,2011,Society,2,2,1422
+Kiowa,2012,Person,4,4,1453
+Kiowa,2012,Property,2,2,1453
+Kiowa,2012,Society,3,3,1453
+Kiowa,2013,Person,1,1,1470
+Kiowa,2013,Property,3,3,1470
+Kiowa,2013,Society,4,4,1470
+Kiowa,2014,Person,,,1439
+Kiowa,2014,Property,,,1439
+Kiowa,2014,Society,,,1439
+Kiowa,2015,Person,,,1409
+Kiowa,2015,Property,,,1409
+Kiowa,2015,Society,,,1409
+Kiowa,2016,Person,,,1409
+Kiowa,2016,Property,,,1409
+Kiowa,2016,Society,,,1409
+Kiowa,2017,Person,,,1365
+Kiowa,2017,Property,,,1365
+Kiowa,2017,Society,,,1365
+Kit Carson,2008,Person,70,58,7927
+Kit Carson,2008,Property,230,230,7927
+Kit Carson,2008,Society,33,33,7927
+Kit Carson,2009,Person,72,66,7842
+Kit Carson,2009,Property,209,209,7842
+Kit Carson,2009,Society,30,30,7842
+Kit Carson,2010,Person,54,49,8270
+Kit Carson,2010,Property,201,201,8270
+Kit Carson,2010,Society,12,12,8270
+Kit Carson,2011,Person,65,53,8414
+Kit Carson,2011,Property,160,159,8414
+Kit Carson,2011,Society,21,21,8414
+Kit Carson,2012,Person,71,64,8255
+Kit Carson,2012,Property,193,193,8255
+Kit Carson,2012,Society,49,49,8255
+Kit Carson,2013,Person,75,66,8094
+Kit Carson,2013,Property,232,232,8094
+Kit Carson,2013,Society,41,41,8094
+Kit Carson,2014,Person,79,72,8032
+Kit Carson,2014,Property,207,207,8032
+Kit Carson,2014,Society,35,35,8032
+Kit Carson,2015,Person,67,54,8061
+Kit Carson,2015,Property,225,225,8061
+Kit Carson,2015,Society,36,36,8061
+Kit Carson,2016,Person,79,64,8061
+Kit Carson,2016,Property,223,223,8061
+Kit Carson,2016,Society,44,44,8061
+Kit Carson,2017,Person,67,59,8157
+Kit Carson,2017,Property,215,213,8157
+Kit Carson,2017,Society,82,82,8157
+Lake,2008,Person,77,73,7930
+Lake,2008,Property,138,133,7930
+Lake,2008,Society,68,68,7930
+Lake,2009,Person,74,71,8027
+Lake,2009,Property,139,140,8027
+Lake,2009,Society,23,23,8027
+Lake,2010,Person,110,92,7310
+Lake,2010,Property,125,125,7310
+Lake,2010,Society,40,40,7310
+Lake,2011,Person,122,108,7437
+Lake,2011,Property,150,150,7437
+Lake,2011,Society,52,52,7437
+Lake,2012,Person,114,105,7530
+Lake,2012,Property,146,146,7530
+Lake,2012,Society,46,46,7530
+Lake,2013,Person,94,92,7408
+Lake,2013,Property,100,99,7408
+Lake,2013,Society,13,13,7408
+Lake,2014,Person,114,102,7359
+Lake,2014,Property,126,126,7359
+Lake,2014,Society,16,16,7359
+Lake,2015,Person,82,69,7408
+Lake,2015,Property,78,78,7408
+Lake,2015,Society,13,13,7408
+Lake,2016,Person,104,88,7408
+Lake,2016,Property,157,157,7408
+Lake,2016,Society,18,18,7408
+Lake,2017,Person,55,48,7650
+Lake,2017,Property,168,168,7650
+Lake,2017,Society,25,25,7650
+La Plata,2008,Person,19,19,50298
+La Plata,2008,Property,134,134,50298
+La Plata,2008,Society,94,94,50298
+La Plata,2009,Person,16,15,51318
+La Plata,2009,Property,139,139,51318
+La Plata,2009,Society,124,124,51318
+La Plata,2010,Person,17,16,51334
+La Plata,2010,Property,135,135,51334
+La Plata,2010,Society,114,114,51334
+La Plata,2011,Person,10,10,52228
+La Plata,2011,Property,139,139,52228
+La Plata,2011,Society,134,134,52228
+La Plata,2012,Person,206,187,52635
+La Plata,2012,Property,791,790,52635
+La Plata,2012,Society,207,207,52635
+La Plata,2013,Person,313,266,53040
+La Plata,2013,Property,1168,1167,53040
+La Plata,2013,Society,171,171,53040
+La Plata,2014,Person,306,277,54054
+La Plata,2014,Property,1203,1200,54054
+La Plata,2014,Society,222,222,54054
+La Plata,2015,Person,411,371,54874
+La Plata,2015,Property,1619,1618,54874
+La Plata,2015,Society,208,208,54874
+La Plata,2016,Person,478,422,54874
+La Plata,2016,Property,1663,1661,54874
+La Plata,2016,Society,233,233,54874
+La Plata,2017,Person,474,422,56154
+La Plata,2017,Property,1496,1496,56154
+La Plata,2017,Society,284,284,56154
+Larimer,2008,Person,2544,1981,289893
+Larimer,2008,Property,11188,11172,289893
+Larimer,2008,Society,1502,1502,289893
+Larimer,2009,Person,2386,1857,295449
+Larimer,2009,Property,10670,10660,295449
+Larimer,2009,Society,1380,1380,295449
+Larimer,2010,Person,2460,1988,294582
+Larimer,2010,Property,10317,10314,294582
+Larimer,2010,Society,1512,1512,294582
+Larimer,2011,Person,2264,1815,299713
+Larimer,2011,Property,9959,9954,299713
+Larimer,2011,Society,1651,1651,299713
+Larimer,2012,Person,2847,2331,304528
+Larimer,2012,Property,12031,12027,304528
+Larimer,2012,Society,2810,2810,304528
+Larimer,2013,Person,2540,2117,310452
+Larimer,2013,Property,10385,10374,310452
+Larimer,2013,Society,1662,1662,310452
+Larimer,2014,Person,2646,2172,321547
+Larimer,2014,Property,11012,11006,321547
+Larimer,2014,Society,1751,1751,321547
+Larimer,2015,Person,2520,2105,331509
+Larimer,2015,Property,12264,12247,331509
+Larimer,2015,Society,2045,2045,331509
+Larimer,2016,Person,2811,2355,331509
+Larimer,2016,Property,12770,12757,331509
+Larimer,2016,Society,2676,2676,331509
+Larimer,2017,Person,3084,2557,342023
+Larimer,2017,Property,13051,13020,342023
+Larimer,2017,Society,2970,2970,342023
+Las Animas,2008,Person,170,153,16115
+Las Animas,2008,Property,579,579,16115
+Las Animas,2008,Society,36,36,16115
+Las Animas,2009,Person,123,113,16164
+Las Animas,2009,Property,566,566,16164
+Las Animas,2009,Society,29,29,16164
+Las Animas,2010,Person,78,70,15507
+Las Animas,2010,Property,357,357,15507
+Las Animas,2010,Society,29,29,15507
+Las Animas,2011,Person,,,15777
+Las Animas,2011,Property,,,15777
+Las Animas,2011,Society,,,15777
+Las Animas,2012,Person,96,91,15245
+Las Animas,2012,Property,350,350,15245
+Las Animas,2012,Society,51,51,15245
+Las Animas,2013,Person,51,46,14890
+Las Animas,2013,Property,174,173,14890
+Las Animas,2013,Society,53,53,14890
+Las Animas,2014,Person,89,77,14296
+Las Animas,2014,Property,492,492,14296
+Las Animas,2014,Society,21,21,14296
+Las Animas,2015,Person,114,98,13782
+Las Animas,2015,Property,569,568,13782
+Las Animas,2015,Society,35,35,13782
+Las Animas,2016,Person,86,75,13782
+Las Animas,2016,Property,655,655,13782
+Las Animas,2016,Society,17,17,13782
+Las Animas,2017,Person,116,100,13848
+Las Animas,2017,Property,651,650,13848
+Las Animas,2017,Society,52,52,13848
+Lincoln,2008,Person,13,11,5244
+Lincoln,2008,Property,36,36,5244
+Lincoln,2008,Society,2,2,5244
+Lincoln,2009,Person,18,18,5215
+Lincoln,2009,Property,21,21,5215
+Lincoln,2009,Society,17,17,5215
+Lincoln,2010,Person,12,11,5467
+Lincoln,2010,Property,16,16,5467
+Lincoln,2010,Society,3,3,5467
+Lincoln,2011,Person,22,20,5562
+Lincoln,2011,Property,18,18,5562
+Lincoln,2011,Society,6,6,5562
+Lincoln,2012,Person,22,21,5529
+Lincoln,2012,Property,63,63,5529
+Lincoln,2012,Society,7,7,5529
+Lincoln,2013,Person,16,13,5482
+Lincoln,2013,Property,52,52,5482
+Lincoln,2013,Society,3,3,5482
+Lincoln,2014,Person,24,22,5451
+Lincoln,2014,Property,44,44,5451
+Lincoln,2014,Society,1,1,5451
+Lincoln,2015,Person,15,15,5540
+Lincoln,2015,Property,56,56,5540
+Lincoln,2015,Society,6,6,5540
+Lincoln,2016,Person,24,24,5540
+Lincoln,2016,Property,68,67,5540
+Lincoln,2016,Society,6,6,5540
+Lincoln,2017,Person,24,22,5652
+Lincoln,2017,Property,60,60,5652
+Lincoln,2017,Society,11,11,5652
+Logan,2008,Person,187,173,21121
+Logan,2008,Property,699,699,21121
+Logan,2008,Society,106,106,21121
+Logan,2009,Person,206,180,20970
+Logan,2009,Property,655,655,20970
+Logan,2009,Society,146,146,20970
+Logan,2010,Person,231,201,22709
+Logan,2010,Property,767,765,22709
+Logan,2010,Society,163,163,22709
+Logan,2011,Person,164,140,23105
+Logan,2011,Property,750,749,23105
+Logan,2011,Society,141,141,23105
+Logan,2012,Person,178,151,22932
+Logan,2012,Property,872,872,22932
+Logan,2012,Society,216,216,22932
+Logan,2013,Person,168,148,22727
+Logan,2013,Property,911,910,22727
+Logan,2013,Society,137,137,22727
+Logan,2014,Person,224,197,22492
+Logan,2014,Property,839,838,22492
+Logan,2014,Society,160,160,22492
+Logan,2015,Person,310,273,22542
+Logan,2015,Property,1041,1041,22542
+Logan,2015,Society,229,229,22542
+Logan,2016,Person,246,227,22542
+Logan,2016,Property,1024,1018,22542
+Logan,2016,Society,162,162,22542
+Logan,2017,Person,238,216,21803
+Logan,2017,Property,1048,1047,21803
+Logan,2017,Society,220,220,21803
+Mesa,2008,Person,1415,1261,142140
+Mesa,2008,Property,7323,7311,142140
+Mesa,2008,Society,1619,1619,142140
+Mesa,2009,Person,1013,877,146602
+Mesa,2009,Property,5891,5872,146602
+Mesa,2009,Society,1288,1288,146602
+Mesa,2010,Person,1382,1235,146723
+Mesa,2010,Property,6279,6270,146723
+Mesa,2010,Society,1293,1293,146723
+Mesa,2011,Person,1531,1345,149279
+Mesa,2011,Property,7204,7197,149279
+Mesa,2011,Society,1244,1244,149279
+Mesa,2012,Person,1698,1513,149118
+Mesa,2012,Property,7119,7105,149118
+Mesa,2012,Society,1601,1601,149118
+Mesa,2013,Person,1591,1415,149245
+Mesa,2013,Property,6319,6313,149245
+Mesa,2013,Society,1341,1341,149245
+Mesa,2014,Person,1767,1606,148670
+Mesa,2014,Property,6255,6240,148670
+Mesa,2014,Society,1428,1428,148670
+Mesa,2015,Person,1912,1691,149249
+Mesa,2015,Property,6836,6834,149249
+Mesa,2015,Society,1615,1615,149249
+Mesa,2016,Person,1799,1614,149249
+Mesa,2016,Property,7019,7012,149249
+Mesa,2016,Society,1744,1744,149249
+Mesa,2017,Person,2177,1913,150129
+Mesa,2017,Property,7087,7078,150129
+Mesa,2017,Society,1986,1986,150129
+Mineral,2008,Person,,,980
+Mineral,2008,Property,1,1,980
+Mineral,2008,Society,,,980
+Mineral,2009,Person,,,979
+Mineral,2009,Property,2,2,979
+Mineral,2009,Society,,,979
+Mineral,2010,Person,,,712
+Mineral,2010,Property,,,712
+Mineral,2010,Society,,,712
+Mineral,2011,Person,,1,724
+Mineral,2011,Property,3,3,724
+Mineral,2011,Society,,,724
+Mineral,2012,Person,2,1,718
+Mineral,2012,Property,1,1,718
+Mineral,2012,Society,,,718
+Mineral,2013,Person,6,6,714
+Mineral,2013,Property,1,1,714
+Mineral,2013,Society,,,714
+Mineral,2014,Person,2,2,729
+Mineral,2014,Property,1,1,729
+Mineral,2014,Society,2,2,729
+Mineral,2015,Person,1,1,700
+Mineral,2015,Property,2,2,700
+Mineral,2015,Society,,,700
+Mineral,2016,Person,,,700
+Mineral,2016,Property,,,700
+Mineral,2016,Society,,,700
+Mineral,2017,Person,1,1,734
+Mineral,2017,Property,,,734
+Mineral,2017,Society,,,734
+Moffat,2008,Person,175,150,13718
+Moffat,2008,Property,555,555,13718
+Moffat,2008,Society,131,131,13718
+Moffat,2009,Person,194,166,13941
+Moffat,2009,Property,595,596,13941
+Moffat,2009,Society,167,167,13941
+Moffat,2010,Person,173,146,13795
+Moffat,2010,Property,557,558,13795
+Moffat,2010,Society,84,84,13795
+Moffat,2011,Person,139,128,14035
+Moffat,2011,Property,499,499,14035
+Moffat,2011,Society,151,151,14035
+Moffat,2012,Person,153,124,13637
+Moffat,2012,Property,502,502,13637
+Moffat,2012,Society,233,233,13637
+Moffat,2013,Person,119,111,13086
+Moffat,2013,Property,415,415,13086
+Moffat,2013,Society,123,123,13086
+Moffat,2014,Person,127,115,13009
+Moffat,2014,Property,364,364,13009
+Moffat,2014,Society,112,112,13009
+Moffat,2015,Person,145,128,12766
+Moffat,2015,Property,470,469,12766
+Moffat,2015,Society,205,205,12766
+Moffat,2016,Person,188,158,12766
+Moffat,2016,Property,467,466,12766
+Moffat,2016,Society,283,283,12766
+Moffat,2017,Person,165,137,12948
+Moffat,2017,Property,424,422,12948
+Moffat,2017,Society,319,319,12948
+Montezuma,2008,Person,275,235,25412
+Montezuma,2008,Property,775,770,25412
+Montezuma,2008,Society,93,93,25412
+Montezuma,2009,Person,271,245,25602
+Montezuma,2009,Property,905,905,25602
+Montezuma,2009,Society,60,60,25602
+Montezuma,2010,Person,251,216,25535
+Montezuma,2010,Property,830,829,25535
+Montezuma,2010,Society,115,115,25535
+Montezuma,2011,Person,271,220,25980
+Montezuma,2011,Property,823,823,25980
+Montezuma,2011,Society,189,189,25980
+Montezuma,2012,Person,229,203,25794
+Montezuma,2012,Property,643,643,25794
+Montezuma,2012,Society,191,191,25794
+Montezuma,2013,Person,180,162,25558
+Montezuma,2013,Property,684,683,25558
+Montezuma,2013,Society,61,61,25558
+Montezuma,2014,Person,215,182,25815
+Montezuma,2014,Property,713,707,25815
+Montezuma,2014,Society,71,71,25815
+Montezuma,2015,Person,193,171,25926
+Montezuma,2015,Property,643,642,25926
+Montezuma,2015,Society,91,91,25926
+Montezuma,2016,Person,165,151,25926
+Montezuma,2016,Property,620,620,25926
+Montezuma,2016,Society,112,112,25926
+Montezuma,2017,Person,168,146,27148
+Montezuma,2017,Property,684,684,27148
+Montezuma,2017,Society,128,128,27148
+Montrose,2008,Person,348,292,40363
+Montrose,2008,Property,1918,1915,40363
+Montrose,2008,Society,336,336,40363
+Montrose,2009,Person,368,316,41465
+Montrose,2009,Property,2123,2121,41465
+Montrose,2009,Society,294,294,41465
+Montrose,2010,Person,337,281,41276
+Montrose,2010,Property,1757,1756,41276
+Montrose,2010,Society,362,362,41276
+Montrose,2011,Person,337,284,41995
+Montrose,2011,Property,1463,1454,41995
+Montrose,2011,Society,384,384,41995
+Montrose,2012,Person,361,289,41578
+Montrose,2012,Property,1628,1627,41578
+Montrose,2012,Society,410,410,41578
+Montrose,2013,Person,361,279,40832
+Montrose,2013,Property,1338,1338,40832
+Montrose,2013,Society,282,282,40832
+Montrose,2014,Person,339,263,40826
+Montrose,2014,Property,1562,1561,40826
+Montrose,2014,Society,267,267,40826
+Montrose,2015,Person,345,260,40948
+Montrose,2015,Property,1585,1585,40948
+Montrose,2015,Society,254,254,40948
+Montrose,2016,Person,313,250,40948
+Montrose,2016,Property,1670,1667,40948
+Montrose,2016,Society,296,296,40948
+Montrose,2017,Person,408,325,41364
+Montrose,2017,Property,1918,1915,41364
+Montrose,2017,Society,380,380,41364
+Morgan,2008,Person,260,217,28069
+Morgan,2008,Property,938,936,28069
+Morgan,2008,Society,218,218,28069
+Morgan,2009,Person,253,200,28881
+Morgan,2009,Property,775,775,28881
+Morgan,2009,Society,252,252,28881
+Morgan,2010,Person,205,167,29032
+Morgan,2010,Property,882,881,29032
+Morgan,2010,Society,164,164,29032
+Morgan,2011,Person,180,158,28649
+Morgan,2011,Property,774,774,28649
+Morgan,2011,Society,156,156,28649
+Morgan,2012,Person,213,185,28565
+Morgan,2012,Property,797,797,28565
+Morgan,2012,Society,228,228,28565
+Morgan,2013,Person,196,180,28756
+Morgan,2013,Property,914,913,28756
+Morgan,2013,Society,101,101,28756
+Morgan,2014,Person,231,207,28630
+Morgan,2014,Property,791,787,28630
+Morgan,2014,Society,113,113,28630
+Morgan,2015,Person,269,241,28480
+Morgan,2015,Property,798,798,28480
+Morgan,2015,Society,100,100,28480
+Morgan,2016,Person,238,209,28480
+Morgan,2016,Property,811,810,28480
+Morgan,2016,Society,101,101,28480
+Morgan,2017,Person,304,264,28186
+Morgan,2017,Property,925,924,28186
+Morgan,2017,Society,191,191,28186
+Otero,2008,Person,237,207,18697
+Otero,2008,Property,873,873,18697
+Otero,2008,Society,41,41,18697
+Otero,2009,Person,254,226,18648
+Otero,2009,Property,870,872,18648
+Otero,2009,Society,63,63,18648
+Otero,2010,Person,233,217,18831
+Otero,2010,Property,655,657,18831
+Otero,2010,Society,36,36,18831
+Otero,2011,Person,182,177,19159
+Otero,2011,Property,494,494,19159
+Otero,2011,Society,48,48,19159
+Otero,2012,Person,119,107,19126
+Otero,2012,Property,500,500,19126
+Otero,2012,Society,40,40,19126
+Otero,2013,Person,171,153,18754
+Otero,2013,Property,679,679,18754
+Otero,2013,Society,32,32,18754
+Otero,2014,Person,129,118,18759
+Otero,2014,Property,617,617,18759
+Otero,2014,Society,48,48,18759
+Otero,2015,Person,134,130,18454
+Otero,2015,Property,686,686,18454
+Otero,2015,Society,90,90,18454
+Otero,2016,Person,196,173,18454
+Otero,2016,Property,651,650,18454
+Otero,2016,Society,67,67,18454
+Otero,2017,Person,156,141,18131
+Otero,2017,Property,649,648,18131
+Otero,2017,Society,82,82,18131
+Ouray,2008,Person,8,7,4463
+Ouray,2008,Property,30,30,4463
+Ouray,2008,Society,2,2,4463
+Ouray,2009,Person,5,5,4665
+Ouray,2009,Property,41,41,4665
+Ouray,2009,Society,1,1,4665
+Ouray,2010,Person,9,9,4436
+Ouray,2010,Property,39,39,4436
+Ouray,2010,Society,1,1,4436
+Ouray,2011,Person,4,4,4513
+Ouray,2011,Property,53,53,4513
+Ouray,2011,Society,,,4513
+Ouray,2012,Person,9,9,4416
+Ouray,2012,Property,45,45,4416
+Ouray,2012,Society,1,1,4416
+Ouray,2013,Person,,,4583
+Ouray,2013,Property,,,4583
+Ouray,2013,Society,,,4583
+Ouray,2014,Person,5,5,4608
+Ouray,2014,Property,28,28,4608
+Ouray,2014,Society,4,4,4608
+Ouray,2015,Person,31,21,4689
+Ouray,2015,Property,40,40,4689
+Ouray,2015,Society,3,3,4689
+Ouray,2016,Person,5,5,4689
+Ouray,2016,Property,31,31,4689
+Ouray,2016,Society,4,4,4689
+Ouray,2017,Person,4,4,4908
+Ouray,2017,Property,33,33,4908
+Ouray,2017,Society,2,2,4908
+Park,2008,Person,,,17996
+Park,2008,Property,,,17996
+Park,2008,Society,,,17996
+Park,2009,Person,,,17961
+Park,2009,Property,,,17961
+Park,2009,Society,,,17961
+Park,2010,Person,,,16206
+Park,2010,Property,,,16206
+Park,2010,Society,,,16206
+Park,2011,Person,,,16488
+Park,2011,Property,,,16488
+Park,2011,Society,,,16488
+Park,2012,Person,101,96,16312
+Park,2012,Property,147,147,16312
+Park,2012,Society,24,24,16312
+Park,2013,Person,97,91,16055
+Park,2013,Property,134,134,16055
+Park,2013,Society,16,16,16055
+Park,2014,Person,91,84,16176
+Park,2014,Property,96,96,16176
+Park,2014,Society,14,14,16176
+Park,2015,Person,81,78,16426
+Park,2015,Property,107,107,16426
+Park,2015,Society,22,22,16426
+Park,2016,Person,73,73,16426
+Park,2016,Property,132,131,16426
+Park,2016,Society,24,24,16426
+Park,2017,Person,58,55,17258
+Park,2017,Property,100,100,17258
+Park,2017,Society,11,11,17258
+Phillips,2008,Person,7,7,4507
+Phillips,2008,Property,45,45,4507
+Phillips,2008,Society,4,4,4507
+Phillips,2009,Person,27,18,4486
+Phillips,2009,Property,73,73,4486
+Phillips,2009,Society,8,8,4486
+Phillips,2010,Person,22,22,4442
+Phillips,2010,Property,55,55,4442
+Phillips,2010,Society,3,3,4442
+Phillips,2011,Person,19,18,4519
+Phillips,2011,Property,54,54,4519
+Phillips,2011,Society,9,9,4519
+Phillips,2012,Person,22,22,4460
+Phillips,2012,Property,42,41,4460
+Phillips,2012,Society,5,5,4460
+Phillips,2013,Person,19,19,4363
+Phillips,2013,Property,30,30,4363
+Phillips,2013,Society,4,4,4363
+Phillips,2014,Person,36,31,4356
+Phillips,2014,Property,50,50,4356
+Phillips,2014,Society,5,5,4356
+Phillips,2015,Person,60,51,4355
+Phillips,2015,Property,80,80,4355
+Phillips,2015,Society,10,10,4355
+Phillips,2016,Person,36,31,4355
+Phillips,2016,Property,65,65,4355
+Phillips,2016,Society,10,10,4355
+Phillips,2017,Person,26,21,4244
+Phillips,2017,Property,43,43,4244
+Phillips,2017,Society,5,5,4244
+Pitkin,2008,Person,16,14,14278
+Pitkin,2008,Property,111,111,14278
+Pitkin,2008,Society,3,3,14278
+Pitkin,2009,Person,43,38,14714
+Pitkin,2009,Property,115,115,14714
+Pitkin,2009,Society,2,2,14714
+Pitkin,2010,Person,65,57,16217
+Pitkin,2010,Property,165,165,16217
+Pitkin,2010,Society,8,8,16217
+Pitkin,2011,Person,145,120,16500
+Pitkin,2011,Property,557,557,16500
+Pitkin,2011,Society,66,66,16500
+Pitkin,2012,Person,104,86,16397
+Pitkin,2012,Property,710,710,16397
+Pitkin,2012,Society,64,64,16397
+Pitkin,2013,Person,116,97,16472
+Pitkin,2013,Property,595,595,16472
+Pitkin,2013,Society,20,20,16472
+Pitkin,2014,Person,81,74,16591
+Pitkin,2014,Property,537,537,16591
+Pitkin,2014,Society,30,30,16591
+Pitkin,2015,Person,121,104,16844
+Pitkin,2015,Property,634,634,16844
+Pitkin,2015,Society,29,29,16844
+Pitkin,2016,Person,102,90,16844
+Pitkin,2016,Property,643,643,16844
+Pitkin,2016,Society,27,27,16844
+Pitkin,2017,Person,84,72,16828
+Pitkin,2017,Property,514,513,16828
+Pitkin,2017,Society,36,36,16828
+Prowers,2008,Person,117,98,13039
+Prowers,2008,Property,624,624,13039
+Prowers,2008,Society,113,113,13039
+Prowers,2009,Person,26,25,12999
+Prowers,2009,Property,134,134,12999
+Prowers,2009,Society,61,61,12999
+Prowers,2010,Person,24,21,12551
+Prowers,2010,Property,268,268,12551
+Prowers,2010,Society,35,35,12551
+Prowers,2011,Person,77,64,12770
+Prowers,2011,Property,506,506,12770
+Prowers,2011,Society,121,121,12770
+Prowers,2012,Person,82,69,12723
+Prowers,2012,Property,571,572,12723
+Prowers,2012,Society,189,189,12723
+Prowers,2013,Person,71,69,12413
+Prowers,2013,Property,546,545,12413
+Prowers,2013,Society,119,119,12413
+Prowers,2014,Person,39,38,12293
+Prowers,2014,Property,377,376,12293
+Prowers,2014,Society,70,70,12293
+Prowers,2015,Person,29,26,11948
+Prowers,2015,Property,210,210,11948
+Prowers,2015,Society,40,40,11948
+Prowers,2016,Person,22,18,11948
+Prowers,2016,Property,91,90,11948
+Prowers,2016,Society,43,43,11948
+Prowers,2017,Person,24,20,11775
+Prowers,2017,Property,140,140,11775
+Prowers,2017,Society,54,54,11775
+Pueblo,2008,Person,1498,1288,156301
+Pueblo,2008,Property,4460,4417,156301
+Pueblo,2008,Society,240,240,156301
+Pueblo,2009,Person,2283,1997,158754
+Pueblo,2009,Property,5953,5942,158754
+Pueblo,2009,Society,364,364,158754
+Pueblo,2010,Person,2458,2119,159063
+Pueblo,2010,Property,7974,7961,159063
+Pueblo,2010,Society,380,380,159063
+Pueblo,2011,Person,1966,1678,161834
+Pueblo,2011,Property,8191,8176,161834
+Pueblo,2011,Society,471,471,161834
+Pueblo,2012,Person,2096,1837,162766
+Pueblo,2012,Property,10558,10543,162766
+Pueblo,2012,Society,532,532,162766
+Pueblo,2013,Person,2545,2184,162300
+Pueblo,2013,Property,12975,12952,162300
+Pueblo,2013,Society,626,626,162300
+Pueblo,2014,Person,2316,2018,162854
+Pueblo,2014,Property,11854,11835,162854
+Pueblo,2014,Society,641,641,162854
+Pueblo,2015,Person,2373,2088,163063
+Pueblo,2015,Property,11959,11940,163063
+Pueblo,2015,Society,850,850,163063
+Pueblo,2016,Person,2539,2232,163063
+Pueblo,2016,Property,12372,12358,163063
+Pueblo,2016,Society,939,939,163063
+Pueblo,2017,Person,2588,2273,165456
+Pueblo,2017,Property,11330,11310,165456
+Pueblo,2017,Society,959,959,165456
+Rio Blanco,2008,Person,31,27,6264
+Rio Blanco,2008,Property,75,75,6264
+Rio Blanco,2008,Society,9,9,6264
+Rio Blanco,2009,Person,35,30,6393
+Rio Blanco,2009,Property,71,71,6393
+Rio Blanco,2009,Society,93,93,6393
+Rio Blanco,2010,Person,12,12,6666
+Rio Blanco,2010,Property,60,60,6666
+Rio Blanco,2010,Society,88,88,6666
+Rio Blanco,2011,Person,41,39,6782
+Rio Blanco,2011,Property,104,102,6782
+Rio Blanco,2011,Society,42,42,6782
+Rio Blanco,2012,Person,63,51,6876
+Rio Blanco,2012,Property,132,132,6876
+Rio Blanco,2012,Society,51,51,6876
+Rio Blanco,2013,Person,43,38,6974
+Rio Blanco,2013,Property,123,122,6974
+Rio Blanco,2013,Society,20,20,6974
+Rio Blanco,2014,Person,46,41,6889
+Rio Blanco,2014,Property,110,110,6889
+Rio Blanco,2014,Society,26,26,6889
+Rio Blanco,2015,Person,44,43,6744
+Rio Blanco,2015,Property,87,87,6744
+Rio Blanco,2015,Society,28,28,6744
+Rio Blanco,2016,Person,30,29,6744
+Rio Blanco,2016,Property,65,65,6744
+Rio Blanco,2016,Society,27,27,6744
+Rio Blanco,2017,Person,37,37,6501
+Rio Blanco,2017,Property,86,86,6501
+Rio Blanco,2017,Society,22,22,6501
+Rio Grande,2008,Person,70,66,11367
+Rio Grande,2008,Property,181,181,11367
+Rio Grande,2008,Society,48,48,11367
+Rio Grande,2009,Person,69,59,11374
+Rio Grande,2009,Property,166,166,11374
+Rio Grande,2009,Society,51,51,11374
+Rio Grande,2010,Person,66,59,11748
+Rio Grande,2010,Property,197,197,11748
+Rio Grande,2010,Society,44,44,11748
+Rio Grande,2011,Person,40,36,11936
+Rio Grande,2011,Property,229,229,11936
+Rio Grande,2011,Society,38,38,11936
+Rio Grande,2012,Person,105,89,11879
+Rio Grande,2012,Property,393,393,11879
+Rio Grande,2012,Society,61,61,11879
+Rio Grande,2013,Person,70,64,11768
+Rio Grande,2013,Property,356,356,11768
+Rio Grande,2013,Society,17,17,11768
+Rio Grande,2014,Person,49,46,11603
+Rio Grande,2014,Property,245,245,11603
+Rio Grande,2014,Society,16,16,11603
+Rio Grande,2015,Person,64,61,11340
+Rio Grande,2015,Property,298,297,11340
+Rio Grande,2015,Society,65,65,11340
+Rio Grande,2016,Person,97,89,11340
+Rio Grande,2016,Property,374,373,11340
+Rio Grande,2016,Society,85,85,11340
+Rio Grande,2017,Person,87,78,10778
+Rio Grande,2017,Property,417,416,10778
+Rio Grande,2017,Society,116,116,10778
+Routt,2008,Person,208,184,22737
+Routt,2008,Property,942,941,22737
+Routt,2008,Society,213,213,22737
+Routt,2009,Person,165,151,23399
+Routt,2009,Property,889,887,23399
+Routt,2009,Society,211,211,23399
+Routt,2010,Person,166,157,23509
+Routt,2010,Property,691,691,23509
+Routt,2010,Society,230,230,23509
+Routt,2011,Person,176,162,23918
+Routt,2011,Property,701,691,23918
+Routt,2011,Society,217,217,23918
+Routt,2012,Person,200,171,23560
+Routt,2012,Property,688,689,23560
+Routt,2012,Society,194,194,23560
+Routt,2013,Person,148,134,23434
+Routt,2013,Property,539,538,23434
+Routt,2013,Society,108,108,23434
+Routt,2014,Person,202,173,23670
+Routt,2014,Property,688,687,23670
+Routt,2014,Society,117,117,23670
+Routt,2015,Person,195,171,24065
+Routt,2015,Property,728,728,24065
+Routt,2015,Society,126,126,24065
+Routt,2016,Person,194,160,24065
+Routt,2016,Property,675,675,24065
+Routt,2016,Society,132,132,24065
+Routt,2017,Person,195,165,24762
+Routt,2017,Property,713,714,24762
+Routt,2017,Society,167,167,24762
+Saguache,2008,Person,34,34,7077
+Saguache,2008,Property,115,115,7077
+Saguache,2008,Society,72,72,7077
+Saguache,2009,Person,39,37,7227
+Saguache,2009,Property,112,112,7227
+Saguache,2009,Society,58,58,7227
+Saguache,2010,Person,46,36,6326
+Saguache,2010,Property,176,176,6326
+Saguache,2010,Society,45,45,6326
+Saguache,2011,Person,61,59,6436
+Saguache,2011,Property,217,217,6436
+Saguache,2011,Society,28,28,6436
+Saguache,2012,Person,59,50,6534
+Saguache,2012,Property,174,174,6534
+Saguache,2012,Society,21,21,6534
+Saguache,2013,Person,70,63,6620
+Saguache,2013,Property,178,178,6620
+Saguache,2013,Society,14,14,6620
+Saguache,2014,Person,57,52,6477
+Saguache,2014,Property,129,129,6477
+Saguache,2014,Society,15,15,6477
+Saguache,2015,Person,40,36,6444
+Saguache,2015,Property,159,158,6444
+Saguache,2015,Society,11,11,6444
+Saguache,2016,Person,50,48,6444
+Saguache,2016,Property,172,172,6444
+Saguache,2016,Society,17,17,6444
+Saguache,2017,Person,36,35,6616
+Saguache,2017,Property,119,119,6616
+Saguache,2017,Society,17,17,6616
+San Juan,2008,Person,5,5,559
+San Juan,2008,Property,38,38,559
+San Juan,2008,Society,,,559
+San Juan,2009,Person,15,12,552
+San Juan,2009,Property,20,20,552
+San Juan,2009,Society,9,9,552
+San Juan,2010,Person,7,6,699
+San Juan,2010,Property,17,17,699
+San Juan,2010,Society,4,4,699
+San Juan,2011,Person,10,10,711
+San Juan,2011,Property,34,31,711
+San Juan,2011,Society,4,4,711
+San Juan,2012,Person,7,6,702
+San Juan,2012,Property,21,21,702
+San Juan,2012,Society,1,1,702
+San Juan,2013,Person,7,5,688
+San Juan,2013,Property,18,18,688
+San Juan,2013,Society,1,1,688
+San Juan,2014,Person,1,1,692
+San Juan,2014,Property,19,19,692
+San Juan,2014,Society,1,1,692
+San Juan,2015,Person,5,5,726
+San Juan,2015,Property,9,9,726
+San Juan,2015,Society,,,726
+San Juan,2016,Person,8,7,726
+San Juan,2016,Property,13,13,726
+San Juan,2016,Society,,,726
+San Juan,2017,Person,6,6,689
+San Juan,2017,Property,7,7,689
+San Juan,2017,Society,3,3,689
+San Miguel,2008,Person,,,7662
+San Miguel,2008,Property,,,7662
+San Miguel,2008,Society,,,7662
+San Miguel,2009,Person,,,7678
+San Miguel,2009,Property,,,7678
+San Miguel,2009,Society,,,7678
+San Miguel,2010,Person,,,7359
+San Miguel,2010,Property,,,7359
+San Miguel,2010,Society,,,7359
+San Miguel,2011,Person,,,7487
+San Miguel,2011,Property,,,7487
+San Miguel,2011,Society,,,7487
+San Miguel,2012,Person,23,20,7594
+San Miguel,2012,Property,186,186,7594
+San Miguel,2012,Society,29,29,7594
+San Miguel,2013,Person,20,13,7704
+San Miguel,2013,Property,194,194,7704
+San Miguel,2013,Society,3,3,7704
+San Miguel,2014,Person,27,26,7806
+San Miguel,2014,Property,125,125,7806
+San Miguel,2014,Society,5,5,7806
+San Miguel,2015,Person,27,25,7995
+San Miguel,2015,Property,127,127,7995
+San Miguel,2015,Society,9,9,7995
+San Miguel,2016,Person,47,38,7995
+San Miguel,2016,Property,120,120,7995
+San Miguel,2016,Society,13,13,7995
+San Miguel,2017,Person,30,26,6671
+San Miguel,2017,Property,114,114,6671
+San Miguel,2017,Society,10,10,6671
+Sedgwick,2008,Person,18,18,2295
+Sedgwick,2008,Property,43,43,2295
+Sedgwick,2008,Society,2,2,2295
+Sedgwick,2009,Person,5,5,2319
+Sedgwick,2009,Property,41,41,2319
+Sedgwick,2009,Society,,,2319
+Sedgwick,2010,Person,2,2,2379
+Sedgwick,2010,Property,12,12,2379
+Sedgwick,2010,Society,,,2379
+Sedgwick,2011,Person,19,20,2420
+Sedgwick,2011,Property,43,43,2420
+Sedgwick,2011,Society,1,1,2420
+Sedgwick,2012,Person,10,5,2397
+Sedgwick,2012,Property,36,36,2397
+Sedgwick,2012,Society,2,2,2397
+Sedgwick,2013,Person,18,16,2402
+Sedgwick,2013,Property,34,34,2402
+Sedgwick,2013,Society,7,7,2402
+Sedgwick,2014,Person,23,15,2370
+Sedgwick,2014,Property,35,35,2370
+Sedgwick,2014,Society,4,4,2370
+Sedgwick,2015,Person,10,10,2352
+Sedgwick,2015,Property,18,18,2352
+Sedgwick,2015,Society,5,5,2352
+Sedgwick,2016,Person,9,9,2352
+Sedgwick,2016,Property,,,2352
+Sedgwick,2016,Society,,,2352
+Sedgwick,2017,Person,8,7,2404
+Sedgwick,2017,Property,15,15,2404
+Sedgwick,2017,Society,5,5,2404
+Summit,2008,Person,22,18,27901
+Summit,2008,Property,50,50,27901
+Summit,2008,Society,9,9,27901
+Summit,2009,Person,320,278,27265
+Summit,2009,Property,1073,1073,27265
+Summit,2009,Society,252,252,27265
+Summit,2010,Person,280,241,27994
+Summit,2010,Property,1304,1300,27994
+Summit,2010,Society,146,146,27994
+Summit,2011,Person,259,234,29346
+Summit,2011,Property,1226,1223,29346
+Summit,2011,Society,100,100,29346
+Summit,2012,Person,265,233,28359
+Summit,2012,Property,1289,1289,28359
+Summit,2012,Society,189,189,28359
+Summit,2013,Person,288,257,28224
+Summit,2013,Property,1233,1232,28224
+Summit,2013,Society,73,73,28224
+Summit,2014,Person,205,189,28965
+Summit,2014,Property,1174,1173,28965
+Summit,2014,Society,55,55,28965
+Summit,2015,Person,310,285,29861
+Summit,2015,Property,1287,1282,29861
+Summit,2015,Society,69,69,29861
+Summit,2016,Person,327,300,29861
+Summit,2016,Property,1484,1482,29861
+Summit,2016,Society,104,104,29861
+Summit,2017,Person,319,291,30663
+Summit,2017,Property,1314,1314,30663
+Summit,2017,Society,93,93,30663
+Teller,2008,Person,127,117,21938
+Teller,2008,Property,638,637,21938
+Teller,2008,Society,152,152,21938
+Teller,2009,Person,141,123,21763
+Teller,2009,Property,624,624,21763
+Teller,2009,Society,163,163,21763
+Teller,2010,Person,162,148,23322
+Teller,2010,Property,670,670,23322
+Teller,2010,Society,110,110,23322
+Teller,2011,Person,170,149,23729
+Teller,2011,Property,913,911,23729
+Teller,2011,Society,139,139,23729
+Teller,2012,Person,174,160,24053
+Teller,2012,Property,706,706,24053
+Teller,2012,Society,159,159,24053
+Teller,2013,Person,151,141,23885
+Teller,2013,Property,869,869,23885
+Teller,2013,Society,142,142,23885
+Teller,2014,Person,244,198,23727
+Teller,2014,Property,825,825,23727
+Teller,2014,Society,144,144,23727
+Teller,2015,Person,199,177,23831
+Teller,2015,Property,919,919,23831
+Teller,2015,Society,109,109,23831
+Teller,2016,Person,298,248,23831
+Teller,2016,Property,892,892,23831
+Teller,2016,Society,132,132,23831
+Teller,2017,Person,217,192,24430
+Teller,2017,Property,943,943,24430
+Teller,2017,Society,145,145,24430
+Washington,2008,Person,20,17,4593
+Washington,2008,Property,115,115,4593
+Washington,2008,Society,7,7,4593
+Washington,2009,Person,52,38,4458
+Washington,2009,Property,118,115,4458
+Washington,2009,Society,24,24,4458
+Washington,2010,Person,41,38,4814
+Washington,2010,Property,148,147,4814
+Washington,2010,Society,15,15,4814
+Washington,2011,Person,60,47,4898
+Washington,2011,Property,141,141,4898
+Washington,2011,Society,34,34,4898
+Washington,2012,Person,68,54,4836
+Washington,2012,Property,126,125,4836
+Washington,2012,Society,32,32,4836
+Washington,2013,Person,45,38,4784
+Washington,2013,Property,142,142,4784
+Washington,2013,Society,14,14,4784
+Washington,2014,Person,32,22,4830
+Washington,2014,Property,63,63,4830
+Washington,2014,Society,4,4,4830
+Washington,2015,Person,44,30,4792
+Washington,2015,Property,77,76,4792
+Washington,2015,Society,21,21,4792
+Washington,2016,Person,56,50,4792
+Washington,2016,Property,181,181,4792
+Washington,2016,Society,27,27,4792
+Washington,2017,Person,62,52,4908
+Washington,2017,Property,169,169,4908
+Washington,2017,Society,23,23,4908
+Weld,2008,Person,2281,1930,264866
+Weld,2008,Property,10108,10097,264866
+Weld,2008,Society,1251,1251,264866
+Weld,2009,Person,2256,1872,271365
+Weld,2009,Property,8332,8306,271365
+Weld,2009,Society,1255,1255,271365
+Weld,2010,Person,2399,1932,266870
+Weld,2010,Property,7787,7769,266870
+Weld,2010,Society,1239,1239,266870
+Weld,2011,Person,2417,1931,271520
+Weld,2011,Property,7527,7517,271520
+Weld,2011,Society,1144,1144,271520
+Weld,2012,Person,2622,2103,275648
+Weld,2012,Property,9138,9131,275648
+Weld,2012,Society,1753,1753,275648
+Weld,2013,Person,2807,2223,282732
+Weld,2013,Property,8543,8532,282732
+Weld,2013,Society,1329,1329,282732
+Weld,2014,Person,2616,2132,289420
+Weld,2014,Property,8971,8964,289420
+Weld,2014,Society,1658,1658,289420
+Weld,2015,Person,2780,2297,300619
+Weld,2015,Property,8501,8495,300619
+Weld,2015,Society,1468,1468,300619
+Weld,2016,Person,2890,2365,300619
+Weld,2016,Property,9720,9686,300619
+Weld,2016,Society,1869,1869,300619
+Weld,2017,Person,2879,2340,306504
+Weld,2017,Property,8713,8698,306504
+Weld,2017,Society,2123,2123,306504
+Yuma,2008,Person,44,42,9654
+Yuma,2008,Property,163,163,9654
+Yuma,2008,Society,11,11,9654
+Yuma,2009,Person,40,38,9669
+Yuma,2009,Property,88,88,9669
+Yuma,2009,Society,5,5,9669
+Yuma,2010,Person,36,34,10043
+Yuma,2010,Property,124,124,10043
+Yuma,2010,Society,22,22,10043
+Yuma,2011,Person,35,33,10218
+Yuma,2011,Property,92,92,10218
+Yuma,2011,Society,10,10,10218
+Yuma,2012,Person,26,25,10240
+Yuma,2012,Property,81,81,10240
+Yuma,2012,Society,17,17,10240
+Yuma,2013,Person,36,33,10217
+Yuma,2013,Property,103,95,10217
+Yuma,2013,Society,5,5,10217
+Yuma,2014,Person,13,13,10241
+Yuma,2014,Property,70,70,10241
+Yuma,2014,Society,3,3,10241
+Yuma,2015,Person,29,29,10287
+Yuma,2015,Property,44,44,10287
+Yuma,2015,Society,4,4,10287
+Yuma,2016,Person,22,21,10287
+Yuma,2016,Property,43,43,10287
+Yuma,2016,Society,4,4,10287
+Yuma,2017,Person,24,23,10079
+Yuma,2017,Property,44,43,10079
+Yuma,2017,Society,1,1,10079
+Broomfield,2008,Person,270,242,55889
+Broomfield,2008,Property,1973,1966,55889
+Broomfield,2008,Society,667,667,55889
+Broomfield,2009,Person,294,255,56862
+Broomfield,2009,Property,1766,1763,56862
+Broomfield,2009,Society,506,506,56862
+Broomfield,2010,Person,277,227,58145
+Broomfield,2010,Property,1834,1827,58145
+Broomfield,2010,Society,515,515,58145
+Broomfield,2011,Person,201,179,59424
+Broomfield,2011,Property,1626,1625,59424
+Broomfield,2011,Society,561,561,59424
+Broomfield,2012,Person,210,182,60693
+Broomfield,2012,Property,1735,1734,60693
+Broomfield,2012,Society,550,550,60693
+Broomfield,2013,Person,261,217,63935
+Broomfield,2013,Property,1678,1677,63935
+Broomfield,2013,Society,307,307,63935
+Broomfield,2014,Person,230,197,63935
+Broomfield,2014,Property,1583,1582,63935
+Broomfield,2014,Society,331,331,63935
+Broomfield,2015,Person,253,228,68158
+Broomfield,2015,Property,1898,1897,68158
+Broomfield,2015,Society,219,219,68158
+Broomfield,2016,Person,290,256,63935
+Broomfield,2016,Property,2590,2587,63935
+Broomfield,2016,Society,309,309,63935
+Broomfield,2017,Person,404,344,68341
+Broomfield,2017,Property,3089,3087,68341
+Broomfield,2017,Society,355,355,68341

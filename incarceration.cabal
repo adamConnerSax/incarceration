@@ -64,9 +64,9 @@ executable explore-data
   default-language:    Haskell2010
 
 
-executable colorado-joins
+executable colorado-analysis
   ghc-options:         -O0 
-  main-is:             colorado-joins.hs
+  main-is:             colorado-analysis.hs
   other-modules:       DataSourcePaths
                      , DataSources
   -- other-extensions:
