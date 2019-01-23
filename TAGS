@@ -56,28 +56,32 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-analysis.hs,819
+./explore-data/colorado-analysis.hs,1021
 module Main Main18,19
-F.tableTypes' F.tableTypes'60,61
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols63,64
-justsFromRec justsFromRec65,66
+F.tableTypes' F.tableTypes'61,62
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols64,65
 justsFromRec justsFromRec66,67
-type instance instance68,69
-type instance FI.VectorFor FI.VectorFor68,69
-main main71,72
+justsFromRec justsFromRec67,68
+type instance instance69,70
+type instance FI.VectorFor FI.VectorFor69,70
 main main72,73
-type IndexCrimeRate IndexCrimeRate121,122
-type TotalBondRate TotalBondRate122,123
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis123,124
-type BondRate BondRate134,135
-type CRate CRate135,136
-bondVsCrimeAnalysis bondVsCrimeAnalysis136,137
-bondRateVsCrimeRateVL bondRateVsCrimeRateVL157,158
-type MoneyPct MoneyPct179,180
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis180,181
-moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL213,214
-transformF transformF234,235
-transformF transformF235,236
+main main73,74
+type MoneyBondRate MoneyBondRate109,110
+type PostedBondRate PostedBondRate110,111
+type CRate CRate111,112
+bondVsCrimeAnalysis bondVsCrimeAnalysis112,113
+bondVsCrimeAnalysis bondVsCrimeAnalysis113,114
+moneyBondRateVsCrimeRateVL moneyBondRateVsCrimeRateVL191,192
+postedBondRateVsCrimeRateVL postedBondRateVsCrimeRateVL209,210
+--type --type229,230
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis230,231
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL270,271
+kMeansNotes kMeansNotes291,292
+transformF transformF299,300
+transformF transformF300,301
+type IndexCrimeRate IndexCrimeRate304,305
+type TotalBondRate TotalBondRate305,306
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis306,307
 
 ./colorado-joins.hs,24
 module Main Main13,14
