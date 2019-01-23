@@ -109,6 +109,7 @@ main = do
 
 type MoneyBondRate = "money_bond_rate" F.:-> Double
 type PostedBondRate = "posted_bond_rate" F.:-> Double
+type ReoffenseRate = "reoffense_rate" F.:-> Double
 type CRate = "crime_rate" F.:-> Double
 bondVsCrimeAnalysis :: P.Producer (FM.MaybeRow CountyBondCO) (F.SafeT IO) () -> P.Producer (FM.MaybeRow CrimeStatsCO) (F.SafeT IO) () -> IO ()
 bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
@@ -123,15 +124,17 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       foldAllCrimes :: FL.Fold (F.Record (F.RecordColumns CrimeStatsCO)) (F.FrameRec [County,Year,Crimes,Offenses,EstPopulation])
       foldAllCrimes = FA.aggregateFs (Proxy @[County,Year]) V.Identity mergeCrimeTypes (0 &: 0 &: 0 &: V.RNil) V.Identity         
       mergedCrimeStatsFrame = FL.fold foldAllCrimes crimeStatsList
+      unmergedCrimeStatsFrame = F.boxedFrame crimeStatsList
       foldAllBonds :: FL.Fold (FM.MaybeRow CountyBondCO) (F.FrameRec [County,Year,MoneyBondFreq,TotalBondFreq,MoneyPosted,PrPosted])
       foldAllBonds = FA.aggregateFs (Proxy @[County,Year]) selectMaybe addBonds (0 &: 0 &: 0 &: 0 &: V.RNil) V.Identity where
         selectMaybe = F.recMaybe . F.rcast @[County,Year,MoneyBondFreq,TotalBondFreq,MoneyPosted,PrPosted]
         addBonds = flip $ V.recAdd . F.rcast @[MoneyBondFreq,TotalBondFreq,MoneyPosted,PrPosted]
       mergedBondDataFrame = FL.fold foldAllBonds countyBondFrameM
-      countyBondAndCrime = F.leftJoin @[County,Year] mergedBondDataFrame mergedCrimeStatsFrame
+      countyBondAndCrimeMerged = F.leftJoin @[County,Year] mergedBondDataFrame mergedCrimeStatsFrame
+      countyBondAndCrimeUnmerged = FM.leftJoinMaybe (Proxy @[County,Year]) countyBondFrameM (justsFromRec <$> unmergedCrimeStatsFrame)
   putStrLn $ (show $ FL.fold FL.length crimeStatsList) ++ " rows in crimeStatsList (unmerged)."
   putStrLn $ (show $ FL.fold FL.length mergedCrimeStatsFrame) ++ " rows in crimeStatsFrame(merged)."
-  let kmMoneyBondRatevsCrimeRateByYear = runIdentity $ FL.foldM (kmMoneyBondRatevsCrimeRate (Proxy @'[Year])) kmData where        
+  let kmMoneyBondRatevsMergedCrimeRateByYear = runIdentity $ FL.foldM (kmMoneyBondRatevsCrimeRate (Proxy @'[Year])) kmData where        
         mutateData :: F.Record [Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
                    -> F.Record [Year,County,MoneyBondRate,CRate,EstPopulation]
         mutateData = runcurryX (\yr cnty mbonds tbonds crimes offenses pop ->
@@ -139,12 +142,12 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
                                     0 -> yr &: cnty &: 0 &: (realToFrac crimes/ realToFrac pop) &: pop &: V.RNil
                                     _ -> yr &: cnty &: (realToFrac mbonds/realToFrac tbonds) &: (realToFrac crimes/ realToFrac pop) &: pop &: V.RNil
                                )
-        kmData = fmap mutateData . catMaybes $ fmap (F.recMaybe . F.rcast) countyBondAndCrime
+        kmData = fmap mutateData . catMaybes $ fmap (F.recMaybe . F.rcast) countyBondAndCrimeMerged
         dataProxy = Proxy @[MoneyBondRate, CRate, EstPopulation]
         sunXF = FL.premap (F.rgetField @CRate &&& F.rgetField @EstPopulation) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
         sunYF = FL.premap (F.rgetField @MoneyBondRate &&& F.rgetField @EstPopulation) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
         kmMoneyBondRatevsCrimeRate proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 10 KM.partitionCentroids KM.euclidSq
-  let kmPostedBondRatevsCrimeRateByYear = runIdentity $ FL.foldM (kmPostedBondRatevsCrimeRate (Proxy @'[Year])) kmData where        
+  let kmPostedBondRatevsMergedCrimeRateByYear = runIdentity $ FL.foldM (kmPostedBondRatevsCrimeRate (Proxy @'[Year])) kmData where        
         mutateData :: F.Record [Year,County,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
                    -> F.Record [Year,County,PostedBondRate,CRate,EstPopulation]
         mutateData = runcurryX (\yr cnty tbonds mposted prposted crimes offenses pop ->
@@ -152,7 +155,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
                                     0 -> yr &: cnty &: 0 &: (realToFrac crimes/ realToFrac pop) &: pop &: V.RNil
                                     _ -> yr &: cnty &: (realToFrac (mposted+prposted)/realToFrac tbonds) &: (realToFrac crimes/ realToFrac pop) &: pop &: V.RNil
                                )
-        kmData = fmap mutateData . catMaybes $ fmap (F.recMaybe . F.rcast) countyBondAndCrime
+        kmData = fmap mutateData . catMaybes $ fmap (F.recMaybe . F.rcast) countyBondAndCrimeMerged
         dataProxy = Proxy @[PostedBondRate, CRate, EstPopulation]
         sunXF = FL.premap (F.rgetField @CRate &&& F.rgetField @EstPopulation) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
         sunYF = FL.premap (F.rgetField @PostedBondRate &&& F.rgetField @EstPopulation) $ FA.weightedScaleAndUnscale (FA.RescaleNormalize 1) FA.RescaleNone id
@@ -162,7 +165,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       HL.h2_ "Colorado Bond Rates and Crime Rates (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
       HL.p_ "Each county in Colorado issues money bonds and personal recognizance bonds.  For each county I look at the % of money bonds out of all bonds issued and the crime rate.  We have 3 years of data and there are 64 counties in Colorado (each with vastly different populations).  So I've used a population-weighted k-means clustering technique to reduce the number of points to at most 7 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster."
-    H.placeVisualization "crimeRateVsMoneyBondRate" $ moneyBondRateVsCrimeRateVL kmMoneyBondRatevsCrimeRateByYear
+    H.placeVisualization "crimeRateVsMoneyBondRate" $ moneyBondRateVsCrimeRateVL kmMoneyBondRatevsMergedCrimeRateByYear
     H.placeTextSection $ do
       HL.p_ "Notes:"
       HL.ul_ $ do
@@ -177,7 +180,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
           HL.span_ ", but only for 2016, so I re-downloaded it for this. Also, there are some crimes in that data that don't roll up to a particular county but instead are attributed to the Colorado Bureau of Investigation or the Colorado State Patrol.  I've ignored those."
     H.placeTextSection $ do
       HL.p_ "Below I look at the percentage of all bonds which are \"posted\" (posting bond means paying the money bond or agreeing to the terms of the personal recognizance bond ?) rather than the % of money bonds. I use the same clustering technique."
-    H.placeVisualization "crimeRateVsPostedBondRate" $ postedBondRateVsCrimeRateVL kmPostedBondRatevsCrimeRateByYear
+    H.placeVisualization "crimeRateVsPostedBondRate" $ postedBondRateVsCrimeRateVL kmPostedBondRatevsMergedCrimeRateByYear
     H.placeTextSection $ do
       HL.p_ "Notes:"
       HL.ul_ $ do
