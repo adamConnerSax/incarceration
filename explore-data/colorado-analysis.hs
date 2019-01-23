@@ -159,14 +159,15 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
         kmPostedBondRatevsCrimeRate proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 10 KM.partitionCentroids KM.euclidSq        
   htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bond Rate vs Crime rate" $ do
     H.placeTextSection $ do
-      HL.h1_ "Colorado Bond Rates and Crime Rates (preliminary)"
-      HL.p_ "Each county in Colorado issues some money bonds and some personal recognizance bonds.  Here we look at the % of money bonds out of all bonds issued and the crime rate in each county.  There are 64 counties in Colorado and they have vastly different populations. Plotting each county would be messy to look at.  So I've used a population-weighted k-means clustering technique to reduce the number of points to at most 7 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster."
+      HL.h2_ "Colorado Bond Rates and Crime Rates (preliminary)"
+      HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
+      HL.p_ "Each county in Colorado issues money bonds and personal recognizance bonds.  For each county I look at the % of money bonds out of all bonds issued and the crime rate.  We have 3 years of data and there are 64 counties in Colorado (each with vastly different populations).  So I've used a population-weighted k-means clustering technique to reduce the number of points to at most 7 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster."
     H.placeVisualization "crimeRateVsMoneyBondRate" $ moneyBondRateVsCrimeRateVL kmMoneyBondRatevsCrimeRateByYear
     H.placeTextSection $ do
       HL.p_ "Notes:"
       HL.ul_ $ do
         HL.li_ $ do
-          HL.div_ "Money Bond Rate is (number of money bonds/total number of bonds). That data comes from "
+          HL.span_ "Money Bond Rate is (number of money bonds/total number of bonds). That data comes from "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv"] "complete-county-bond.csv."
         HL.li_ $ do
           HL.span_ "Crime Rate is crimes/estimated_population. Those numbers come from the Colorado crime statistics "
@@ -181,13 +182,13 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       HL.p_ "Notes:"
       HL.ul_ $ do
         HL.li_ $ do
-          HL.div_ "Posted Bond Rate is [(number of posted money bonds + number of posted PR bonds)/total number of bonds] where that data comes from "
+          HL.span_ "Posted Bond Rate is [(number of posted money bonds + number of posted PR bonds)/total number of bonds] where that data comes from "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv"] "complete-county-bond.csv."
         HL.li_ $ do
           HL.span_ "Crime Rate, as above, is crimes/estimated_population where those numbers come from the Colorado crime statistics "
           HL.a_ [HL.href_ "https://coloradocrimestats.state.co.us/"] "web-site."
     kMeansNotes
-  T.writeFile "analysis/bondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
+  T.writeFile "analysis/moneyBondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
 
 moneyBondRateVsCrimeRateVL dataRecords =
   let dat = FV.recordsToVLData (transformF @MoneyBondRate (*100) . transformF @CRate (*100)) dataRecords
@@ -195,7 +196,7 @@ moneyBondRateVsCrimeRateVL dataRecords =
         . GV.position GV.X [FV.pName @MoneyBondRate, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Money Bond Rate (%)"]]
         . GV.position GV.Y [FV.pName @CRate, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Crime Rate (%)"]]
         . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
-        . GV.size [FV.mName @EstPopulation, GV.MmType GV.Quantitative]
+        . GV.size [FV.mName @EstPopulation, GV.MmType GV.Quantitative, GV.MLegend [GV.LTitle "population"]]
 --      transform = GV.transform . GV.filter (GV.FRange "money_bond_rate" (GV.NumberRange 0 100)) 
       sizing = [GV.autosize [GV.AFit], GV.height 400, GV.width 800]
       vl = GV.toVegaLite $
@@ -213,7 +214,7 @@ postedBondRateVsCrimeRateVL dataRecords =
         . GV.position GV.X [FV.pName @PostedBondRate, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Posted Bond Rate (%)"]]
         . GV.position GV.Y [FV.pName @CRate, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Crime Rate (%)"]]
         . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
-        . GV.size [FV.mName @EstPopulation, GV.MmType GV.Quantitative]
+        . GV.size [FV.mName @EstPopulation, GV.MmType GV.Quantitative, GV.MLegend [GV.LTitle "population"]]
 --      transform = GV.transform . GV.filter (GV.FRange "money_bond_rate" (GV.NumberRange 0 100)) 
       sizing = [GV.autosize [GV.AFit], GV.height 400, GV.width 800]
       vl = GV.toVegaLite $
@@ -247,15 +248,16 @@ kmMoneyBondPctAnalysis joinedData = do
                                                            <$> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType])
                                                            <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType,Urbanicity])) kmData
     H.placeTextSection $ do
-      HL.h1_ "Colorado Money Bond Rate and Poverty (preliminary)"
+      HL.h2_ "Colorado Money Bond Rate and Poverty (preliminary)"
+      HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
       HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" and sometimes on a personal recognizance bond. We have county-level data of all bonds (?) issued in 2014, 2015 and 2016.  Plotting it all is very noisy (since there are 64 counties in CO) so we use a population-weighted k-means clustering technique to combine similar counties into clusters. In the plots below, each circle represents one cluster of counties and the circle's size represents the total population of all the counties included in the cluster.  We consider felonies and misdemeanors separately."
     H.placeVisualization "mBondsVspRateByYrFelonies" $ moneyBondPctVsPovertyRateVL False kmByYear
-    H.placeTextSection $ HL.p_ "Broken down by \"urbanicity\":"
+    H.placeTextSection $ HL.h3_ "Broken down by \"urbanicity\":"
     H.placeVisualization "mBondsVspRateByYrUrbFelonies" $ moneyBondPctVsPovertyRateVL True kmByYearUrb
     H.placeTextSection $ do
       HL.p_ "Notes:"
       HL.ul_ $ do
-        HL.li_ "Denver, the only urban county in CO, didn't report misdemeanors in this data"
+        HL.li_ "Denver, the only urban county in CO, didn't report misdemeanors in this data, so the last plot is blank."
         HL.li_ $ do
           HL.span_ "Money Bond Rate is (number of money bonds/total number of bonds). That data comes from "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv"] "complete-county-bond.csv."
@@ -265,8 +267,13 @@ kmMoneyBondPctAnalysis joinedData = do
           HL.span_ ". That data originates from the "
           HL.a_ [HL.href_ "https://www.census.gov/programs-surveys/saipe.html"] "SAIPE website"
           HL.span_ " at the census bureau."
+        HL.li_ $ do
+          HL.span_ "Urbanicity classification comes from the "
+          HL.a_ [HL.href_ "https://www.vera.org/projects/incarceration-trends"] "VERA"
+          HL.span_ " data. In the repo "
+          HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/county_bond_saipe_vera_data.csv"] "here."
     kMeansNotes
-  T.writeFile "analysis/moneyBonds.html" $ TL.toStrict $ htmlAsText
+  T.writeFile "analysis/moneyBondRateAndPovertyRate.html" $ TL.toStrict $ htmlAsText
 
 moneyBondPctVsPovertyRateVL facetByUrb dataRecords =
   let dat = FV.recordsToVLData (transformF @MoneyBondRate (*100)) dataRecords
@@ -274,7 +281,7 @@ moneyBondPctVsPovertyRateVL facetByUrb dataRecords =
         . GV.position GV.X [FV.pName @PovertyR, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "Poverty Rate (%)"]]
         . GV.position GV.Y [FV.pName @MoneyBondRate, GV.PmType GV.Quantitative, GV.PAxis [GV.AxTitle "% Money Bonds"]]
         . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
-        . GV.size [FV.mName @TotalPop, GV.MmType GV.Quantitative]
+        . GV.size [FV.mName @TotalPop, GV.MmType GV.Quantitative, GV.MLegend [GV.LTitle "population"]]
         . GV.row [FV.fName @OffType, GV.FmType GV.Nominal, GV.FHeader [GV.HTitle "Type of Offense"]]
         . if facetByUrb then GV.column [FV.fName @Urbanicity, GV.FmType GV.Nominal] else id
       sizing = if facetByUrb
@@ -290,12 +297,11 @@ moneyBondPctVsPovertyRateVL facetByUrb dataRecords =
   in vl
 
 kMeansNotes =  H.placeTextSection $ do
-  HL.h2_ "Some notes on weighted k-means"
+  HL.h3_ "Some notes on weighted k-means"
   HL.ul_ $ do
     HL.li_ "k-means works by choosing random starting locations for cluster centers, assigning each data-point to the nearest cluster center, moving the center of each cluster to the weighted average of the data-points assigned to the same cluster and then repeating until no data-points move to a new cluster."
-    HL.li_ "But how do you define distance between points?  Each axis has a different sort of data and it's not clear how to combine differences in each into an overall distance.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the data so that the set of points has mean 0 and std-deviation 1 in each variable.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original."
+    HL.li_ "How do you define distance between points?  Each axis has a different sort of data and it's not clear how to combine differences in each into a meanignful overall distance.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the data so that the set of points has mean 0 and std-deviation 1 in each variable.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original. This attempts to give the two variables equal weight in determining what \"nearby\" means for these data points."
     HL.li_ "This clustering happens for each combination plotted."
-    HL.li_ "Would this clustering be more useful if it somehow worked to get clusters of similar total weight?"
 
 transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (FA.FType x -> FA.FType x) -> F.Record rs -> F.Record rs
 transformF f r = F.rputField @x (f $ F.rgetField @x r) r

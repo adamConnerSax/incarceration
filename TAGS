@@ -71,17 +71,17 @@ type PostedBondRate PostedBondRate110,111
 type CRate CRate111,112
 bondVsCrimeAnalysis bondVsCrimeAnalysis112,113
 bondVsCrimeAnalysis bondVsCrimeAnalysis113,114
-moneyBondRateVsCrimeRateVL moneyBondRateVsCrimeRateVL191,192
-postedBondRateVsCrimeRateVL postedBondRateVsCrimeRateVL209,210
---type --type229,230
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis230,231
-moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL270,271
-kMeansNotes kMeansNotes291,292
-transformF transformF299,300
-transformF transformF300,301
-type IndexCrimeRate IndexCrimeRate304,305
-type TotalBondRate TotalBondRate305,306
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis306,307
+moneyBondRateVsCrimeRateVL moneyBondRateVsCrimeRateVL192,193
+postedBondRateVsCrimeRateVL postedBondRateVsCrimeRateVL210,211
+--type --type230,231
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis231,232
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL277,278
+kMeansNotes kMeansNotes298,299
+transformF transformF305,306
+transformF transformF306,307
+type IndexCrimeRate IndexCrimeRate310,311
+type TotalBondRate TotalBondRate311,312
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis312,313
 
 ./colorado-joins.hs,24
 module Main Main13,14
@@ -105,7 +105,7 @@ makeReport makeReport42,43
 module Html.ReportHtml.Report3,4
 makeReportHtmlAsText makeReportHtmlAsText21,22
 makeReportHtmlAsText makeReportHtmlAsText22,23
-placeVisualization placeVisualization34,35
-placeVisualization placeVisualization35,36
-placeTextSection placeTextSection40,41
-placeTextSection placeTextSection41,42
+placeVisualization placeVisualization36,37
+placeVisualization placeVisualization37,38
+placeTextSection placeTextSection42,43
+placeTextSection placeTextSection43,44

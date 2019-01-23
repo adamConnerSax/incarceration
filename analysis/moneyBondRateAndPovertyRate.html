@@ -1,4 +1,4 @@
-<html><head><title>Colorado Money Bonds and Poverty</title><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><div><h1>Colorado Money Bond Rate and Poverty (preliminary)</h1><p>Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a &quot;money bond&quot; and sometimes on a personal recognizance bond. We have county-level data of all bonds (?) issued in 2014, 2015 and 2016.  Plotting it all is very noisy (since there are 64 counties in CO) so we use a population-weighted k-means clustering technique to combine similar counties into clusters. In the plots below, each circle represents one cluster of counties and the circle&#39;s size represents the total population of all the counties included in the cluster.  We consider felonies and misdemeanors separately.</p></div><div id="mBondsVspRateByYrFelonies"><script type="text/javascript">var vlSpec=
+<html><head><title>Colorado Money Bonds and Poverty</title><link href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.4/tufte.min.css" rel="stylesheet"><meta content="width=device-width, initial-scale=1" name="viewport"><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><body><article><section><h2>Colorado Money Bond Rate and Poverty (preliminary)</h2><p class="subtitle">Adam Conner-Sax</p><p>Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a &quot;money bond&quot; and sometimes on a personal recognizance bond. We have county-level data of all bonds (?) issued in 2014, 2015 and 2016.  Plotting it all is very noisy (since there are 64 counties in CO) so we use a population-weighted k-means clustering technique to combine similar counties into clusters. In the plots below, each circle represents one cluster of counties and the circle&#39;s size represents the total population of all the counties included in the cluster.  We consider felonies and misdemeanors separately.</p></section><figure id="mBondsVspRateByYrFelonies"><script type="text/javascript">var vlSpec=
 {
     "height": 300,
     "autosize": {
@@ -229,7 +229,10 @@
         },
         "size": {
             "field": "total_pop",
-            "type": "quantitative"
+            "type": "quantitative",
+            "legend": {
+                "title": "population"
+            }
         },
         "row": {
             "field": "off_type",
@@ -256,7 +259,7 @@
     "background": "white",
     "description": "Vega-Lite Attempt"
 };
-vegaEmbed('#mBondsVspRateByYrFelonies',vlSpec);</script></div><div><p>Broken down by &quot;urbanicity&quot;:</p></div><div id="mBondsVspRateByYrUrbFelonies"><script type="text/javascript">var vlSpec=
+vegaEmbed('#mBondsVspRateByYrFelonies',vlSpec);</script></figure><section><h3>Broken down by &quot;urbanicity&quot;:</h3></section><figure id="mBondsVspRateByYrUrbFelonies"><script type="text/javascript">var vlSpec=
 {
     "autosize": {
         "resize": true,
@@ -972,7 +975,10 @@ vegaEmbed('#mBondsVspRateByYrFelonies',vlSpec);</script></div><div><p>Broken dow
         },
         "size": {
             "field": "total_pop",
-            "type": "quantitative"
+            "type": "quantitative",
+            "legend": {
+                "title": "population"
+            }
         },
         "row": {
             "field": "off_type",
@@ -1003,4 +1009,4 @@ vegaEmbed('#mBondsVspRateByYrFelonies',vlSpec);</script></div><div><p>Broken dow
     "background": "white",
     "description": "Vega-Lite Attempt"
 };
-vegaEmbed('#mBondsVspRateByYrUrbFelonies',vlSpec);</script></div><div><p>Notes:</p><ul><li>Denver, the only urban county in CO, didn&#39;t report misdemeanors in this data</li><li><span>Money Bond Rate is (number of money bonds/total number of bonds). That data comes from </span><a href="https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv">complete-county-bond.csv.</a></li><li><span>Poverty Rate comes from the census and we have that data in </span><a href="https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond-SAIPE.csv">complete-county-bond-SAIPE.csv</a><span>. That data originates from the </span><a href="https://www.census.gov/programs-surveys/saipe.html">SAIPE website</a><span> at the census bureau.</span></li></ul></div><div><h2>Some notes on weighted k-means</h2><ul><li>k-means works by choosing random starting locations for cluster centers, assigning each data-point to the nearest cluster center, moving the center of each cluster to the weighted average of the data-points assigned to the same cluster and then repeating until no data-points move to a new cluster.</li><li>But how do you define distance between points?  Each axis has a different sort of data and it&#39;s not clear how to combine differences in each into an overall distance.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the data so that the set of points has mean 0 and std-deviation 1 in each variable.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original.</li><li>This clustering happens for each combination plotted.</li><li>Would this clustering be more useful if it somehow worked to get clusters of similar total weight?</li></ul></div></html>
+vegaEmbed('#mBondsVspRateByYrUrbFelonies',vlSpec);</script></figure><section><p>Notes:</p><ul><li>Denver, the only urban county in CO, didn&#39;t report misdemeanors in this data, so the last plot is blank.</li><li><span>Money Bond Rate is (number of money bonds/total number of bonds). That data comes from </span><a href="https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv">complete-county-bond.csv.</a></li><li><span>Poverty Rate comes from the census and we have that data in </span><a href="https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond-SAIPE.csv">complete-county-bond-SAIPE.csv</a><span>. That data originates from the </span><a href="https://www.census.gov/programs-surveys/saipe.html">SAIPE website</a><span> at the census bureau.</span></li><li><span>Urbanicity classification comes from the </span><a href="https://www.vera.org/projects/incarceration-trends">VERA</a><span> data. In the repo </span><a href="https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/county_bond_saipe_vera_data.csv">here.</a></li></ul></section><section><h3>Some notes on weighted k-means</h3><ul><li>k-means works by choosing random starting locations for cluster centers, assigning each data-point to the nearest cluster center, moving the center of each cluster to the weighted average of the data-points assigned to the same cluster and then repeating until no data-points move to a new cluster.</li><li>How do you define distance between points?  Each axis has a different sort of data and it&#39;s not clear how to combine differences in each into a meanignful overall distance.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the data so that the set of points has mean 0 and std-deviation 1 in each variable.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original. This attempts to give the two variables equal weight in determining what &quot;nearby&quot; means for these data points.</li><li>This clustering happens for each combination plotted.</li></ul></section></article></body></html>
