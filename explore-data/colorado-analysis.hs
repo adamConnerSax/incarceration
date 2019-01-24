@@ -154,9 +154,11 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       kmMoneyBondRatevsMergedCrimeRateByYear = runIdentity $ FL.foldM (kmMoneyBondRatevsCrimeRate (Proxy @'[Year])) kmData where        
         select = F.rcast @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
+        
       kmMoneyBondRatevsCrimeRateByYearAndType = runIdentity $ FL.foldM (kmMoneyBondRatevsCrimeRate (Proxy @[Year,CrimeAgainst])) kmData where
         select = F.rcast @[Year,County,CrimeAgainst,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
+        
       sunPostedBondRateF = FL.premap (F.rgetField @PostedBondRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       pbrAndCr :: F.Record [TotalBondFreq,MoneyPosted,PrPosted,Crimes,EstPopulation] -> F.Record [PostedBondRate,CrimeRate,EstPopulation]
       pbrAndCr r = postedBondRate r &: cRate r &: F.rgetField @EstPopulation r &: V.RNil
@@ -165,9 +167,11 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       kmPostedBondRatevsMergedCrimeRateByYear = runIdentity $ FL.foldM (kmPostedBondRatevsCrimeRate (Proxy @'[Year])) kmData where        
         select = F.rcast @[Year,County,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
+        
       kmPostedBondRatevsCrimeRateByYearAndType = runIdentity $ FL.foldM (kmPostedBondRatevsCrimeRate (Proxy @[Year,CrimeAgainst])) kmData where        
         select = F.rcast @[Year,County,CrimeAgainst,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
+        
       sunReoffenseRateF = FL.premap (F.rgetField @ReoffenseRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       rorAndMbr :: F.Record [MoneyNewYes,PrNewYes,MoneyPosted,PrPosted,TotalBondFreq,MoneyBondFreq] -> F.Record [ReoffenseRate, MoneyBondRate]
       rorAndMbr r = reoffenseRate r &: moneyBondRate r &: V.RNil
@@ -176,13 +180,14 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       kmReoffenseRateVsMergedMoneyBondRateByYear = runIdentity $ FL.foldM (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData where
         select = F.rcast @[Year, County, MoneyNewYes, PrNewYes, MoneyPosted, PrPosted, TotalBondFreq, MoneyBondFreq, EstPopulation]
         kmData = fmap (FT.mutate rorAndMbr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
+        
   htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bond Rate vs Crime rate" $ do
     H.placeTextSection $ do
       HL.h2_ "Colorado Bond Rates and Crime Rates (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
       HL.p_ "Each county in Colorado issues money bonds and personal recognizance bonds.  For each county I look at the % of money bonds out of all bonds issued and the crime rate.  We have 3 years of data and there are 64 counties in Colorado (each with vastly different populations).  So I've used a population-weighted k-means clustering technique to reduce the number of points to at most 7 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster."
     H.placeVisualization "crimeRateVsMoneyBondRateMerged" $ moneyBondRateVsCrimeRateVL True kmMoneyBondRatevsMergedCrimeRateByYear    
-    HL.div_ "Broken down by Colorado's crime categories:"
+    HL.p_ "Broken down by Colorado's crime categories:"
     H.placeVisualization "crimeRateVsMoneyBondRateUnMerged" $ moneyBondRateVsCrimeRateVL False kmMoneyBondRatevsCrimeRateByYearAndType
     H.placeTextSection $ do
       HL.p_ "Notes:"
@@ -200,7 +205,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
     H.placeTextSection $ do
       HL.p_ "Below I look at the percentage of all bonds which are \"posted\" (posting bond means paying the money bond or agreeing to the terms of the personal recognizance bond ?) rather than the % of money bonds. I use the same clustering technique."
     H.placeVisualization "crimeRateVsPostedBondRate" $ postedBondRateVsCrimeRateVL True kmPostedBondRatevsMergedCrimeRateByYear
-    HL.div_ "Broken down by Colorado's crime categories:"
+    HL.p_ "Broken down by Colorado's crime categories:"
     H.placeVisualization "crimeRateVsPostedBondRateUnMerged" $ postedBondRateVsCrimeRateVL False kmPostedBondRatevsCrimeRateByYearAndType
     H.placeTextSection $ do
       HL.p_ "Notes:"
@@ -211,6 +216,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
         HL.li_ $ do
           HL.span_ "Crime Rate, as above, is crimes/estimated_population where those numbers come from the Colorado crime statistics "
           HL.a_ [HL.href_ "https://coloradocrimestats.state.co.us/"] "web-site."
+    HL.p_ "Below I look at the rate of re-offending among people out on bond, here considered in each county along with money-bond rate and clustered as above."       
     H.placeVisualization "reoffenseRateVsMoneyBondRate" $ reoffenseRateVsMoneyBondRateVL True kmReoffenseRateVsMergedMoneyBondRateByYear
     H.placeTextSection $ do
       HL.p_ "Notes:"
