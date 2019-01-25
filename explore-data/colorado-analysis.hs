@@ -118,10 +118,10 @@ type MoneyBondRate = "money_bond_rate" F.:-> Double
 type PostedBondRate = "posted_bond_rate" F.:-> Double
 type ReoffenseRate = "reoffense_rate" F.:-> Double
 
-moneyBondRate r = let t = r ^. totalBondFreq in bool ((r ^. moneyBondFreq) `rDiv` t) 0 (t == 0)
-postedBondRate r = let t = r ^. totalBondFreq in bool ((r ^. moneyPosted + r ^. prPosted) `rDiv` t) 0 (t == 0)
-cRate r = (r ^. crimes) `rDiv` (r ^. estPopulation)
-reoffenseRate r = (r ^. moneyNewYes + r ^. prNewYes) `rDiv` (r ^. moneyPosted + r ^. prPosted)
+moneyBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @MoneyBondRate $ bool ((r ^. moneyBondFreq) `rDiv` t) 0 (t == 0)  
+postedBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @PostedBondRate $ bool ((r ^. moneyPosted + r ^. prPosted) `rDiv` t) 0 (t == 0)
+cRate r = FT.recordSingleton @CrimeRate $ (r ^. crimes) `rDiv` (r ^. estPopulation)
+reoffenseRate r = FT.recordSingleton @ReoffenseRate $ (r ^. moneyNewYes + r ^. prNewYes) `rDiv` (r ^. moneyPosted + r ^. prPosted) 
 
 bondVsCrimeAnalysis :: P.Producer (FM.MaybeRow CountyBondCO) (F.SafeT IO) () -> P.Producer (FM.MaybeRow CrimeStatsCO) (F.SafeT IO) () -> IO ()
 bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
@@ -149,8 +149,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       kmMoneyBondRatevsCrimeRate proxy_ks =
         KM.kMeans proxy_ks (Proxy @[MoneyBondRate, CrimeRate, EstPopulation]) sunCrimeRateF sunMoneyBondRateF 10 KM.partitionCentroids KM.euclidSq
-      mbrAndCr :: F.Record [MoneyBondFreq, TotalBondFreq, Crimes, EstPopulation] -> F.Record [MoneyBondRate, CrimeRate, EstPopulation]
-      mbrAndCr r = moneyBondRate r &: cRate r &: F.rgetField @EstPopulation r &: V.RNil
+      mbrAndCr r = moneyBondRate r F.<+> cRate r
       kmMoneyBondRatevsMergedCrimeRateByYear = runIdentity $ FL.foldM (kmMoneyBondRatevsCrimeRate (Proxy @'[Year])) kmData where        
         select = F.rcast @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
@@ -160,8 +159,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
         
       sunPostedBondRateF = FL.premap (F.rgetField @PostedBondRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
-      pbrAndCr :: F.Record [TotalBondFreq,MoneyPosted,PrPosted,Crimes,EstPopulation] -> F.Record [PostedBondRate,CrimeRate,EstPopulation]
-      pbrAndCr r = postedBondRate r &: cRate r &: F.rgetField @EstPopulation r &: V.RNil
+      pbrAndCr r = postedBondRate r F.<+> cRate r
       kmPostedBondRatevsCrimeRate proxy_ks =
         KM.kMeans proxy_ks (Proxy @[PostedBondRate, CrimeRate, EstPopulation]) sunCrimeRateF sunPostedBondRateF 10 KM.partitionCentroids KM.euclidSq       
       kmPostedBondRatevsMergedCrimeRateByYear = runIdentity $ FL.foldM (kmPostedBondRatevsCrimeRate (Proxy @'[Year])) kmData where        
@@ -173,8 +171,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
         
       sunReoffenseRateF = FL.premap (F.rgetField @ReoffenseRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
-      rorAndMbr :: F.Record [MoneyNewYes,PrNewYes,MoneyPosted,PrPosted,TotalBondFreq,MoneyBondFreq] -> F.Record [ReoffenseRate, MoneyBondRate]
-      rorAndMbr r = reoffenseRate r &: moneyBondRate r &: V.RNil
+      rorAndMbr r = reoffenseRate r F.<+> moneyBondRate r 
       kmReoffenseRatevsMoneyBondRate proxy_ks =
         KM.kMeans proxy_ks (Proxy @[MoneyBondRate, ReoffenseRate, EstPopulation]) sunMoneyBondRateF sunReoffenseRateF 10 KM.partitionCentroids KM.euclidSq       
       kmReoffenseRateVsMergedMoneyBondRateByYear = runIdentity $ FL.foldM (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData where
@@ -311,8 +308,7 @@ kmMoneyBondPctAnalysis joinedData = do
   putStrLn "Doing money bond % vs poverty rate analysis..."
   htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bonds and Poverty" $ do    
     let select = F.rcast @[Year,County,OffType,Urbanicity,PovertyR, MoneyBondFreq,TotalBondFreq,TotalPop]
-        mutation :: F.Record [MoneyBondFreq,TotalBondFreq] -> F.Record '[MoneyBondRate]
-        mutation r = moneyBondRate r &: V.RNil
+        mutation r = moneyBondRate r 
         kmData = fmap (FT.mutate mutation) . catMaybes $ fmap (F.recMaybe . select) joinedData
         dataProxy = Proxy @[PovertyR,MoneyBondRate,TotalPop]
         sunPovertyRF = FL.premap (F.rgetField @PovertyR &&& F.rgetField @TotalPop) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
@@ -384,12 +380,11 @@ transformF f r = F.rputField @x (f $ F.rgetField @x r) r
 --  kmBondRatevsCrimeRateAnalysis countyBondPlusFIPSAndSAIPEAndVera
 type IndexCrimeRate = "index_crime_rate" F.:-> Double
 type TotalBondRate = "total_bond_rate" F.:-> Double
-indexCrimeRate r = (r ^. indexCrime) `rDiv` (r ^. totalPop)
-totalBondRate r = (r ^. totalBondFreq) `rDiv` (r ^. totalPop)
+indexCrimeRate r = FT.recordSingleton @IndexCrimeRate $ (r ^. indexCrime) `rDiv` (r ^. totalPop)
+totalBondRate r = FT.recordSingleton @TotalBondRate $ (r ^. totalBondFreq) `rDiv` (r ^. totalPop) 
 kmBondRatevsCrimeRateAnalysis joinedData = do
   let select = F.rcast @[Year,County,Urbanicity,TotalBondFreq,IndexCrime,TotalPop]
-      mutation :: F.Record [TotalBondFreq, IndexCrime, TotalPop] -> F.Record [TotalBondRate, IndexCrimeRate, TotalPop]
-      mutation r = totalBondRate r &: indexCrimeRate r &: F.rgetField @TotalPop r &: V.RNil
+      mutation r = totalBondRate r F.<+> indexCrimeRate r
       mData = fmap (FT.mutate mutation) . catMaybes $ fmap (F.recMaybe . select) joinedData
   F.writeCSV "data/raw_COCrimeRatevsBondRate.csv" mData
 {-  let dataCols = Proxy @[TotalBondRate, IndexCrimeRate, TotalPop]

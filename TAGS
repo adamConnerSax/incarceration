@@ -77,20 +77,20 @@ cRate cRate122,123
 reoffenseRate reoffenseRate123,124
 bondVsCrimeAnalysis bondVsCrimeAnalysis125,126
 bondVsCrimeAnalysis bondVsCrimeAnalysis126,127
-reoffenseRateVsMoneyBondRateVL reoffenseRateVsMoneyBondRateVL230,231
-moneyBondRateVsCrimeRateVL moneyBondRateVsCrimeRateVL253,254
-postedBondRateVsCrimeRateVL postedBondRateVsCrimeRateVL276,277
---type --type308,309
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis309,310
-moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL351,352
-kMeansNotes kMeansNotes372,373
-transformF transformF379,380
-transformF transformF380,381
-type IndexCrimeRate IndexCrimeRate384,385
-type TotalBondRate TotalBondRate385,386
-indexCrimeRate indexCrimeRate386,387
-totalBondRate totalBondRate387,388
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis388,389
+reoffenseRateVsMoneyBondRateVL reoffenseRateVsMoneyBondRateVL227,228
+moneyBondRateVsCrimeRateVL moneyBondRateVsCrimeRateVL250,251
+postedBondRateVsCrimeRateVL postedBondRateVsCrimeRateVL273,274
+--type --type305,306
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis306,307
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL347,348
+kMeansNotes kMeansNotes368,369
+transformF transformF375,376
+transformF transformF376,377
+type IndexCrimeRate IndexCrimeRate380,381
+type TotalBondRate TotalBondRate381,382
+indexCrimeRate indexCrimeRate382,383
+totalBondRate totalBondRate383,384
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis384,385
 
 ./colorado-joins.hs,24
 module Main Main13,14
