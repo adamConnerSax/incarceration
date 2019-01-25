@@ -11,7 +11,7 @@ veraTrendsFP = veraDir ++ "/incarceration_trends.csv"
 
 
 crimeStatsCO_FP = externalDataDir ++ "/ColoradoCrimeStatsFixed.csv"
-countyDistrictCrosswalkCO_FP = coloradoMoneyBailDir ++ "/county-district-crosswalk.csv"
+countyDistrictCrosswalkCO_FP = externalDataDir ++ "/county-district-crosswalk.csv"
 
 -- data added to this repo for now
 countyBondCO_FP = externalDataDir ++ "/complete_county_bond_nospace.csv"
