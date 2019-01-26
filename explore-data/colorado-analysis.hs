@@ -146,7 +146,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       kmCrimeRateVsMoneyBondRate proxy_ks =
         let dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
-        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunCrimeRateF sunMoneyBondRateF 10 KM.partitionCentroids KM.euclidSq 
+        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunCrimeRateF 10 KM.partitionCentroids KM.euclidSq 
       mbrAndCr r = moneyBondRate r F.<+> cRate r
       kmMergedCrimeRateVsMoneyBondRateByYear = runIdentity $ FL.foldM (kmCrimeRateVsMoneyBondRate (Proxy @'[Year])) kmData where        
         select = F.rcast @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
@@ -246,42 +246,40 @@ crimeRateVsMoneyBondRateVL' mergedOffenseAgainst dataRecords =
                                       ]                     
       pointEncoding = GV.color [FV.mName @Year, GV.MmType GV.Nominal]
                       . GV.size [FV.mName @EstPopulation, GV.MmType GV.Quantitative, GV.MLegend [GV.LTitle "population"]]
-                      . if mergedOffenseAgainst then id else GV.row [FV.fName @CrimeAgainst, GV.FmType GV.Nominal,GV.FHeader [GV.HTitle "Crime Against"]]                                                          
+                      . if mergedOffenseAgainst then id else GV.row [FV.fName @CrimeAgainst, GV.FmType GV.Nominal,GV.FHeader [GV.HTitle "Crime Against"]]
+                                                                                                                              
       labelEncoding = GV.text [FV.tName @KM.MarkLabel, GV.TmType GV.Nominal]
       ptSpec = GV.fromVL $ GV.toVegaLite [(GV.encoding . posEncodingB . pointEncoding) [], GV.mark GV.Point []]
       labelSpec = GV.fromVL $ GV.toVegaLite [(GV.encoding . posEncodingB . labelEncoding) [], GV.mark GV.Text []]      
       layers = GV.layer [ptSpec, labelSpec]
       transformCentroid = GV.transform . GV.filter (GV.FEqual (FV.colName @KM.IsCentroid) (GV.Boolean True))
-      transformCounty = GV.transform . GV.filter (GV.FEqual (FV.colName @KM.IsCentroid) (GV.Boolean False)) . GV.filter (GV.FSelection "county_detail")      
-      sizing = [GV.height 400, GV.width 800]
+      sizing = [GV.height 400, GV.width 600]
       selectDetail = GV.selection . GV.select "county_detail" GV.Interval []
+      transformCounty = GV.transform . GV.filter (GV.FEqual (FV.colName @KM.IsCentroid) (GV.Boolean False)) . GV.filter (GV.FSelection "county_detail")
+      mergedOffenseCol = if mergedOffenseAgainst then [] else [FV.colName @CrimeAgainst]
+      selectCluster = GV.selection . GV.select "cluster_detail" GV.Single [GV.On "dblclick",GV.Fields ([FV.colName @KM.ClusterId, FV.colName @Year] <> mergedOffenseCol)]
+      transformCluster = GV.transform . GV.filter (GV.FSelection "cluster_detail")
       topSpec = GV.fromVL $ GV.toVegaLite $
                 [
                   GV.title ("Crime rate vs. Money Bond rate (Clustered)")
---                , GV.background "white"
                 , (GV.encoding . posEncodingT . pointEncoding) []
                 , GV.mark GV.Point []
                 , transformCentroid []
-                , selectDetail []
-                ] <> sizing
+                , selectCluster []
+                ] -- <> sizing 
       bottomSpec = GV.fromVL $ GV.toVegaLite $
                    [
                      GV.title ("Crime rate vs. Money Bond rate (Counties)")
---                   , GV.background "white"
                    , layers
-                   , transformCounty []
-                   ] <> sizing
-                     
+                   , transformCluster []
+                   ] -- <> sizing
+      configuration = GV.configure . GV.configuration (GV.View [GV.ViewWidth 400]) . GV.configuration (GV.Padding $ GV.PSize 50)
       vl = GV.toVegaLite $
         [ GV.description "Vega-lite"
---      , GV.title ("Crime rate vs. Money Bond rate")
         , GV.background "white"
---        , (GV.encoding . posEncodingT) []
         , GV.vConcat [topSpec, bottomSpec]
---        , layers --GV.mark GV.Point []
---        , baseEncoding []
---        , transform []
-        , dat] {- <> sizing -}
+        , configuration []
+        , dat]
   in vl
 
 reoffenseRateVsMoneyBondRateVL mergedOffenseAgainst dataRecords =
