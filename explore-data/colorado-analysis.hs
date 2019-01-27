@@ -161,7 +161,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
         select = F.rcast @[Year,County,CrimeAgainst,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
         
-      sunPostedBondRateF = FL.premap (F.rgetField @PostedBondRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
+      sunPostedBondRateF = FL.premap (F.rgetField @PostedBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       pbrAndCr r = postedBondRate r F.<+> cRate r
       kmCrimeRateVsPostedBondRate proxy_ks =
         let dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
@@ -174,7 +174,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
         select = F.rcast @[Year,County,CrimeAgainst,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
         
-      sunReoffenseRateF = FL.premap (F.rgetField @ReoffenseRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
+      sunReoffenseRateF = FL.premap (F.rgetField @ReoffenseRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       rorAndMbr r = reoffenseRate r F.<+> moneyBondRate r 
       kmReoffenseRatevsMoneyBondRate proxy_ks =
         let dp = Proxy @[MoneyBondRate, ReoffenseRate, EstPopulation]
