@@ -31,6 +31,7 @@ import qualified Html.Report                as H
 import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
 import           Control.Monad.IO.Class     (liftIO)
+import           Control.Monad.State (evalStateT)
 import           Control.Lens ((%~),(^.))
 import           Data.Bool                  (bool)
 import           Data.Functor.Identity      (runIdentity)
@@ -60,6 +61,8 @@ import qualified Graphics.Vega.VegaLite     as GV
 import qualified Pipes                      as P
 import qualified Pipes.Prelude              as P
 import qualified Lucid                      as HL
+import           Data.Random.Source.PureMT as R
+import           Data.Random as R
 
 -- stage restriction means this all has to be up top
 F.tableTypes' (F.rowGen fipsByCountyFP) { F.rowTypeName = "FIPSByCountyRenamed", F.columnNames = ["fips","County","State"]}
@@ -142,17 +145,19 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       countyBondAndCrimeUnmerged = FM.leftJoinMaybe (Proxy @[County,Year]) countyBondFrameM (justsFromRec <$> unmergedCrimeStatsFrame)      
   putStrLn $ (show $ FL.fold FL.length crimeStatsList) ++ " rows in crimeStatsList (unmerged)."
   putStrLn $ (show $ FL.fold FL.length mergedCrimeStatsFrame) ++ " rows in crimeStatsFrame(merged)."
-  let sunCrimeRateF = FL.premap (F.rgetField @CrimeRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
-      sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
+  let --sunCrimeRateF = FL.premap (F.rgetField @CrimeRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNormalize 1) id
+      --sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate &&& F.rgetField @EstPopulation) $ MR.weightedScaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
+      sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
+      sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       kmCrimeRateVsMoneyBondRate proxy_ks =
         let dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
-        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunCrimeRateF 10 KM.partitionCentroids KM.euclidSq 
+        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunCrimeRateF 10 KM.forgyCentroids KM.euclidSq 
       mbrAndCr r = moneyBondRate r F.<+> cRate r
-      kmMergedCrimeRateVsMoneyBondRateByYear = runIdentity $ FL.foldM (kmCrimeRateVsMoneyBondRate (Proxy @'[Year])) kmData where        
+      kmMergedCrimeRateVsMoneyBondRateByYear = runIdentity $ (flip evalStateT) (R.pureMT 1)  $ FL.foldM (kmCrimeRateVsMoneyBondRate (Proxy @'[Year])) kmData where        
         select = F.rcast @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         
-      kmCrimeRateVsMoneyBondRateByYearAndType = runIdentity $ FL.foldM (kmCrimeRateVsMoneyBondRate (Proxy @[Year,CrimeAgainst])) kmData where
+      kmCrimeRateVsMoneyBondRateByYearAndType = runIdentity $ (flip evalStateT) (R.pureMT 1) $ FL.foldM (kmCrimeRateVsMoneyBondRate (Proxy @[Year,CrimeAgainst])) kmData where
         select = F.rcast @[Year,County,CrimeAgainst,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
         
@@ -160,7 +165,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = do
       pbrAndCr r = postedBondRate r F.<+> cRate r
       kmCrimeRateVsPostedBondRate proxy_ks =
         let dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
-        in KM.kMeans proxy_ks dp sunCrimeRateF sunPostedBondRateF 10 KM.partitionCentroids KM.euclidSq       
+        in KM.kMeans proxy_ks dp sunPostedBondRateF sunCrimeRateF 10 KM.partitionCentroids KM.euclidSq       
       kmMergedCrimeRateVsPostedBondRateByYear = runIdentity $ FL.foldM (kmCrimeRateVsPostedBondRate (Proxy @'[Year])) kmData where        
         select = F.rcast @[Year,County,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
@@ -273,7 +278,7 @@ crimeRateVsMoneyBondRateVL' mergedOffenseAgainst dataRecords =
                    , layers
                    , transformCluster []
                    ] -- <> sizing
-      configuration = GV.configure . GV.configuration (GV.View [GV.ViewWidth 400]) . GV.configuration (GV.Padding $ GV.PSize 50)
+      configuration = GV.configure . GV.configuration (GV.View [GV.ViewWidth 800, GV.ViewHeight 400]) . GV.configuration (GV.Padding $ GV.PSize 50)
       vl = GV.toVegaLite $
         [ GV.description "Vega-lite"
         , GV.background "white"

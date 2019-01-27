@@ -81,8 +81,11 @@ executable colorado-analysis
                      , incarceration
                      , lens
                      , lucid
+                     , mtl
                      , pipes
                      , prettyprinter
+                     , random-fu
+                     , random-source
                      , text
                      , time
                      , type-of-html
