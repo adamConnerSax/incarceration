@@ -120,8 +120,9 @@ main = do
           countyBondPlusFIPSAndDistrict = FM.leftJoinMaybe (Proxy @'[County]) (F.boxedFrame countyBondPlusFIPS) (justsFromRec <$> countyDistrictFrame)
           countyBondPlusFIPSAndSAIPE = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndDistrict) (justsFromRec <$> povertyFrame)
           countyBondPlusFIPSAndSAIPEAndVera = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndSAIPE) veraFrameM      
-      kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
-      bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data 
+--      kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
+      bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
+      return ()
 
 -- CrimeRate is defined in DataSources since we use it in more places
 type MoneyBondRate = "money_bond_rate" F.:-> Double
@@ -293,83 +294,6 @@ rRVsMBRVL mergedOffenseAgainst dataRecords =
           vlF = FV.clustersWithClickIntoVL @MoneyBondRate @CrimeRate @KM.IsCentroid @KM.ClusterId @KM.MarkLabel @[Year,CrimeAgainst]
       in vlF "Money Bond Rate (%, All Crimes)" "Reoffense Rate (%)" "Reoffense Rate vs Money Bond Rate" ptEncFaceted id id id dat
 
-
-reoffenseRateVsMoneyBondRateVL mergedOffenseAgainst dataRecords =
-  let dat = FV.recordsToVLData (transformF @ReoffenseRate (*100) . transformF @MoneyBondRate (*100)) dataRecords
-      enc = GV.encoding
-        . GV.position GV.X [FV.pName @MoneyBondRate, GV.PmType GV.Quantitative,
-                            GV.PAxis [GV.AxTitle "Money Bond Rate (%, All Crime Types)"]
-                           ]
-        . GV.position GV.Y [FV.pName @ReoffenseRate,
-                            GV.PmType GV.Quantitative,
-                            GV.PAxis [GV.AxTitle "Reoffense Rate (%)"]
-                           ]
-        . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
-        . GV.size [FV.mName @EstPopulation, GV.MmType GV.Quantitative, GV.MLegend [GV.LTitle "population"]]
-        . if mergedOffenseAgainst then id else GV.row [FV.fName @CrimeAgainst, GV.FmType GV.Nominal,GV.FHeader [GV.HTitle "Crime Against"]]
-      sizing = [GV.autosize [GV.AFit], GV.height 400, GV.width 800]
-      vl = GV.toVegaLite $
-        [ GV.description "Vega-lite"
-        , GV.title ("Reoffense rate vs. Money Bond rate")
-        , GV.background "white"
-        , GV.mark GV.Point []
-        , enc []
-        , dat] <> sizing
-  in vl
-
-crimeRateVsMoneyBondRateVL mergedOffenseAgainst dataRecords =
-  let dat = FV.recordsToVLData (transformF @MoneyBondRate (*100) . transformF @CrimeRate (*100)) dataRecords
-      enc = GV.encoding
-        . GV.position GV.X [FV.pName @MoneyBondRate, GV.PmType GV.Quantitative,
-                            GV.PAxis [GV.AxTitle "Money Bond Rate (%, All Crime Types)"]
-                           ]
-        . GV.position GV.Y [FV.pName @CrimeRate,
-                            GV.PmType GV.Quantitative,
-                            GV.PAxis [GV.AxTitle $ if mergedOffenseAgainst then "Crime Rate (%, All Crime Types)" else "Crime Rate (%)"]
-                           ]
-        . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
-        . GV.size [FV.mName @EstPopulation, GV.MmType GV.Quantitative, GV.MLegend [GV.LTitle "population"]]
-        . if mergedOffenseAgainst then id else GV.row [FV.fName @CrimeAgainst, GV.FmType GV.Nominal,GV.FHeader [GV.HTitle "Crime Against"]]
-      sizing = [GV.autosize [GV.AFit], GV.height 400, GV.width 800]
-      vl = GV.toVegaLite $
-        [ GV.description "Vega-lite"
-        , GV.title ("Crime rate vs. Money Bond rate")
-        , GV.background "white"
-        , GV.mark GV.Point []
-        , enc []
-        , dat] <> sizing
-  in vl
-
-crimeRateVsPostedBondRateVL mergedOffenseAgainst dataRecords =
-  let dat = FV.recordsToVLData (transformF @PostedBondRate (*100) . transformF @CrimeRate (*100)) dataRecords
-      enc = GV.encoding
-        . GV.position GV.X [ FV.pName @PostedBondRate
-                           , GV.PmType GV.Quantitative
-                           , GV.PAxis [GV.AxTitle "Posted Bond Rate (%)"]
-                           ]
-        . GV.position GV.Y [ FV.pName @CrimeRate
-                           , GV.PmType GV.Quantitative
-                           , GV.PAxis [GV.AxTitle $ if mergedOffenseAgainst then "Crime Rate (%, All Crime Types)" else "Crime Rate (%)"]
-                           ]
-        . GV.color [FV.mName @Year, GV.MmType GV.Nominal]
-        . GV.size [ FV.mName @EstPopulation
-                  , GV.MmType GV.Quantitative
-                  , GV.MLegend [GV.LTitle "population"]
-                  ]
-        . if mergedOffenseAgainst then id else GV.row [ FV.fName @CrimeAgainst
-                                                      , GV.FmType GV.Nominal
-                                                      , GV.FHeader [GV.HTitle "Crime Against"]
-                                                      ]
-      sizing = [GV.autosize [GV.AFit], GV.height 400, GV.width 800]
-      vl = GV.toVegaLite $
-        [ GV.description "Vega-lite"
-        , GV.title ("Crime rate vs. Posted Bond rate")
-        , GV.background "white"
-        , GV.mark GV.Point []
-        , enc []
-        , dat] <> sizing
-  in vl
-
         
 -- NB: The data has two rows for each county and year, one for misdemeanors and one for felonies.
 --type MoneyPct = "moneyPct" F.:-> Double --F.declareColumn "moneyPct" ''Double
@@ -383,10 +307,11 @@ kmMoneyBondPctAnalysis joinedData = SL.wrapPrefix "MoneyBondVsPoverty" $ do
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       kmMoneyBondRatevsPovertyRate proxy_ks =
         KM.kMeans proxy_ks dataProxy sunPovertyRF sunMoneyBondRateF 5 (\x y -> return $ KM.partitionCentroids x y) KM.euclidSq        
-  (kmByYear, kmByYearUrb) <- P.lift $ FL.foldM ((,)
-                                                 <$> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType])
-                                                 <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType,Urbanicity])) kmData
-  htmlAsText <- P.lift $ H.makeReportHtmlAsText "Colorado Money Bonds and Poverty" $ do    
+  (kmByYear, kmByYearUrb) <- FL.foldM ((,)
+                                        <$> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType])
+                                        <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType,Urbanicity])) kmData
+  SL.log SL.Info "Creating Html"
+  htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bonds and Poverty" $ do    
     H.placeTextSection $ do
       HL.h2_ "Colorado Money Bond Rate and Poverty (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
