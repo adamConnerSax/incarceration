@@ -120,7 +120,7 @@ main = do
           countyBondPlusFIPSAndDistrict = FM.leftJoinMaybe (Proxy @'[County]) (F.boxedFrame countyBondPlusFIPS) (justsFromRec <$> countyDistrictFrame)
           countyBondPlusFIPSAndSAIPE = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndDistrict) (justsFromRec <$> povertyFrame)
           countyBondPlusFIPSAndSAIPEAndVera = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndSAIPE) veraFrameM      
---      kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
+      kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
       bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
       return ()
 
