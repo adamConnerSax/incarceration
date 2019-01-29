@@ -21,6 +21,7 @@ module Main where
 import           DataSources
 import qualified Frames.Aggregations        as FA
 import qualified Frames.KMeans              as KM
+import qualified Frames.Regression          as FR
 import qualified Frames.MaybeUtils          as FM
 import qualified Frames.VegaLite            as FV
 import qualified Frames.VegaLiteTemplates   as FV
@@ -39,6 +40,7 @@ import           Data.Bool                  (bool)
 import           Data.Functor.Identity      (runIdentity)
 import           Data.IORef                 (newIORef)
 import qualified Data.List                  as  List
+import qualified Data.Map                   as M
 import           Data.Maybe                 (catMaybes, fromMaybe)
 import           Data.Monoid                ((<>))
 import           Data.Proxy                 (Proxy (..))
@@ -59,14 +61,12 @@ import qualified Frames.CSV                 as F
 import qualified Frames.InCore              as FI
 import qualified Frames.TH                  as F
 import qualified Graphics.Vega.VegaLite     as GV
---import qualified Html                       as H
---import qualified Html.Attribute             as HA
 import qualified Pipes                      as P
 import qualified Pipes.Prelude              as P
 import qualified Lucid                      as HL
 import           Data.Random.Source.PureMT as R
 import           Data.Random as R
-
+import qualified System.Clock as C
 -- stage restriction means this all has to be up top
 F.tableTypes' (F.rowGen fipsByCountyFP) { F.rowTypeName = "FIPSByCountyRenamed", F.columnNames = ["fips","County","State"]}
 
@@ -83,8 +83,9 @@ type instance FI.VectorFor (Maybe a) = V.Vector
 main :: IO ()
 main = do
   -- create streams which are filtered to CO
+  startReal <- C.getTime C.Monotonic
   randomSrc <- newIORef (pureMT 1)
-  flip (R.runRVarTWith id) randomSrc $ SL.runLoggerIO $ do
+  flip (R.runRVarTWith id) randomSrc $ SL.runLoggerIO SL.nonDiagnostic $ do
     SL.wrapPrefix "Main" $ do
       SL.log SL.Info "Creating data producers from CSV files"
       let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
@@ -109,11 +110,11 @@ main = do
       countyBondFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeEffect $ P.toListM countyBondCO_Data
       veraFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeEffect $ P.toListM $ veraData P.>-> P.map (F.rcast @[Fips,Year,TotalPop,Urbanicity,IndexCrime])
       countyDistrictFrame <- liftIO $F.inCoreAoS countyDistrictCO_Data
-      SL.log SL.Info $ (T.pack $ show $ FL.fold FL.length fipsByCountyFrame) <> " rows in fipsByCountyFrame."
-      SL.log SL.Info $ (T.pack $ show $ FL.fold FL.length povertyFrame) <> " rows in povertyFrame."
-      SL.log SL.Info $ (T.pack $ show $ FL.fold FL.length countyBondFrameM) <> " rows in countyBondFrameM."
-      SL.log SL.Info $ (T.pack $ show $ FL.fold FL.length veraFrameM) <> " rows in veraFrameM."
-      SL.log SL.Info $ (T.pack $ show $ FL.fold FL.length countyDistrictFrame) <> " rows in countyDistrictFrame."
+      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length fipsByCountyFrame) <> " rows in fipsByCountyFrame."
+      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length povertyFrame) <> " rows in povertyFrame."
+      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyBondFrameM) <> " rows in countyBondFrameM."
+      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length veraFrameM) <> " rows in veraFrameM."
+      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyDistrictFrame) <> " rows in countyDistrictFrame."
     -- do joins
       SL.log SL.Info $ "Doing initial the joins..."
       let countyBondPlusFIPS = FM.leftJoinMaybe (Proxy @'[County]) countyBondFrameM (justsFromRec <$> fipsByCountyFrame)
@@ -122,6 +123,10 @@ main = do
           countyBondPlusFIPSAndSAIPEAndVera = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndSAIPE) veraFrameM      
       kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
       bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
+      endReal <- liftIO $ C.getTime C.Monotonic
+      let realTime = C.diffTimeSpec endReal startReal
+          printTime (C.TimeSpec s ns) = (T.pack $ show $ realToFrac s + realToFrac ns/(10^9)) 
+      SL.log SL.Info $ "Time (real): " <> printTime realTime <> "s" 
       return ()
 
 -- CrimeRate is defined in DataSources since we use it in more places
@@ -156,13 +161,14 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
       countyBondAndCrimeMerged = F.leftJoin @[County,Year] mergedBondDataFrame mergedCrimeStatsFrame
       countyBondAndCrimeUnmerged = F.leftJoin @[County,Year] mergedBondDataFrame unmergedCrimeStatsFrame
   SL.log SL.Info "Joined crime data and bond data"    
-  SL.log SL.Info $ (T.pack $ show $ FL.fold FL.length crimeStatsList) <> " rows in crimeStatsList (unmerged)."
-  SL.log SL.Info $ (T.pack $ show $ FL.fold FL.length mergedCrimeStatsFrame) <> " rows in crimeStatsFrame(merged)."
+  SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length crimeStatsList) <> " rows in crimeStatsList (unmerged)."
+  SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length mergedCrimeStatsFrame) <> " rows in crimeStatsFrame(merged)."
+  let initialCentroidsF = KM.kMeansPPCentroids KM.euclidSq
   let sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       kmCrimeRateVsMoneyBondRate proxy_ks =
         let dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
-        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunCrimeRateF 10 KM.forgyCentroids KM.euclidSq 
+        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
       mbrAndCr r = moneyBondRate r F.<+> cRate r
   kmMergedCrimeRateVsMoneyBondRateByYear <- do
     let select = F.rcast @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
@@ -178,8 +184,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
       pbrAndCr r = postedBondRate r F.<+> cRate r
       kmCrimeRateVsPostedBondRate proxy_ks =
         let dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
-        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunPostedBondRateF sunCrimeRateF 10 KM.forgyCentroids KM.euclidSq 
---        in KM.kMeans proxy_ks dp sunPostedBondRateF sunCrimeRateF 10 (\x y -> return $ KM.partitionCentroids x y) KM.euclidSq       
+        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   kmMergedCrimeRateVsPostedBondRateByYear <- do
     let select = F.rcast @[Year,County,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
@@ -196,20 +201,29 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
       rorAndMbr r = reoffenseRate r F.<+> moneyBondRate r 
       kmReoffenseRatevsMoneyBondRate proxy_ks =
         let dp = Proxy @[MoneyBondRate, ReoffenseRate, EstPopulation]
-        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunReoffenseRateF 10 KM.forgyCentroids KM.euclidSq 
---        in KM.kMeans proxy_ks dp sunMoneyBondRateF sunReoffenseRateF 10 (\x y -> return $ KM.partitionCentroids x y) KM.euclidSq       
+        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunReoffenseRateF 10 10 initialCentroidsF KM.euclidSq
   kmReoffenseRateVsMergedMoneyBondRateByYear <- do
     let select = F.rcast @[Year, County, MoneyNewYes, PrNewYes, MoneyPosted, PrPosted, TotalBondFreq, MoneyBondFreq, EstPopulation]
         kmData = fmap (FT.mutate rorAndMbr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
     SL.log SL.Info "Doing weighted-KMeans on re-offense rate vs. money-bond rate (merged)."            
     FL.foldM (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData 
 
+  -- regressions
+  crimeRateByMoneyBondRate <- do
+    let select = F.rcast @[Year,MoneyBondFreq,TotalBondFreq,Crimes,EstPopulation]
+        rData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
+        guess = [0,0] -- guess has one extra dimension for constant
+        regressOne = FR.leastSquaresRegression @CrimeRate @'[MoneyBondRate] guess
+    SL.log SL.Info "Regressing Crime Rate on Money Bond Rate"
+    return $ FL.fold (FL.Fold (FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap regressOne)) rData
+  SL.log SL.Info $ "regression results: " <> (T.pack $ show crimeRateByMoneyBondRate)
+
   SL.log SL.Info "Creating Html"
   htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bond Rate vs Crime rate" $ do
     H.placeTextSection $ do
       HL.h2_ "Colorado Bond Rates and Crime Rates (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
-      HL.p_ "Each county in Colorado issues money bonds and personal recognizance bonds.  For each county I look at the % of money bonds out of all bonds issued and the crime rate.  We have 3 years of data and there are 64 counties in Colorado (each with vastly different populations).  So I've used a population-weighted k-means clustering technique to reduce the number of points to at most 7 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster."
+      HL.p_ "Each county in Colorado issues money bonds and personal recognizance bonds.  For each county I look at the % of money bonds out of all bonds issued and the crime rate.  We have 3 years of data and there are 64 counties in Colorado (each with vastly different populations).  So I've used a population-weighted k-means clustering technique (see notes below) to reduce the number of points to at most 10 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster."
     H.placeVisualization "crimeRateVsMoneyBondRateMerged" $ cRVsMBRVL True kmMergedCrimeRateVsMoneyBondRateByYear    
     HL.p_ "Broken down by Colorado's crime categories:"
     H.placeVisualization "crimeRateVsMoneyBondRateUnMerged" $ cRVsMBRVL False kmCrimeRateVsMoneyBondRateByYearAndType
@@ -306,7 +320,7 @@ kmMoneyBondPctAnalysis joinedData = SL.wrapPrefix "MoneyBondVsPoverty" $ do
       sunPovertyRF = FL.premap (F.rgetField @PovertyR) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       kmMoneyBondRatevsPovertyRate proxy_ks =
-        KM.kMeans proxy_ks dataProxy sunPovertyRF sunMoneyBondRateF 5 (\x y -> return $ KM.partitionCentroids x y) KM.euclidSq        
+        KM.kMeans proxy_ks dataProxy sunPovertyRF sunMoneyBondRateF 5 (KM.kMeansPPCentroids KM.euclidSq) KM.euclidSq        
   (kmByYear, kmByYearUrb) <- FL.foldM ((,)
                                         <$> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType])
                                         <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType,Urbanicity])) kmData
@@ -364,9 +378,16 @@ moneyBondPctVsPovertyRateVL facetByUrb dataRecords =
 kMeansNotes =  H.placeTextSection $ do
   HL.h3_ "Some notes on weighted k-means"
   HL.ul_ $ do
-    HL.li_ "k-means works by choosing random starting locations for cluster centers, assigning each data-point to the nearest cluster center, moving the center of each cluster to the weighted average of the data-points assigned to the same cluster and then repeating until no data-points move to a new cluster."
+    HL.li_ $ do
+      HL.a_ [HL.href_ "https://en.wikipedia.org/wiki/K-means_clustering"] "k-means"
+      HL.span_ " works by choosing random starting locations for cluster centers, assigning each data-point to the nearest cluster center, moving the center of each cluster to the weighted average of the data-points assigned to the same cluster and then repeating until no data-points move to a new cluster."
     HL.li_ "How do you define distance between points?  Each axis has a different sort of data and it's not clear how to combine differences in each into a meanignful overall distance.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the data so that the set of points has mean 0 and std-deviation 1 in each variable.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original. This attempts to give the two variables equal weight in determining what \"nearby\" means for these data points."
     HL.li_ "This clustering happens for each combination plotted."
+    HL.li_ $ do
+      HL.span_ "k-means is sensitive to the choice of starting points.  Here we use the \"k-means++\" method.  This chooses one of the data points as a starting point.  Then chooses among the remaining points in a way designed to make it likely that the initial centers are widely dispersed.  See "
+      HL.a_ [HL.href_ "https://en.wikipedia.org/wiki/K-means%2B%2B"] "here"
+      HL.span_ " for more information.  We repeat the k-means clustering with a few different starting centers chosen this way and choose the best clustering, in the sense of minimizing total weighted distance of all points from their cluster centers."
+
 
 transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (FA.FType x -> FA.FType x) -> F.Record rs -> F.Record rs
 transformF f r = F.rputField @x (f $ F.rgetField @x r) r

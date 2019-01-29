@@ -73,6 +73,7 @@ executable colorado-analysis
   build-depends:       base >=4.11.1.0
                      , aeson-pretty
                      , bytestring
+                     , clock
                      , containers
                      , foldl
                      , Frames
