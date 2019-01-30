@@ -27,6 +27,7 @@ import qualified Frames.VegaLite            as FV
 import qualified Frames.VegaLiteTemplates   as FV
 import qualified Frames.Transform           as FT
 import qualified Math.Rescale               as MR
+import qualified Math.Regression.LeastSquares as LS
 import qualified System.PipesLogger         as SL
 import qualified Html.Report                as H
 
@@ -209,14 +210,18 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     FL.foldM (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData 
 
   -- regressions
-  crimeRateByMoneyBondRate <- do
+  _ <- do
     let select = F.rcast @[Year,MoneyBondFreq,TotalBondFreq,Crimes,EstPopulation]
-        rData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
+        rData = catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         guess = [0,0] -- guess has one extra dimension for constant
-        regressOne = FR.leastSquaresRegression @CrimeRate @'[MoneyBondRate] guess
+        regressOneBM = FR.leastSquaresByMinimization @Crimes @'[EstPopulation,MoneyBondFreq] False guess
+        regressOneOLS = FR.ordinaryLeastSquares @Crimes @'[EstPopulation,MoneyBondFreq] False
     SL.log SL.Info "Regressing Crime Rate on Money Bond Rate"
-    return $ FL.fold (FL.Fold (FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap regressOne)) rData
-  SL.log SL.Info $ "regression results: " <> (T.pack $ show crimeRateByMoneyBondRate)
+    let r1 = FL.fold (FL.Fold (FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap regressOneBM)) rData
+    r2 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneOLS)) rData
+    SL.log SL.Info $ "regression (by minimization) results: " <> (T.pack $ show r1)
+    SL.log SL.Info $ "regression (by OLS) results: " <> (T.pack $ show (fmap LS.parameters r2))
+    
 
   SL.log SL.Info "Creating Html"
   htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bond Rate vs Crime rate" $ do
