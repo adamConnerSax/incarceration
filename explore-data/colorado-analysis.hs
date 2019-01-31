@@ -212,15 +212,18 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
   -- regressions
   _ <- do
     let select = F.rcast @[Year,MoneyBondFreq,TotalBondFreq,Crimes,EstPopulation]
-        rData = catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
+        rData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         guess = [0,0] -- guess has one extra dimension for constant
         regressOneBM = FR.leastSquaresByMinimization @Crimes @'[EstPopulation,MoneyBondFreq] False guess
-        regressOneOLS = FR.ordinaryLeastSquares @Crimes @'[EstPopulation,MoneyBondFreq] False
+        regressOneOLS = FR.ordinaryLeastSquares @Crimes @'[EstPopulation, MoneyBondFreq] False
+        regressOneWLS = FR.popWeightedLeastSquares @CrimeRate @'[MoneyBondRate] @EstPopulation True 
     SL.log SL.Info "Regressing Crime Rate on Money Bond Rate"
     let r1 = FL.fold (FL.Fold (FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap regressOneBM)) rData
     r2 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneOLS)) rData
+    r3 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS)) rData
     SL.log SL.Info $ "regression (by minimization) results: " <> (T.pack $ show r1)
     SL.log SL.Info $ "regression (by OLS) results: " <> (T.pack $ show (fmap LS.parameters r2))
+    SL.log SL.Info $ "regression (by WLS) results: " <> (T.pack $ show (fmap LS.parameters r3))
     
 
   SL.log SL.Info "Creating Html"
