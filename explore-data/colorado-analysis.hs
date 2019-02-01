@@ -134,11 +134,13 @@ main = do
 type MoneyBondRate = "money_bond_rate" F.:-> Double
 type PostedBondRate = "posted_bond_rate" F.:-> Double
 type ReoffenseRate = "reoffense_rate" F.:-> Double
+type InvStdDev = "oneOverSigma" F.:-> Double
 
 moneyBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @MoneyBondRate $ bool ((r ^. moneyBondFreq) `rDiv` t) 0 (t == 0)  
 postedBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @PostedBondRate $ bool ((r ^. moneyPosted + r ^. prPosted) `rDiv` t) 0 (t == 0)
 cRate r = FT.recordSingleton @CrimeRate $ (r ^. crimes) `rDiv` (r ^. estPopulation)
 reoffenseRate r = FT.recordSingleton @ReoffenseRate $ (r ^. moneyNewYes + r ^. prNewYes) `rDiv` (r ^. moneyPosted + r ^. prPosted) 
+oneOverSigma r = FT.recordSingleton @InvStdDev $ 1.0/sqrt (realToFrac $ r ^. estPopulation)
 
 bondVsCrimeAnalysis :: (P.MonadIO m, MonadRandom m)
                     => P.Producer (FM.MaybeRow CountyBondCO) (F.SafeT IO) ()
@@ -210,20 +212,24 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     FL.foldM (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData 
 
   -- regressions
+  let rMut r = mbrAndCr r F.<+> oneOverSigma r
   _ <- do
     let select = F.rcast @[Year,MoneyBondFreq,TotalBondFreq,Crimes,EstPopulation]
-        rData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
+        rData = fmap (FT.mutate rMut) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         guess = [0,0] -- guess has one extra dimension for constant
         regressOneBM = FR.leastSquaresByMinimization @Crimes @'[EstPopulation,MoneyBondFreq] False guess
         regressOneOLS = FR.ordinaryLeastSquares @Crimes @'[EstPopulation, MoneyBondFreq] False
-        regressOneWLS = FR.popWeightedLeastSquares @CrimeRate @'[MoneyBondRate] @EstPopulation True 
+        regressOneWLS = FR.popWeightedLeastSquares @CrimeRate @'[] @EstPopulation True
+        regressOneWLS2 = FR.weightedLeastSquares @Crimes @'[EstPopulation, MoneyBondFreq] @InvStdDev False
     SL.log SL.Info "Regressing Crime Rate on Money Bond Rate"
     let r1 = FL.fold (FL.Fold (FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap regressOneBM)) rData
     r2 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneOLS)) rData
     r3 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS)) rData
+    r4 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS2)) rData
     SL.log SL.Info $ "regression (by minimization) results: " <> (T.pack $ show r1)
     SL.log SL.Info $ "regression (by OLS) results: " <> (T.pack $ show r2)
-    SL.log SL.Info $ "regression (by WLS) results: " <> (T.pack $ show r3)
+    SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> (T.pack $ show r3)
+    SL.log SL.Info $ "regression (counts by inv sqrt pop wighted LS) results: " <> (T.pack $ show r4)
     
 
   SL.log SL.Info "Creating Html"
