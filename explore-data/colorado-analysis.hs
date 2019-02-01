@@ -222,8 +222,8 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     r2 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneOLS)) rData
     r3 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS)) rData
     SL.log SL.Info $ "regression (by minimization) results: " <> (T.pack $ show r1)
-    SL.log SL.Info $ "regression (by OLS) results: " <> (T.pack $ show (fmap LS.parameters r2))
-    SL.log SL.Info $ "regression (by WLS) results: " <> (T.pack $ show (fmap LS.parameters r3))
+    SL.log SL.Info $ "regression (by OLS) results: " <> (T.pack $ show r2)
+    SL.log SL.Info $ "regression (by WLS) results: " <> (T.pack $ show r3)
     
 
   SL.log SL.Info "Creating Html"
