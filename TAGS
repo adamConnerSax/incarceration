@@ -56,7 +56,7 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-analysis.hs,1240
+./explore-data/colorado-analysis.hs,1323
 module Main Main18,19
 F.tableTypes' F.tableTypes'71,72
 type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols73,74
@@ -71,26 +71,28 @@ main main84,85
 type MoneyBondRate MoneyBondRate133,134
 type PostedBondRate PostedBondRate134,135
 type ReoffenseRate ReoffenseRate135,136
-moneyBondRate moneyBondRate137,138
-postedBondRate postedBondRate138,139
-cRate cRate139,140
-reoffenseRate reoffenseRate140,141
-bondVsCrimeAnalysis bondVsCrimeAnalysis143,144
-bondVsCrimeAnalysis bondVsCrimeAnalysis146,147
-cRVsMBRVL cRVsMBRVL283,284
-cRVsPBRVL cRVsPBRVL297,298
-rRVsMBRVL rRVsMBRVL311,312
---type --type327,328
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis328,329
-moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL371,372
-kMeansNotes kMeansNotes392,393
-transformF transformF406,407
-transformF transformF407,408
-type IndexCrimeRate IndexCrimeRate411,412
-type TotalBondRate TotalBondRate412,413
-indexCrimeRate indexCrimeRate413,414
-totalBondRate totalBondRate414,415
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis415,416
+type PostedBondFreq PostedBondFreq136,137
+moneyBondRate moneyBondRate138,139
+postedBondRate postedBondRate139,140
+cRate cRate140,141
+reoffenseRate reoffenseRate141,142
+postedBondFreq postedBondFreq142,143
+bondVsCrimeAnalysis bondVsCrimeAnalysis145,146
+bondVsCrimeAnalysis bondVsCrimeAnalysis148,149
+cRVsMBRVL cRVsMBRVL286,287
+cRVsPBRVL cRVsPBRVL300,301
+rRVsMBRVL rRVsMBRVL314,315
+--type --type330,331
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis331,332
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL374,375
+kMeansNotes kMeansNotes395,396
+transformF transformF409,410
+transformF transformF410,411
+type IndexCrimeRate IndexCrimeRate414,415
+type TotalBondRate TotalBondRate415,416
+indexCrimeRate indexCrimeRate416,417
+totalBondRate totalBondRate417,418
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis418,419
 
 ./colorado-joins.hs,24
 module Main Main13,14
