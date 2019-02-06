@@ -45,7 +45,7 @@ executable explore-data
   other-modules:       DataSourcePaths
                      , DataSources
   -- other-extensions:
-  build-depends:       base >=4.11.1.0
+  build-depends:       base >=4.11.1.0                       
                      , containers
                      , dhall
                      , foldl
@@ -74,6 +74,7 @@ executable colorado-analysis
                      , aeson-pretty
                      , bytestring
                      , clock
+                     , colonnade
                      , containers
                      , foldl
                      , Frames

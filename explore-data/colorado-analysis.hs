@@ -26,11 +26,11 @@ import qualified Frames.MaybeUtils          as FM
 import qualified Frames.VegaLite            as FV
 import qualified Frames.VegaLiteTemplates   as FV
 import qualified Frames.Transform           as FT
+import qualified Frames.Table               as Table
 import qualified Math.Rescale               as MR
 import qualified Math.Regression.LeastSquares as LS
 import qualified System.PipesLogger         as SL
 import qualified Html.Report                as H
-
 
 import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
@@ -234,6 +234,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> (T.pack $ show r3)
     SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> (T.pack $ show r4)
     SL.log SL.Info $ "regression (counts by TLS) results: " <> (T.pack $ show r5)
+    SL.log SL.Info $ "data=\n" <> Table.textTable rData
     
 
   SL.log SL.Info "Creating Html"
