@@ -26,9 +26,9 @@ makeReportHtmlAsText title reportHtml =
                                          H.title_ (H.toHtmlRaw title)
                                          H.link_ [H.rel_ "stylesheet", H.href_ "https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.4/tufte.min.css"]
                                          H.meta_ [H.name_ "viewport", H.content_"width=device-width, initial-scale=1"]
-                                         H.script_ [H.src_ "https://cdn.jsdelivr.net/npm/vega@4.4.0"] ""
-                                         H.script_ [H.src_ "https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"] ""
-                                         H.script_ [H.src_ "https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"] ""
+                                         H.script_ [H.src_ "https://cdn.jsdelivr.net/npm/vega@4.4.0/build/vega.js"] ""
+                                         H.script_ [H.src_ "https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc12/build/vega-lite.js"] ""
+                                         H.script_ [H.src_ "https://cdn.jsdelivr.net/npm/vega-embed@3.29.1/build/vega-embed.js"] ""
                                          return ()
                                      )
   in H.renderTextT html

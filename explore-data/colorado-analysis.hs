@@ -42,7 +42,7 @@ import           Data.Functor.Identity      (runIdentity)
 import           Data.IORef                 (newIORef)
 import qualified Data.List                  as  List
 import qualified Data.Map                   as M
-import           Data.Maybe                 (catMaybes, fromMaybe)
+import           Data.Maybe                 (catMaybes, fromMaybe, fromJust)
 import           Data.Monoid                ((<>))
 import           Data.Proxy                 (Proxy (..))
 import           Data.Text                  (Text)
@@ -50,6 +50,7 @@ import qualified Data.Text                  as T
 import qualified Data.Text.IO               as T
 import qualified Data.Text.Lazy             as TL
 import qualified Data.Vector                as V
+import qualified Data.Vector.Storable       as VS
 import qualified Data.Vinyl                 as V
 import qualified Data.Vinyl.XRec            as V
 import           Data.Vinyl.Curry           (runcurryX)
@@ -135,6 +136,9 @@ type MoneyBondRate = "money_bond_rate" F.:-> Double
 type PostedBondRate = "posted_bond_rate" F.:-> Double
 type ReoffenseRate = "reoffense_rate" F.:-> Double
 type PostedBondFreq = "posted_bond_freq" F.:-> Int
+type CrimeError = "crimes_error" F.:-> Double
+type CrimeFitted = "crimes_fitted" F.:-> Double
+type CrimeFittedErr = "crimes_fitted_err" F.:-> Double
 
 moneyBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @MoneyBondRate $ bool ((r ^. moneyBondFreq) `rDiv` t) 0 (t == 0)  
 postedBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @PostedBondRate $ bool ((r ^. moneyPosted + r ^. prPosted) `rDiv` t) 0 (t == 0)
@@ -214,7 +218,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
 
   -- regressions
   let rMut r = mbrAndCr r F.<+> postedBondFreq r
-  _ <- do
+  datForPlot <- do
     let select = F.rcast @[Year,MoneyBondFreq,PrBondFreq,PrPosted,MoneyPosted,TotalBondFreq,Crimes,EstPopulation]
         rData = fmap (FT.mutate rMut) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         guess = [0,0] -- guess has one extra dimension for constant
@@ -234,7 +238,14 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> (T.pack $ show r3)
     SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> (T.pack $ show r4)
     SL.log SL.Info $ "regression (counts by TLS) results: " <> (T.pack $ show r5)
-    SL.log SL.Info $ "data=\n" <> Table.textTable rData
+    let rData2016 = F.filterFrame ((== 2016) . F.rgetField @Year) $ F.toFrame rData
+        fit = LS.parameters $ fromJust $ M.lookup (FT.recordSingleton @Year 2016) r4        
+        crimeFitted r = FT.recordSingleton @CrimeFitted $ ((realToFrac (r ^. estPopulation)) * (fit VS.! 0) + (realToFrac $ F.rgetField @PostedBondFreq r) * (fit VS.! 1))
+        crimeFitError r = FT.recordSingleton @CrimeFittedErr 0
+        crimeError r = FT.recordSingleton @CrimeError (sqrt $ realToFrac $ F.rgetField @Crimes r)
+        rDataWithFit = fmap (FT.mutate (\r -> crimeError r F.<+> crimeFitted r F.<+> crimeFitError r)) rData2016
+    return $ rDataWithFit    
+--    SL.log SL.Info $ "data=\n" <> Table.textTable rData
     
 
   SL.log SL.Info "Creating Html"
@@ -281,9 +292,15 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
         HL.li_ $ do
           HL.span_ "Reoffense Rate is (number of new offenses for all bonds/total number of posted bonds) where that data comes from "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv"] "complete-county-bond.csv."
+
+    H.placeVisualization "regresssionViz" $ regressionViz datForPlot
     
     kMeansNotes
   liftIO $ T.writeFile "analysis/moneyBondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
+
+regressionViz dataWithFit =
+  let dat = FV.recordsToVLData (F.rcast @[PostedBondFreq, Crimes, CrimeError, CrimeFitted, CrimeFittedErr]) dataWithFit
+  in FV.scatterWithFit @PostedBondFreq @Crimes @CrimeError @CrimeFitted @CrimeFittedErr "test scatter with fit" dat
 
 cRVsMBRVL mergedOffenseAgainst dataRecords =
   let dat = FV.recordsToVLData (transformF @MoneyBondRate (*100) . transformF @CrimeRate (*100)) dataRecords
