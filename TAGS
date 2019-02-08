@@ -56,7 +56,7 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-analysis.hs,1478
+./explore-data/colorado-analysis.hs,1465
 module Main Main18,19
 F.tableTypes' F.tableTypes'72,73
 type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols74,75
@@ -72,9 +72,9 @@ type MoneyBondRate MoneyBondRate134,135
 type PostedBondRate PostedBondRate135,136
 type ReoffenseRate ReoffenseRate136,137
 type PostedBondFreq PostedBondFreq137,138
-type CrimeError CrimeError138,139
-type CrimeFitted CrimeFitted139,140
-type CrimeFittedErr CrimeFittedErr140,141
+type CrimeRateError CrimeRateError138,139
+type CrimeRateFitted CrimeRateFitted139,140
+type CrimeRateFittedErr CrimeRateFittedErr140,141
 moneyBondRate moneyBondRate142,143
 postedBondRate postedBondRate143,144
 cRate cRate144,145
@@ -82,7 +82,6 @@ reoffenseRate reoffenseRate145,146
 postedBondFreq postedBondFreq146,147
 bondVsCrimeAnalysis bondVsCrimeAnalysis149,150
 bondVsCrimeAnalysis bondVsCrimeAnalysis152,153
-regressionViz regressionViz300,301
 cRVsMBRVL cRVsMBRVL304,305
 cRVsPBRVL cRVsPBRVL318,319
 rRVsMBRVL rRVsMBRVL332,333

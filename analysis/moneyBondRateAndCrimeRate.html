@@ -18665,6 +18665,24 @@ vegaEmbed('#crimeRateVsPostedBondRateUnMerged',vlSpec);</script></figure><sectio
 };
 vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>Notes:</p><ul><li><span>Reoffense Rate is (number of new offenses for all bonds/total number of posted bonds) where that data comes from </span><a href="https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv">complete-county-bond.csv.</a></li></ul></section><figure id="regresssionViz"><script type="text/javascript">var vlSpec=
 {
+    "transform": [
+        {
+            "as": "yLo",
+            "calculate": "datum.CrimeRate - (datum.yError/2)"
+        },
+        {
+            "as": "yHi",
+            "calculate": "datum.CrimeRate + (datum.yError/2)"
+        },
+        {
+            "as": "fyLo",
+            "calculate": "datum.yFit - (datum.yFitError/2)"
+        },
+        {
+            "as": "fyHi",
+            "calculate": "datum.yFit + (datum.yFitError/2)"
+        }
+    ],
     "config": {
         "view": {
             "height": 400,
@@ -18675,419 +18693,418 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
     "data": {
         "values": [
             {
-                "crimes_error": 251.13143968846273,
-                "crimes_fitted": 54756.02365860146,
-                "Crimes": 63067,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 7534
+                "posted_bond_rate": 0.6267886855241265,
+                "CrimeRate": 7.422616105265635e-2,
+                "yError": 2.955669793664086e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 6.444462921474643e-2
             },
             {
-                "crimes_error": 16.492422502470642,
-                "crimes_fitted": 612.2399557898603,
-                "Crimes": 272,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 723
+                "posted_bond_rate": 0.6769662921348315,
+                "CrimeRate": 1.6679953394247868e-2,
+                "yError": 1.0113707305127026e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 3.754461003187958e-2
             },
             {
-                "crimes_error": 129.53377937819926,
-                "crimes_fitted": 18339.560611418274,
-                "Crimes": 16779,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 5881
+                "posted_bond_rate": 0.5710817634492135,
+                "CrimeRate": 5.237577959657633e-2,
+                "yError": 4.0434070439383205e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.724708173798773e-2
             },
             {
-                "crimes_error": 19.261360284258224,
-                "crimes_fitted": 624.4993550127633,
-                "Crimes": 371,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 334
+                "posted_bond_rate": 0.8048192771084337,
+                "CrimeRate": 3.0079455164585697e-2,
+                "yError": 1.561647501561393e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.0632345955307544e-2
             },
             {
-                "crimes_error": 8.48528137423857,
-                "crimes_fitted": 245.7834819081974,
-                "Crimes": 72,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 16
+                "posted_bond_rate": 0.5,
+                "CrimeRate": 1.9867549668874173e-2,
+                "yError": 2.341413182736912e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 6.782104909166595e-2
             },
             {
-                "crimes_error": 15.066519173319364,
-                "crimes_fitted": 407.3386648076301,
-                "Crimes": 227,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 176
+                "posted_bond_rate": 0.7125506072874493,
+                "CrimeRate": 2.9872351625213844e-2,
+                "yError": 1.9826976145965736e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.3604245928099765e-2
             },
             {
-                "crimes_error": 130.44922383824292,
-                "crimes_fitted": 19330.903886221473,
-                "Crimes": 17017,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 3561
+                "posted_bond_rate": 0.6677292330770673,
+                "CrimeRate": 5.497068467042463e-2,
+                "yError": 4.213952605696475e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 6.244537943960548e-2
             },
             {
-                "crimes_error": 56.471231613982,
-                "crimes_fitted": 3775.8931472935915,
-                "Crimes": 3189,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 1021
+                "posted_bond_rate": 0.7185080928923293,
+                "CrimeRate": 4.987878313912567e-2,
+                "yError": 8.832600549617893e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.905831152410403e-2
             },
             {
-                "crimes_error": 25.865034312755125,
-                "crimes_fitted": 990.4816171920563,
-                "Crimes": 669,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 437
+                "posted_bond_rate": 0.6849529780564263,
+                "CrimeRate": 3.601808980295036e-2,
+                "yError": 1.39253980363708e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.3326241907615826e-2
             },
             {
-                "crimes_error": 3.3166247903554,
-                "crimes_fitted": 104.71922714837908,
-                "Crimes": 11,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 39
+                "posted_bond_rate": 0.4936708860759494,
+                "CrimeRate": 5.829358770535241e-3,
+                "yError": 1.7576178009302596e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.549508592918869e-2
             },
             {
-                "crimes_error": 22.360679774997898,
-                "crimes_fitted": 436.7189074603313,
-                "Crimes": 500,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 318
+                "posted_bond_rate": 0.5291181364392679,
+                "CrimeRate": 5.249343832020997e-2,
+                "yError": 2.3475779291336376e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.584975406407678e-2
             },
             {
-                "crimes_error": 10.14889156509222,
-                "crimes_fitted": 443.76633706106617,
-                "Crimes": 103,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 193
+                "posted_bond_rate": 0.7451737451737451,
+                "CrimeRate": 1.2421611191509889e-2,
+                "yError": 1.2239377188967943e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.3517406784981444e-2
             },
             {
-                "crimes_error": 0,
-                "crimes_fitted": 200.27759982640353,
-                "Crimes": 0,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 73
+                "posted_bond_rate": 0.5251798561151079,
+                "CrimeRate": 0,
+                "yError": 0,
+                "yFitError": 2.0e-2,
+                "yFit": 5.5756570107573365e-2
             },
             {
-                "crimes_error": 12.083045973594572,
-                "crimes_fitted": 309.62716707970446,
-                "Crimes": 146,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 86
+                "posted_bond_rate": 0.7610619469026548,
+                "CrimeRate": 2.771976457186254e-2,
+                "yError": 2.2941040390344735e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.8786247784261336e-2
             },
             {
-                "crimes_error": 17.146428199482248,
-                "crimes_fitted": 235.71785104176905,
-                "Crimes": 294,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 102
+                "posted_bond_rate": 0.8095238095238095,
+                "CrimeRate": 6.683337122073199e-2,
+                "yError": 3.8978013638286536e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.3584417149754274e-2
             },
             {
-                "crimes_error": 31.843366656181317,
-                "crimes_fitted": 1661.1846913367458,
-                "Crimes": 1014,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 600
+                "posted_bond_rate": 0.7989347536617842,
+                "CrimeRate": 3.410122750966874e-2,
+                "yError": 1.0709052179647325e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.586630877204458e-2
             },
             {
-                "crimes_error": 226.99118925632334,
-                "crimes_fitted": 45138.557682102975,
-                "Crimes": 51525,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 4521
+                "posted_bond_rate": 0.6840671811166591,
+                "CrimeRate": 7.550357698653905e-2,
+                "yError": 3.3262778715731903e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 6.614502794783106e-2
             },
             {
-                "crimes_error": 8.06225774829855,
-                "crimes_fitted": 124.67992524102799,
-                "Crimes": 65,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 20
+                "posted_bond_rate": 0.5128205128205128,
+                "CrimeRate": 3.307888040712468e-2,
+                "yError": 4.102930151805877e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 6.345034363411094e-2
             },
             {
-                "crimes_error": 108.72902096496593,
-                "crimes_fitted": 20491.748379503457,
-                "Crimes": 11822,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 3276
+                "posted_bond_rate": 0.6799501867995019,
+                "CrimeRate": 3.661887194545888e-2,
+                "yError": 3.367902296964305e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 6.347358398304868e-2
             },
             {
-                "crimes_error": 45.59605246071199,
-                "crimes_fitted": 3279.6573739626774,
-                "Crimes": 2079,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 868
+                "posted_bond_rate": 0.6434395848776872,
+                "CrimeRate": 3.757319453480807e-2,
+                "yError": 8.240449009743365e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.9272344646184444e-2
             },
             {
-                "crimes_error": 208.91864445281087,
-                "crimes_fitted": 42257.29112885678,
-                "Crimes": 43647,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 7672
+                "posted_bond_rate": 0.5033790433698576,
+                "CrimeRate": 6.461330755531738e-2,
+                "yError": 3.092749702859182e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 6.255603702805251e-2
             },
             {
-                "crimes_error": 6.48074069840786,
-                "crimes_fitted": 1468.4280938955787,
-                "Crimes": 42,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 369
+                "posted_bond_rate": 0.82,
+                "CrimeRate": 1.7097496438021576e-3,
+                "yError": 2.638200976351663e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.977724786873921e-2
             },
             {
-                "crimes_error": 29.949958263743873,
-                "crimes_fitted": 2444.432730025701,
-                "Crimes": 897,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 1148
+                "posted_bond_rate": 0.7060270602706027,
+                "CrimeRate": 1.9257191927866037e-2,
+                "yError": 6.429789236527237e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.2478160799177775e-2
             },
             {
-                "crimes_error": 52.81098370604357,
-                "crimes_fitted": 3103.5665226640667,
-                "Crimes": 2789,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 1353
+                "posted_bond_rate": 0.6892511462047886,
+                "CrimeRate": 4.8064660669355115e-2,
+                "yError": 9.101262142150687e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.3485791242961205e-2
             },
             {
-                "crimes_error": 33.823069050575526,
-                "crimes_fitted": 77.89248288799286,
-                "Crimes": 1144,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 458
+                "posted_bond_rate": 0.6928895612708018,
+                "CrimeRate": 0.1914644351464435,
+                "yError": 5.660764694656992e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 1.3036398809705911e-2
             },
             {
-                "crimes_error": 15.620499351813308,
-                "crimes_fitted": 791.5004410152133,
-                "Crimes": 244,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 321
+                "posted_bond_rate": 0.7734939759036145,
+                "CrimeRate": 1.6778985008939623e-2,
+                "yError": 1.074164444492732e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.4428582108046575e-2
             },
             {
-                "crimes_error": 25.079872407968907,
-                "crimes_fitted": 817.2130079922148,
-                "Crimes": 629,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 412
+                "posted_bond_rate": 0.7907869481765835,
+                "CrimeRate": 3.9627039627039624e-2,
+                "yError": 1.5800335417355828e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.148447098798052e-2
             },
             {
-                "crimes_error": 23.323807579381203,
-                "crimes_fitted": 287.3362115409651,
-                "Crimes": 544,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 225
+                "posted_bond_rate": 0.5667506297229219,
+                "CrimeRate": 8.453768453768454e-2,
+                "yError": 3.6245233223591612e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.465209192555791e-2
             },
             {
-                "crimes_error": 184.331223616619,
-                "crimes_fitted": 32921.76474999862,
-                "Crimes": 33978,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 5632
+                "posted_bond_rate": 0.5444702242846094,
+                "CrimeRate": 6.501734599568694e-2,
+                "yError": 3.527201996494808e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 6.299622607390873e-2
             },
             {
-                "crimes_error": 18.601075237738275,
-                "crimes_fitted": 392.4400857202605,
-                "Crimes": 346,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 239
+                "posted_bond_rate": 0.6694677871148459,
+                "CrimeRate": 4.29227143034363e-2,
+                "yError": 2.3075394166652123e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.8683796764701706e-2
             },
             {
-                "crimes_error": 48.72371086031933,
-                "crimes_fitted": 2823.877909367425,
-                "Crimes": 2374,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 1426
+                "posted_bond_rate": 0.7256997455470738,
+                "CrimeRate": 4.326274738491818e-2,
+                "yError": 8.879197955374007e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.1461127480544974e-2
             },
             {
-                "crimes_error": 16.703293088490067,
-                "crimes_fitted": 325.4898488182598,
-                "Crimes": 279,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 266
+                "posted_bond_rate": 0.7732558139534884,
+                "CrimeRate": 3.766198704103672e-2,
+                "yError": 2.254764185811294e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.393761458129858e-2
             },
             {
-                "crimes_error": 135.1184665395519,
-                "crimes_fitted": 19066.43154758455,
-                "Crimes": 18257,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 5969
+                "posted_bond_rate": 0.6769108641415287,
+                "CrimeRate": 5.5072411307083666e-2,
+                "yError": 4.0758611844490464e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.751406914317425e-2
             },
             {
-                "crimes_error": 27.53179979587241,
-                "crimes_fitted": 541.746050271712,
-                "Crimes": 758,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 579
+                "posted_bond_rate": 0.5784215784215784,
+                "CrimeRate": 5.4999274415904804e-2,
+                "yError": 1.9976636044022936e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 3.9308231771274994e-2
             },
             {
-                "crimes_error": 9.899494936611665,
-                "crimes_fitted": 270.66006050817714,
-                "Crimes": 98,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 163
+                "posted_bond_rate": 0.3367768595041322,
+                "CrimeRate": 1.768953068592058e-2,
+                "yError": 1.7869124434317085e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.885560658992367e-2
             },
             {
-                "crimes_error": 37.841775856849004,
-                "crimes_fitted": 1221.310869505795,
-                "Crimes": 1432,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 505
+                "posted_bond_rate": 0.710267229254571,
+                "CrimeRate": 6.35258628338213e-2,
+                "yError": 1.678723088317319e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.417934830564257e-2
             },
             {
-                "crimes_error": 102.77159140540736,
-                "crimes_fitted": 8189.787099801056,
-                "Crimes": 10562,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 3207
+                "posted_bond_rate": 0.6437173825772782,
+                "CrimeRate": 7.07676433342937e-2,
+                "yError": 6.885914907664866e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.4873313052690845e-2
             },
             {
-                "crimes_error": 30.62678566222711,
-                "crimes_fitted": 542.2438043762768,
-                "Crimes": 938,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 483
+                "posted_bond_rate": 0.7362804878048781,
+                "CrimeRate": 7.347642174526085e-2,
+                "yError": 2.3990902132404127e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.247562309073138e-2
             },
             {
-                "crimes_error": 29.949958263743873,
-                "crimes_fitted": 1282.4086124798582,
-                "Crimes": 897,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 742
+                "posted_bond_rate": 0.6548984995586937,
+                "CrimeRate": 3.459847257579264e-2,
+                "yError": 1.1552093752890487e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.946419086939205e-2
             },
             {
-                "crimes_error": 47.738873049120045,
-                "crimes_fitted": 2236.997342710676,
-                "Crimes": 2279,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 893
+                "posted_bond_rate": 0.820018365472911,
+                "CrimeRate": 5.565595389274201e-2,
+                "yError": 1.1658413853941594e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.463019787805696e-2
             },
             {
-                "crimes_error": 33.91164991562634,
-                "crimes_fitted": 1460.3832062040478,
-                "Crimes": 1150,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 747
+                "posted_bond_rate": 0.6038803556992725,
+                "CrimeRate": 4.037921348314607e-2,
+                "yError": 1.1907180447902508e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.1277500217838765e-2
             },
             {
-                "crimes_error": 30.23243291566195,
-                "crimes_fitted": 862.8734231942949,
-                "Crimes": 914,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 594
+                "posted_bond_rate": 0.810368349249659,
+                "CrimeRate": 4.952855749431018e-2,
+                "yError": 1.6382590720527771e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.6758069968261345e-2
             },
             {
-                "crimes_error": 6.324555320336759,
-                "crimes_fitted": 261.66572609250085,
-                "Crimes": 40,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 95
+                "posted_bond_rate": 0.6985294117647058,
+                "CrimeRate": 8.530603540200469e-3,
+                "yError": 1.3488068501464618e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.580416423384535e-2
             },
             {
-                "crimes_error": 15.132745950421556,
-                "crimes_fitted": 933.1674697821859,
-                "Crimes": 229,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 311
+                "posted_bond_rate": 0.735224586288416,
+                "CrimeRate": 1.3941312553269207e-2,
+                "yError": 9.212678649958332e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.681039022173298e-2
             },
             {
-                "crimes_error": 10.535653752852738,
-                "crimes_fitted": 270.5061026766763,
-                "Crimes": 111,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 52
+                "posted_bond_rate": 0.6933333333333334,
+                "CrimeRate": 2.5487944890929967e-2,
+                "yError": 2.4192086688525232e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 6.211391565480512e-2
             },
             {
-                "crimes_error": 27.784887978899608,
-                "crimes_fitted": 1048.614795896766,
-                "Crimes": 772,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 198
+                "posted_bond_rate": 0.6947368421052632,
+                "CrimeRate": 4.58323438613156e-2,
+                "yError": 1.6495421502552604e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 6.225449987513454e-2
             },
             {
-                "crimes_error": 12.489995996796797,
-                "crimes_fitted": 501.4703256649531,
-                "Crimes": 156,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 460
+                "posted_bond_rate": 0.5168539325842697,
+                "CrimeRate": 1.3056578506863073e-2,
+                "yError": 1.0453629056575825e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.197106843529906e-2
             },
             {
-                "crimes_error": 125.89678312014172,
-                "crimes_fitted": 8853.63683382338,
-                "Crimes": 15850,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 3628
+                "posted_bond_rate": 0.6313957535676993,
+                "CrimeRate": 9.72016950503793e-2,
+                "yError": 7.72074493417524e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.429580489641048e-2
             },
             {
-                "crimes_error": 11.045361017187261,
-                "crimes_fitted": 359.38155505034865,
-                "Crimes": 122,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 159
+                "posted_bond_rate": 0.7194570135746606,
+                "CrimeRate": 1.8090154211150653e-2,
+                "yError": 1.6378056075307327e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.3289079930360125e-2
             },
             {
-                "crimes_error": 23.57965224510319,
-                "crimes_fitted": 567.4080972756421,
-                "Crimes": 556,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 316
+                "posted_bond_rate": 0.6960352422907489,
+                "CrimeRate": 4.90299823633157e-2,
+                "yError": 2.0793344131484295e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.003598741407779e-2
             },
             {
-                "crimes_error": 31.63858403911275,
-                "crimes_fitted": 1372.930278243351,
-                "Crimes": 1001,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 448
+                "posted_bond_rate": 0.7658119658119659,
+                "CrimeRate": 4.159567837107833e-2,
+                "yError": 1.314713652155111e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.7050915364361146e-2
             },
             {
-                "crimes_error": 15.459624833740307,
-                "crimes_fitted": 378.2256308822746,
-                "Crimes": 239,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 106
+                "posted_bond_rate": 0.5888888888888889,
+                "CrimeRate": 3.708876474239603e-2,
+                "yError": 2.3990727550807426e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.869423198048954e-2
             },
             {
-                "crimes_error": 13.416407864998739,
-                "crimes_fitted": 380.1589667186639,
-                "Crimes": 180,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 249
+                "posted_bond_rate": 0.8527397260273972,
+                "CrimeRate": 2.25140712945591e-2,
+                "yError": 1.678099795497028e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.7549589333166234e-2
             },
             {
-                "crimes_error": 43.76071297408213,
-                "crimes_fitted": 1452.492931825917,
-                "Crimes": 1915,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 887
+                "posted_bond_rate": 0.7300411522633745,
+                "CrimeRate": 6.413047118314859e-2,
+                "yError": 1.465480492082721e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 4.8641804756234454e-2
             },
             {
-                "crimes_error": 36.359317925395686,
-                "crimes_fitted": 1276.6452683208167,
-                "Crimes": 1322,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 553
+                "posted_bond_rate": 0.6810344827586207,
+                "CrimeRate": 5.5473962485837774e-2,
+                "yError": 1.5257151577942885e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.357078042553047e-2
             },
             {
-                "crimes_error": 16.24807680927192,
-                "crimes_fitted": 268.99617092519264,
-                "Crimes": 264,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 95
+                "posted_bond_rate": 0.6129032258064516,
+                "CrimeRate": 5.509181969949917e-2,
+                "yError": 3.3906671137879634e-3,
+                "yFitError": 2.0e-2,
+                "yFit": 5.613442631994838e-2
             },
             {
-                "crimes_error": 120.3287164395931,
-                "crimes_fitted": 17288.160109514698,
-                "Crimes": 14479,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 5415
+                "posted_bond_rate": 0.6804473485800452,
+                "CrimeRate": 4.81639550394353e-2,
+                "yError": 4.002698313798965e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.7508541075296966e-2
             },
             {
-                "crimes_error": 8.306623862918075,
-                "crimes_fitted": 616.0849878770593,
-                "Crimes": 69,
-                "crimes_fitted_err": 0,
-                "posted_bond_freq": 153
+                "posted_bond_rate": 0.7391304347826086,
+                "CrimeRate": 6.707494896471274e-3,
+                "yError": 8.074874951801375e-4,
+                "yFitError": 2.0e-2,
+                "yFit": 5.988966539098468e-2
             }
         ]
     },
     "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "title": "test scatter with fit",
     "layer": [
         {
-            "mark": {
-                "type": "point"
-            },
+            "mark": "point",
             "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesS": {
@@ -19096,40 +19113,86 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
                 }
             },
             "encoding": {
-                "yError": {
-                    "field": "crimes_error"
-                },
                 "x": {
-                    "field": "posted_bond_freq",
+                    "field": "posted_bond_rate",
                     "type": "quantitative"
                 },
                 "y": {
-                    "field": "Crimes",
+                    "field": "CrimeRate",
                     "type": "quantitative"
                 }
             }
         },
         {
-            "mark": {
-                "type": "line"
-            },
+            "mark": "rule",
             "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
-                "scalesR": {
+                "scalesSE": {
                     "bind": "scales",
                     "type": "interval"
                 }
             },
             "encoding": {
-                "yError": {
-                    "field": "crimes_fitted_err"
-                },
                 "x": {
-                    "field": "posted_bond_freq",
+                    "field": "posted_bond_rate",
+                    "type": "quantitative"
+                },
+                "y2": {
+                    "field": "yHi",
                     "type": "quantitative"
                 },
                 "y": {
-                    "field": "crimes_fitted",
+                    "field": "yLo",
+                    "type": "quantitative"
+                }
+            }
+        },
+        {
+            "mark": "line",
+            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+            "selection": {
+                "scalesF": {
+                    "bind": "scales",
+                    "type": "interval"
+                }
+            },
+            "encoding": {
+                "x": {
+                    "field": "posted_bond_rate",
+                    "type": "quantitative"
+                },
+                "y": {
+                    "field": "yFit",
+                    "type": "quantitative",
+                    "axis": {
+                        "title": "WLS regression"
+                    }
+                }
+            }
+        },
+        {
+            "mark": {
+                "opacity": 0.5,
+                "type": "area"
+            },
+            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+            "selection": {
+                "scalesFE": {
+                    "bind": "scales",
+                    "type": "interval"
+                }
+            },
+            "encoding": {
+                "x": {
+                    "field": "posted_bond_rate",
+                    "type": "quantitative"
+                },
+                "y2": {
+                    "field": "fyHi",
+                    "type": "quantitative"
+                },
+                "y": {
+                    "field": "fyLo",
                     "type": "quantitative"
                 }
             }

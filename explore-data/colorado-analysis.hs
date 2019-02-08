@@ -136,9 +136,9 @@ type MoneyBondRate = "money_bond_rate" F.:-> Double
 type PostedBondRate = "posted_bond_rate" F.:-> Double
 type ReoffenseRate = "reoffense_rate" F.:-> Double
 type PostedBondFreq = "posted_bond_freq" F.:-> Int
-type CrimeError = "crimes_error" F.:-> Double
-type CrimeFitted = "crimes_fitted" F.:-> Double
-type CrimeFittedErr = "crimes_fitted_err" F.:-> Double
+type CrimeRateError = "crime_rate_error" F.:-> Double
+type CrimeRateFitted = "crime_rate_fitted" F.:-> Double
+type CrimeRateFittedErr = "crime_rate_fitted_err" F.:-> Double
 
 moneyBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @MoneyBondRate $ bool ((r ^. moneyBondFreq) `rDiv` t) 0 (t == 0)  
 postedBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @PostedBondRate $ bool ((r ^. moneyPosted + r ^. prPosted) `rDiv` t) 0 (t == 0)
@@ -217,8 +217,8 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     FL.foldM (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData 
 
   -- regressions
-  let rMut r = mbrAndCr r F.<+> postedBondFreq r
-  datForPlot <- do
+  let rMut r = mbrAndCr r F.<+> postedBondFreq r F.<+> postedBondRate r
+  (errF, fitF, rData) <- do
     let select = F.rcast @[Year,MoneyBondFreq,PrBondFreq,PrPosted,MoneyPosted,TotalBondFreq,Crimes,EstPopulation]
         rData = fmap (FT.mutate rMut) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         guess = [0,0] -- guess has one extra dimension for constant
@@ -240,11 +240,15 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     SL.log SL.Info $ "regression (counts by TLS) results: " <> (T.pack $ show r5)
     let rData2016 = F.filterFrame ((== 2016) . F.rgetField @Year) $ F.toFrame rData
         fit = LS.parameters $ fromJust $ M.lookup (FT.recordSingleton @Year 2016) r4        
-        crimeFitted r = FT.recordSingleton @CrimeFitted $ ((realToFrac (r ^. estPopulation)) * (fit VS.! 0) + (realToFrac $ F.rgetField @PostedBondFreq r) * (fit VS.! 1))
-        crimeFitError r = FT.recordSingleton @CrimeFittedErr 0
-        crimeError r = FT.recordSingleton @CrimeError (sqrt $ realToFrac $ F.rgetField @Crimes r)
-        rDataWithFit = fmap (FT.mutate (\r -> crimeError r F.<+> crimeFitted r F.<+> crimeFitError r)) rData2016
-    return $ rDataWithFit    
+        crimeRateFitF r =
+          let pop = realToFrac $ F.rgetField @EstPopulation r
+              pbf = realToFrac $ F.rgetField @PostedBondFreq r
+          in ((fit VS.! 0) + pbf * (fit VS.! 1)/pop, 0.02)
+        crimeRateErrorF r =
+          let crs = realToFrac $ F.rgetField @Crimes r
+              pop = realToFrac $ F.rgetField @EstPopulation r
+          in (sqrt crs)/pop           
+    return $ (crimeRateErrorF, crimeRateFitF, rData2016)    
 --    SL.log SL.Info $ "data=\n" <> Table.textTable rData
     
 
@@ -293,14 +297,10 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
           HL.span_ "Reoffense Rate is (number of new offenses for all bonds/total number of posted bonds) where that data comes from "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv"] "complete-county-bond.csv."
 
-    H.placeVisualization "regresssionViz" $ regressionViz datForPlot
+    H.placeVisualization "regresssionViz" $ FV.scatterWithFit @PostedBondRate @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
     
     kMeansNotes
   liftIO $ T.writeFile "analysis/moneyBondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
-
-regressionViz dataWithFit =
-  let dat = FV.recordsToVLData (F.rcast @[PostedBondFreq, Crimes, CrimeError, CrimeFitted, CrimeFittedErr]) dataWithFit
-  in FV.scatterWithFit @PostedBondFreq @Crimes @CrimeError @CrimeFitted @CrimeFittedErr "test scatter with fit" dat
 
 cRVsMBRVL mergedOffenseAgainst dataRecords =
   let dat = FV.recordsToVLData (transformF @MoneyBondRate (*100) . transformF @CrimeRate (*100)) dataRecords
