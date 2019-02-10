@@ -229,6 +229,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
         regressOneWLS = FR.popWeightedLeastSquares @CrimeRate @'[] @EstPopulation True
         regressOneWLS2 = FR.varWeightedLeastSquares @Crimes @'[EstPopulation, PostedBondFreq] @EstPopulation False
         regressOneWTLS = FR.varWeightedTLS @Crimes @'[EstPopulation, PostedBondFreq] @EstPopulation False
+        
     SL.log SL.Info "Regressing Crime Rate on Money Bond Rate"
     let r1 = FL.fold (FL.Fold (FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap regressOneBM)) rData
     r2 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneOLS)) rData
@@ -236,10 +237,10 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     r4 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS2)) rData
     r5 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWTLS)) rData
 --    SL.log SL.Info $ "regression (by minimization) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r1)
-    SL.log SL.Info $ "regression (by OLS) results: " <> (T.pack $ show $ fmap (flip (FR.prettyPrintRegressionResult @Crimes @[EstPopulation, MoneyBondFreq]) 0.95) r2)
---    SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r3)
---    SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r4)
---    SL.log SL.Info $ "regression (counts by TLS) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r5)
+    SL.log SL.Info $ "regression (by OLS) results: " <> FR.prettyPrintRegressionResults @Crimes @'[EstPopulation] (M.toList r2) 0.95
+    SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> FR.prettyPrintRegressionResults @CrimeRate @'[EstPopulation] (M.toList r3) 0.95
+    SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> FR.prettyPrintRegressionResults @Crimes @[EstPopulation, PostedBondFreq] (M.toList r4) 0.95
+    SL.log SL.Info $ "regression (counts by TLS) results: " <> FR.prettyPrintRegressionResults @Crimes @[EstPopulation, PostedBondFreq] (M.toList r5) 0.95
     let rData2016 = F.filterFrame ((== 2016) . F.rgetField @Year) $ F.toFrame rData
         fit = fmap (ST.estPoint) $ RE.parameterEstimates $ fromJust $ M.lookup (FT.recordSingleton @Year 2016) r4        
         crimeRateFitF r =
