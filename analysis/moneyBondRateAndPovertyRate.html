@@ -1,4 +1,4 @@
-<html><head><title>Colorado Money Bonds and Poverty</title><link href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.4/tufte.min.css" rel="stylesheet"><meta content="width=device-width, initial-scale=1" name="viewport"><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0/build/vega.js"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc12/build/vega-lite.js"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.29.1/build/vega-embed.js"></script></head><body><article><section><h2>Colorado Money Bond Rate and Poverty (preliminary)</h2><p class="subtitle">Adam Conner-Sax</p><p>Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a &quot;money bond&quot; and sometimes on a personal recognizance bond. We have county-level data of all bonds (?) issued in 2014, 2015 and 2016.  Plotting it all is very noisy (since there are 64 counties in CO) so we use a population-weighted k-means clustering technique to combine similar counties into clusters. In the plots below, each circle represents one cluster of counties and the circle&#39;s size represents the total population of all the counties included in the cluster.  We consider felonies and misdemeanors separately.</p></section><figure id="mBondsVspRateByYrFelonies"><script type="text/javascript">var vlSpec=
+<html><head><title>Colorado Money Bonds and Poverty</title><link href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.4/tufte.min.css" rel="stylesheet"><meta content="width=device-width, initial-scale=1" name="viewport"><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><body><article><section><h2>Colorado Money Bond Rate and Poverty (preliminary)</h2><p class="subtitle">Adam Conner-Sax</p><p>Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a &quot;money bond&quot; and sometimes on a personal recognizance bond. We have county-level data of all bonds (?) issued in 2014, 2015 and 2016.  Plotting it all is very noisy (since there are 64 counties in CO) so we use a population-weighted k-means clustering technique to combine similar counties into clusters. In the plots below, each circle represents one cluster of counties and the circle&#39;s size represents the total population of all the counties included in the cluster.  We consider felonies and misdemeanors separately.</p></section><figure id="mBondsVspRateByYrFelonies"><script type="text/javascript">var vlSpec=
 {
     "height": 300,
     "autosize": {
@@ -220,7 +220,7 @@
         ]
     },
     "width": 700,
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
     "title": "% of money bonds (out of money and personal recognizance bonds) vs poverty rate in CO",
     "encoding": {
         "color": {
@@ -1014,7 +1014,7 @@ vegaEmbed('#mBondsVspRateByYrFelonies',vlSpec);</script></figure><section><h3>Br
             }
         ]
     },
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
     "title": "% of money bonds (out of money and personal recognizance bonds) vs poverty rate in CO",
     "encoding": {
         "color": {

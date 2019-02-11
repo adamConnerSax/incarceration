@@ -136,6 +136,7 @@ main = do
 -- CrimeRate is defined in DataSources since we use it in more places
 type MoneyBondRate = "money_bond_rate" F.:-> Double
 type PostedBondRate = "posted_bond_rate" F.:-> Double
+type PostedBondPerCapita = "posted_bond_per_capita" F.:-> Double
 type ReoffenseRate = "reoffense_rate" F.:-> Double
 type PostedBondFreq = "posted_bond_freq" F.:-> Int
 type CrimeRateError = "crime_rate_error" F.:-> Double
@@ -144,6 +145,7 @@ type CrimeRateFittedErr = "crime_rate_fitted_err" F.:-> Double
 
 moneyBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @MoneyBondRate $ bool ((r ^. moneyBondFreq) `rDiv` t) 0 (t == 0)  
 postedBondRate r = let t = r ^. totalBondFreq in FT.recordSingleton @PostedBondRate $ bool ((r ^. moneyPosted + r ^. prPosted) `rDiv` t) 0 (t == 0)
+postedBondPerCapita r = FT.recordSingleton @PostedBondPerCapita $ (r ^. moneyPosted + r ^. prPosted) `rDiv` (r ^. estPopulation)
 cRate r = FT.recordSingleton @CrimeRate $ (r ^. crimes) `rDiv` (r ^. estPopulation)
 reoffenseRate r = FT.recordSingleton @ReoffenseRate $ (r ^. moneyNewYes + r ^. prNewYes) `rDiv` (r ^. moneyPosted + r ^. prPosted) 
 postedBondFreq r = FT.recordSingleton @PostedBondFreq $ (r ^. moneyPosted + r ^. prPosted)
@@ -219,8 +221,8 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     FL.foldM (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData 
 
   -- regressions
-  let rMut r = mbrAndCr r F.<+> postedBondFreq r F.<+> postedBondRate r
-  (errF, fitF, rData) <- do
+  let rMut r = mbrAndCr r F.<+> postedBondFreq r F.<+> postedBondRate r F.<+> postedBondPerCapita r
+  (errF, fitF, rData, regressionRes, regressionResMany) <- do
     let select = F.rcast @[Year,MoneyBondFreq,PrBondFreq,PrPosted,MoneyPosted,TotalBondFreq,Crimes,EstPopulation]
         rData = fmap (FT.mutate rMut) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         guess = [0,0] -- guess has one extra dimension for constant
@@ -237,12 +239,13 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     r4 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS2)) rData
     r5 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWTLS)) rData
 --    SL.log SL.Info $ "regression (by minimization) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r1)
-    SL.log SL.Info $ "regression (by OLS) results: " <> FR.prettyPrintRegressionResults @Crimes @'[EstPopulation] (M.toList r2) 0.95
-    SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> FR.prettyPrintRegressionResults @CrimeRate @'[EstPopulation] (M.toList r3) 0.95
-    SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> FR.prettyPrintRegressionResults @Crimes @[EstPopulation, PostedBondFreq] (M.toList r4) 0.95
-    SL.log SL.Info $ "regression (counts by TLS) results: " <> FR.prettyPrintRegressionResults @Crimes @[EstPopulation, PostedBondFreq] (M.toList r5) 0.95
+    SL.log SL.Info $ "regression (by OLS) results: " <> FR.prettyPrintRegressionResults (M.toList r2) 0.95
+    SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> FR.prettyPrintWeightedRegressionResults (M.toList r3) 0.95
+    SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> FR.prettyPrintWeightedRegressionResults (M.toList r4) 0.95
+    SL.log SL.Info $ "regression (counts by TLS) results: " <> FR.prettyPrintWeightedRegressionResults (M.toList r5) 0.95
     let rData2016 = F.filterFrame ((== 2016) . F.rgetField @Year) $ F.toFrame rData
-        fit = fmap (ST.estPoint) $ RE.parameterEstimates $ fromJust $ M.lookup (FT.recordSingleton @Year 2016) r4        
+        regressionR = fromJust $ M.lookup (FT.recordSingleton @Year 2016) r4 
+        fit = fmap (ST.estPoint) $ RE.parameterEstimates (FR.weightedRegressionResult regressionR)
         crimeRateFitF r =
           let pop = realToFrac $ F.rgetField @EstPopulation r
               pbf = realToFrac $ F.rgetField @PostedBondFreq r
@@ -251,7 +254,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
           let crs = realToFrac $ F.rgetField @Crimes r
               pop = realToFrac $ F.rgetField @EstPopulation r
           in (sqrt crs)/pop           
-    return $ (crimeRateErrorF, crimeRateFitF, rData2016)    
+    return $ (crimeRateErrorF, crimeRateFitF, rData2016, regressionR, r4)    
 --    SL.log SL.Info $ "data=\n" <> Table.textTable rData
     
 
@@ -300,8 +303,14 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
           HL.span_ "Reoffense Rate is (number of new offenses for all bonds/total number of posted bonds) where that data comes from "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv"] "complete-county-bond.csv."
 
-    H.placeVisualization "regresssionViz" $ FV.scatterWithFit @PostedBondRate @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
-    
+    H.placeTextSection $ do
+      HL.h2_ "Regressions"
+      HL.p_ "We can use linear regression to investigate the relationship between Crime Rate and the use of money and personal recognizance bonds. We begin by finding a best fit (using population-weighted least squares) to the model "
+      H.latex_ "$c_i = cr (p_{i}) + A (pb_{i}) + e_{i}$" 
+      HL.p_ "where, for each county (denoted by the subscipt i), c is the number of crimes, p is the population and pb is the number of posted bonds and e is an error term we seek to minimize. We look at the result for each of the years in the data:"
+    H.placeVisualization "regresssionCoeffs" $ FV.regressionCoefficientPlotMany (T.pack . show . F.rgetField @Year) "Regression Results (by year)" [" cr","A"] (M.toList (fmap FR.weightedRegressionResult regressionResMany)) 0.95
+    HL.p_ "We look at these regressions directly by overlaying this model on the data itself:"
+    H.placeVisualization "regresssionScatter"  $ FV.scatterWithFit @PostedBondPerCapita @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
     kMeansNotes
   liftIO $ T.writeFile "analysis/moneyBondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
 

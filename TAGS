@@ -56,7 +56,7 @@ fipsFilter fipsFilter151,152
 stateFilter stateFilter152,153
 yearFilter yearFilter153,154
 
-./explore-data/colorado-analysis.hs,1465
+./explore-data/colorado-analysis.hs,1568
 module Main Main18,19
 F.tableTypes' F.tableTypes'74,75
 type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols76,77
@@ -70,32 +70,34 @@ main main86,87
 main main87,88
 type MoneyBondRate MoneyBondRate136,137
 type PostedBondRate PostedBondRate137,138
-type ReoffenseRate ReoffenseRate138,139
-type PostedBondFreq PostedBondFreq139,140
-type CrimeRateError CrimeRateError140,141
-type CrimeRateFitted CrimeRateFitted141,142
-type CrimeRateFittedErr CrimeRateFittedErr142,143
-moneyBondRate moneyBondRate144,145
-postedBondRate postedBondRate145,146
-cRate cRate146,147
-reoffenseRate reoffenseRate147,148
-postedBondFreq postedBondFreq148,149
-bondVsCrimeAnalysis bondVsCrimeAnalysis151,152
-bondVsCrimeAnalysis bondVsCrimeAnalysis154,155
-cRVsMBRVL cRVsMBRVL307,308
-cRVsPBRVL cRVsPBRVL321,322
-rRVsMBRVL rRVsMBRVL335,336
---type --type351,352
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis352,353
-moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL395,396
-kMeansNotes kMeansNotes416,417
-transformF transformF430,431
-transformF transformF431,432
-type IndexCrimeRate IndexCrimeRate435,436
-type TotalBondRate TotalBondRate436,437
-indexCrimeRate indexCrimeRate437,438
-totalBondRate totalBondRate438,439
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis439,440
+type PostedBondPerCapita PostedBondPerCapita138,139
+type ReoffenseRate ReoffenseRate139,140
+type PostedBondFreq PostedBondFreq140,141
+type CrimeRateError CrimeRateError141,142
+type CrimeRateFitted CrimeRateFitted142,143
+type CrimeRateFittedErr CrimeRateFittedErr143,144
+moneyBondRate moneyBondRate145,146
+postedBondRate postedBondRate146,147
+postedBondPerCapita postedBondPerCapita147,148
+cRate cRate148,149
+reoffenseRate reoffenseRate149,150
+postedBondFreq postedBondFreq150,151
+bondVsCrimeAnalysis bondVsCrimeAnalysis153,154
+bondVsCrimeAnalysis bondVsCrimeAnalysis156,157
+cRVsMBRVL cRVsMBRVL316,317
+cRVsPBRVL cRVsPBRVL330,331
+rRVsMBRVL rRVsMBRVL344,345
+--type --type360,361
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis361,362
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL404,405
+kMeansNotes kMeansNotes425,426
+transformF transformF439,440
+transformF transformF440,441
+type IndexCrimeRate IndexCrimeRate444,445
+type TotalBondRate TotalBondRate445,446
+indexCrimeRate indexCrimeRate446,447
+totalBondRate totalBondRate447,448
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis448,449
 
 ./colorado-joins.hs,24
 module Main Main13,14
@@ -115,11 +117,23 @@ makeReportG makeReportG37,38
 makeReportG makeReportG38,39
 makeReport makeReport42,43
 
-./src/Html/Report.hs,305
+./src/Html/Report.hs,669
 module Html.ReportHtml.Report3,4
-makeReportHtmlAsText makeReportHtmlAsText21,22
-makeReportHtmlAsText makeReportHtmlAsText22,23
-placeVisualization placeVisualization36,37
-placeVisualization placeVisualization37,38
-placeTextSection placeTextSection42,43
-placeTextSection placeTextSection43,44
+latexToHtml latexToHtml26,27
+latexToHtml latexToHtml27,28
+latex_ latex_35,36
+latex_ latex_36,37
+mathJaxScript mathJaxScript39,40
+mathJaxScript mathJaxScript40,41
+vegaScripts2 vegaScripts242,43
+vegaScripts2 vegaScripts243,44
+vegaScripts3 vegaScripts348,49
+vegaScripts3 vegaScripts349,50
+tufteSetup tufteSetup54,55
+tufteSetup tufteSetup55,56
+makeReportHtmlAsText makeReportHtmlAsText59,60
+makeReportHtmlAsText makeReportHtmlAsText60,61
+placeVisualization placeVisualization72,73
+placeVisualization placeVisualization73,74
+placeTextSection placeTextSection78,79
+placeTextSection placeTextSection79,80

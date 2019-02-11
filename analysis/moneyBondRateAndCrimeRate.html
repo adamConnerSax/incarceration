@@ -1,4 +1,4 @@
-<html><head><title>Colorado Money Bond Rate vs Crime rate</title><link href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.4/tufte.min.css" rel="stylesheet"><meta content="width=device-width, initial-scale=1" name="viewport"><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0/build/vega.js"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc12/build/vega-lite.js"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.29.1/build/vega-embed.js"></script></head><body><article><section><h2>Colorado Bond Rates and Crime Rates (preliminary)</h2><p class="subtitle">Adam Conner-Sax</p><p>Each county in Colorado issues money bonds and personal recognizance bonds.  For each county I look at the % of money bonds out of all bonds issued and the crime rate.  We have 3 years of data and there are 64 counties in Colorado (each with vastly different populations).  So I&#39;ve used a population-weighted k-means clustering technique (see notes below) to reduce the number of points to at most 10 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster.</p></section><figure id="crimeRateVsMoneyBondRateMerged"><script type="text/javascript">var vlSpec=
+<html><head><title>Colorado Money Bond Rate vs Crime rate</title><link href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.4/tufte.min.css" rel="stylesheet"><meta content="width=device-width, initial-scale=1" name="viewport"><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><script src="https://cdn.jsdelivr.net/npm/vega@4.4.0"></script><script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc11"></script><script src="https://cdn.jsdelivr.net/npm/vega-embed@3.28.0"></script></head><body><article><section><h2>Colorado Bond Rates and Crime Rates (preliminary)</h2><p class="subtitle">Adam Conner-Sax</p><p>Each county in Colorado issues money bonds and personal recognizance bonds.  For each county I look at the % of money bonds out of all bonds issued and the crime rate.  We have 3 years of data and there are 64 counties in Colorado (each with vastly different populations).  So I&#39;ve used a population-weighted k-means clustering technique (see notes below) to reduce the number of points to at most 10 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster.</p></section><figure id="crimeRateVsMoneyBondRateMerged"><script type="text/javascript">var vlSpec=
 {
     "transform": null,
     "config": {
@@ -1868,7 +1868,6 @@
                 }
             ],
             "mark": "point",
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesT": {
                     "bind": "scales",
@@ -1920,12 +1919,10 @@
                     }
                 }
             ],
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "title": "Crime Rate vs Money Bond Rate (cluster detail)",
             "layer": [
                 {
                     "mark": "point",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "selection": {
                         "scalesB": {
                             "bind": "scales",
@@ -1968,7 +1965,6 @@
                 },
                 {
                     "mark": "text",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "encoding": {
                         "text": {
                             "field": "mark_label",
@@ -1999,7 +1995,7 @@
             ]
         }
     ],
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
     "background": "white",
     "description": "Vega-lite"
 };
@@ -8178,7 +8174,6 @@ vegaEmbed('#crimeRateVsMoneyBondRateMerged',vlSpec);</script></figure><p>Broken 
                 }
             ],
             "mark": "point",
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesT": {
                     "bind": "scales",
@@ -8238,12 +8233,10 @@ vegaEmbed('#crimeRateVsMoneyBondRateMerged',vlSpec);</script></figure><p>Broken 
                     }
                 }
             ],
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "title": "Crime Rate vs Money Bond Rate (cluster detail)",
             "layer": [
                 {
                     "mark": "point",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "selection": {
                         "scalesB": {
                             "bind": "scales",
@@ -8293,7 +8286,6 @@ vegaEmbed('#crimeRateVsMoneyBondRateMerged',vlSpec);</script></figure><p>Broken 
                 },
                 {
                     "mark": "text",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "encoding": {
                         "text": {
                             "field": "mark_label",
@@ -8324,7 +8316,7 @@ vegaEmbed('#crimeRateVsMoneyBondRateMerged',vlSpec);</script></figure><p>Broken 
             ]
         }
     ],
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
     "background": "white",
     "description": "Vega-lite"
 };
@@ -10198,7 +10190,6 @@ vegaEmbed('#crimeRateVsMoneyBondRateUnMerged',vlSpec);</script></figure><section
                 }
             ],
             "mark": "point",
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesT": {
                     "bind": "scales",
@@ -10250,12 +10241,10 @@ vegaEmbed('#crimeRateVsMoneyBondRateUnMerged',vlSpec);</script></figure><section
                     }
                 }
             ],
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "title": "Crime Rate vs Posted Bond Rate (cluster detail)",
             "layer": [
                 {
                     "mark": "point",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "selection": {
                         "scalesB": {
                             "bind": "scales",
@@ -10298,7 +10287,6 @@ vegaEmbed('#crimeRateVsMoneyBondRateUnMerged',vlSpec);</script></figure><section
                 },
                 {
                     "mark": "text",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "encoding": {
                         "text": {
                             "field": "mark_label",
@@ -10329,7 +10317,7 @@ vegaEmbed('#crimeRateVsMoneyBondRateUnMerged',vlSpec);</script></figure><section
             ]
         }
     ],
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
     "background": "white",
     "description": "Vega-lite"
 };
@@ -16508,7 +16496,6 @@ vegaEmbed('#crimeRateVsPostedBondRate',vlSpec);</script></figure><p>Broken down 
                 }
             ],
             "mark": "point",
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesT": {
                     "bind": "scales",
@@ -16568,12 +16555,10 @@ vegaEmbed('#crimeRateVsPostedBondRate',vlSpec);</script></figure><p>Broken down 
                     }
                 }
             ],
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "title": "Crime Rate vs Posted Bond Rate (cluster detail)",
             "layer": [
                 {
                     "mark": "point",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "selection": {
                         "scalesB": {
                             "bind": "scales",
@@ -16623,7 +16608,6 @@ vegaEmbed('#crimeRateVsPostedBondRate',vlSpec);</script></figure><p>Broken down 
                 },
                 {
                     "mark": "text",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "encoding": {
                         "text": {
                             "field": "mark_label",
@@ -16654,7 +16638,7 @@ vegaEmbed('#crimeRateVsPostedBondRate',vlSpec);</script></figure><p>Broken down 
             ]
         }
     ],
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
     "background": "white",
     "description": "Vega-lite"
 };
@@ -18528,7 +18512,6 @@ vegaEmbed('#crimeRateVsPostedBondRateUnMerged',vlSpec);</script></figure><sectio
                 }
             ],
             "mark": "point",
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesT": {
                     "bind": "scales",
@@ -18580,12 +18563,10 @@ vegaEmbed('#crimeRateVsPostedBondRateUnMerged',vlSpec);</script></figure><sectio
                     }
                 }
             ],
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "title": "Reoffense Rate vs Money Bond Rate (cluster detail)",
             "layer": [
                 {
                     "mark": "point",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "selection": {
                         "scalesB": {
                             "bind": "scales",
@@ -18628,7 +18609,6 @@ vegaEmbed('#crimeRateVsPostedBondRateUnMerged',vlSpec);</script></figure><sectio
                 },
                 {
                     "mark": "text",
-                    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
                     "encoding": {
                         "text": {
                             "field": "mark_label",
@@ -18659,11 +18639,122 @@ vegaEmbed('#crimeRateVsPostedBondRateUnMerged',vlSpec);</script></figure><sectio
             ]
         }
     ],
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
     "background": "white",
     "description": "Vega-lite"
 };
-vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>Notes:</p><ul><li><span>Reoffense Rate is (number of new offenses for all bonds/total number of posted bonds) where that data comes from </span><a href="https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv">complete-county-bond.csv.</a></li></ul></section><figure id="regresssionViz"><script type="text/javascript">var vlSpec=
+vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>Notes:</p><ul><li><span>Reoffense Rate is (number of new offenses for all bonds/total number of posted bonds) where that data comes from </span><a href="https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv">complete-county-bond.csv.</a></li></ul></section><section><h2>Regressions</h2><p>We can use linear regression to investigate the relationship between Crime Rate and the use of money and personal recognizance bonds. We begin by finding a best fit (using population-weighted least squares) to the model </p><span><p><span class="math inline">\(c_i = cr (p_{i}) + A (pb_{i}) + e_{i}\)</span></p></span><p>where, for each county (denoted by the subscipt i), c is the number of crimes, p is the population and pb is the number of posted bonds and e is an error term we seek to minimize. We look at the result for each of the years in the data:</p></section><figure id="regresssionCoeffs"><script type="text/javascript">var vlSpec=
+{
+    "transform": [
+        {
+            "as": "estLo",
+            "calculate": "datum.Estimate - datum.Confidence/2"
+        },
+        {
+            "as": "estHi",
+            "calculate": "datum.Estimate + datum.Confidence/2"
+        }
+    ],
+    "config": {
+        "view": {
+            "height": 400,
+            "width": 800
+        },
+        "padding": 50
+    },
+    "data": {
+        "values": [
+            {
+                "Confidence": 1.5388942158031134e-4,
+                "Key": "2014",
+                "Estimate": 5.7766279870607305e-2,
+                "Parameter": " cr"
+            },
+            {
+                "Confidence": 1.3719060507080326e-2,
+                "Key": "2014",
+                "Estimate": -0.25192601053718894,
+                "Parameter": "A"
+            },
+            {
+                "Confidence": 1.4735083588944642e-4,
+                "Key": "2015",
+                "Estimate": 6.038151738380465e-2,
+                "Parameter": " cr'"
+            },
+            {
+                "Confidence": 1.2796425794146348e-2,
+                "Key": "2015",
+                "Estimate": -0.2545736672347362,
+                "Parameter": "A'"
+            },
+            {
+                "Confidence": 1.645999685800695e-4,
+                "Key": "2016",
+                "Estimate": 7.116936730768762e-2,
+                "Parameter": " cr''"
+            },
+            {
+                "Confidence": 1.4349717130330146e-2,
+                "Key": "2016",
+                "Estimate": -0.7583940759289098,
+                "Parameter": "A''"
+            }
+        ]
+    },
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+    "title": "Regression Results (by year)",
+    "layer": [
+        {
+            "mark": "point",
+            "encoding": {
+                "color": {
+                    "field": "Key",
+                    "type": "nominal"
+                },
+                "x": {
+                    "field": "Estimate",
+                    "type": "quantitative",
+                    "axis": {
+                        "title": "Estimate (with 95% confidence error bars)"
+                    }
+                },
+                "y": {
+                    "field": "Parameter",
+                    "type": "ordinal"
+                }
+            }
+        },
+        {
+            "mark": "rule",
+            "encoding": {
+                "x2": {
+                    "field": "estHi",
+                    "type": "quantitative",
+                    "axis": {
+                        "title": ""
+                    }
+                },
+                "color": {
+                    "field": "Key",
+                    "type": "nominal"
+                },
+                "x": {
+                    "field": "estLo",
+                    "type": "quantitative",
+                    "axis": {
+                        "title": ""
+                    }
+                },
+                "y": {
+                    "field": "Parameter",
+                    "type": "ordinal"
+                }
+            }
+        }
+    ]
+};
+vegaEmbed('#regresssionCoeffs',vlSpec);</script></figure><p>We look at these regressions directly by overlaying this model on the data itself:</p><figure id="regresssionScatter"><script type="text/javascript">var vlSpec=
 {
     "transform": [
         {
@@ -18693,419 +18784,418 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
     "data": {
         "values": [
             {
-                "posted_bond_rate": 0.6267886855241265,
                 "CrimeRate": 7.422616105265635e-2,
+                "posted_bond_per_capita": 8.86707624226161e-3,
                 "yError": 2.955669793664086e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 6.444462921474643e-2
             },
             {
-                "posted_bond_rate": 0.6769662921348315,
                 "CrimeRate": 1.6679953394247868e-2,
+                "posted_bond_per_capita": 4.433678788250445e-2,
                 "yError": 1.0113707305127026e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 3.754461003187958e-2
             },
             {
-                "posted_bond_rate": 0.5710817634492135,
                 "CrimeRate": 5.237577959657633e-2,
+                "posted_bond_per_capita": 1.8357587449041386e-2,
                 "yError": 4.0434070439383205e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.724708173798773e-2
             },
             {
-                "posted_bond_rate": 0.8048192771084337,
                 "CrimeRate": 3.0079455164585697e-2,
+                "posted_bond_per_capita": 2.707961731798281e-2,
                 "yError": 1.561647501561393e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.0632345955307544e-2
             },
             {
-                "posted_bond_rate": 0.5,
                 "CrimeRate": 1.9867549668874173e-2,
+                "posted_bond_per_capita": 4.415011037527594e-3,
                 "yError": 2.341413182736912e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 6.782104909166595e-2
             },
             {
-                "posted_bond_rate": 0.7125506072874493,
                 "CrimeRate": 2.9872351625213844e-2,
+                "posted_bond_per_capita": 2.316094222924069e-2,
                 "yError": 1.9826976145965736e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.3604245928099765e-2
             },
             {
-                "posted_bond_rate": 0.6677292330770673,
                 "CrimeRate": 5.497068467042463e-2,
+                "posted_bond_per_capita": 1.1503238415195516e-2,
                 "yError": 4.213952605696475e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 6.244537943960548e-2
             },
             {
-                "posted_bond_rate": 0.7185080928923293,
                 "CrimeRate": 4.987878313912567e-2,
+                "posted_bond_per_capita": 1.596934386486275e-2,
                 "yError": 8.832600549617893e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.905831152410403e-2
             },
             {
-                "posted_bond_rate": 0.6849529780564263,
                 "CrimeRate": 3.601808980295036e-2,
+                "posted_bond_per_capita": 2.352751157532034e-2,
                 "yError": 1.39253980363708e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.3326241907615826e-2
             },
             {
-                "posted_bond_rate": 0.4936708860759494,
                 "CrimeRate": 5.829358770535241e-3,
+                "posted_bond_per_capita": 2.066772655007949e-2,
                 "yError": 1.7576178009302596e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.549508592918869e-2
             },
             {
-                "posted_bond_rate": 0.5291181364392679,
                 "CrimeRate": 5.249343832020997e-2,
+                "posted_bond_per_capita": 3.338582677165354e-2,
                 "yError": 2.3475779291336376e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.584975406407678e-2
             },
             {
-                "posted_bond_rate": 0.7451737451737451,
                 "CrimeRate": 1.2421611191509889e-2,
+                "posted_bond_per_capita": 2.327544621321756e-2,
                 "yError": 1.2239377188967943e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.3517406784981444e-2
             },
             {
-                "posted_bond_rate": 0.5251798561151079,
                 "CrimeRate": 0,
+                "posted_bond_per_capita": 2.032293986636971e-2,
                 "yError": 0,
                 "yFitError": 2.0e-2,
                 "yFit": 5.5756570107573365e-2
             },
             {
-                "posted_bond_rate": 0.7610619469026548,
                 "CrimeRate": 2.771976457186254e-2,
+                "posted_bond_per_capita": 1.6328080501234098e-2,
                 "yError": 2.2941040390344735e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.8786247784261336e-2
             },
             {
-                "posted_bond_rate": 0.8095238095238095,
                 "CrimeRate": 6.683337122073199e-2,
+                "posted_bond_per_capita": 2.318708797453967e-2,
                 "yError": 3.8978013638286536e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.3584417149754274e-2
             },
             {
-                "posted_bond_rate": 0.7989347536617842,
                 "CrimeRate": 3.410122750966874e-2,
+                "posted_bond_per_capita": 2.0178241129981504e-2,
                 "yError": 1.0709052179647325e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.586630877204458e-2
             },
             {
-                "posted_bond_rate": 0.6840671811166591,
                 "CrimeRate": 7.550357698653905e-2,
+                "posted_bond_per_capita": 6.624971791482639e-3,
                 "yError": 3.3262778715731903e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 6.614502794783106e-2
             },
             {
-                "posted_bond_rate": 0.5128205128205128,
                 "CrimeRate": 3.307888040712468e-2,
+                "posted_bond_per_capita": 1.0178117048346057e-2,
                 "yError": 4.102930151805877e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 6.345034363411094e-2
             },
             {
-                "posted_bond_rate": 0.6799501867995019,
                 "CrimeRate": 3.661887194545888e-2,
+                "posted_bond_per_capita": 1.0147472888963229e-2,
                 "yError": 3.367902296964305e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 6.347358398304868e-2
             },
             {
-                "posted_bond_rate": 0.6434395848776872,
                 "CrimeRate": 3.757319453480807e-2,
+                "posted_bond_per_capita": 1.5687124990963638e-2,
                 "yError": 8.240449009743365e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.9272344646184444e-2
             },
             {
-                "posted_bond_rate": 0.5033790433698576,
                 "CrimeRate": 6.461330755531738e-2,
+                "posted_bond_per_capita": 1.1357328007982106e-2,
                 "yError": 3.092749702859182e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 6.255603702805251e-2
             },
             {
-                "posted_bond_rate": 0.82,
                 "CrimeRate": 1.7097496438021576e-3,
+                "posted_bond_per_capita": 1.5021371870547527e-2,
                 "yError": 2.638200976351663e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.977724786873921e-2
             },
             {
-                "posted_bond_rate": 0.7060270602706027,
                 "CrimeRate": 1.9257191927866037e-2,
+                "posted_bond_per_capita": 2.464577071704594e-2,
                 "yError": 6.429789236527237e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.2478160799177775e-2
             },
             {
-                "posted_bond_rate": 0.6892511462047886,
                 "CrimeRate": 4.8064660669355115e-2,
+                "posted_bond_per_capita": 2.3317133698686796e-2,
                 "yError": 9.101262142150687e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.3485791242961205e-2
             },
             {
-                "posted_bond_rate": 0.6928895612708018,
                 "CrimeRate": 0.1914644351464435,
+                "posted_bond_per_capita": 7.665271966527197e-2,
                 "yError": 5.660764694656992e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 1.3036398809705911e-2
             },
             {
-                "posted_bond_rate": 0.7734939759036145,
                 "CrimeRate": 1.6778985008939623e-2,
+                "posted_bond_per_capita": 2.2073992573236143e-2,
                 "yError": 1.074164444492732e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.4428582108046575e-2
             },
             {
-                "posted_bond_rate": 0.7907869481765835,
                 "CrimeRate": 3.9627039627039624e-2,
+                "posted_bond_per_capita": 2.5956025956025957e-2,
                 "yError": 1.5800335417355828e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.148447098798052e-2
             },
             {
-                "posted_bond_rate": 0.5667506297229219,
                 "CrimeRate": 8.453768453768454e-2,
+                "posted_bond_per_capita": 3.496503496503497e-2,
                 "yError": 3.6245233223591612e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.465209192555791e-2
             },
             {
-                "posted_bond_rate": 0.5444702242846094,
                 "CrimeRate": 6.501734599568694e-2,
+                "posted_bond_per_capita": 1.0776905428445137e-2,
                 "yError": 3.527201996494808e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 6.299622607390873e-2
             },
             {
-                "posted_bond_rate": 0.6694677871148459,
                 "CrimeRate": 4.29227143034363e-2,
+                "posted_bond_per_capita": 2.9648926932142414e-2,
                 "yError": 2.3075394166652123e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.8683796764701706e-2
             },
             {
-                "posted_bond_rate": 0.7256997455470738,
                 "CrimeRate": 4.326274738491818e-2,
+                "posted_bond_per_capita": 2.598680613769727e-2,
                 "yError": 8.879197955374007e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.1461127480544974e-2
             },
             {
-                "posted_bond_rate": 0.7732558139534884,
                 "CrimeRate": 3.766198704103672e-2,
+                "posted_bond_per_capita": 3.590712742980562e-2,
                 "yError": 2.254764185811294e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.393761458129858e-2
             },
             {
-                "posted_bond_rate": 0.6769108641415287,
                 "CrimeRate": 5.5072411307083666e-2,
+                "posted_bond_per_capita": 1.8005544344195785e-2,
                 "yError": 4.0758611844490464e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.751406914317425e-2
             },
             {
-                "posted_bond_rate": 0.5784215784215784,
                 "CrimeRate": 5.4999274415904804e-2,
+                "posted_bond_per_capita": 4.201131911188507e-2,
                 "yError": 1.9976636044022936e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 3.9308231771274994e-2
             },
             {
-                "posted_bond_rate": 0.3367768595041322,
                 "CrimeRate": 1.768953068592058e-2,
+                "posted_bond_per_capita": 2.9422382671480143e-2,
                 "yError": 1.7869124434317085e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.885560658992367e-2
             },
             {
-                "posted_bond_rate": 0.710267229254571,
                 "CrimeRate": 6.35258628338213e-2,
+                "posted_bond_per_capita": 2.240262620885458e-2,
                 "yError": 1.678723088317319e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.417934830564257e-2
             },
             {
-                "posted_bond_rate": 0.6437173825772782,
                 "CrimeRate": 7.07676433342937e-2,
+                "posted_bond_per_capita": 2.1487581156322655e-2,
                 "yError": 6.885914907664866e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.4873313052690845e-2
             },
             {
-                "posted_bond_rate": 0.7362804878048781,
                 "CrimeRate": 7.347642174526085e-2,
+                "posted_bond_per_capita": 3.783487388375372e-2,
                 "yError": 2.3990902132404127e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.247562309073138e-2
             },
             {
-                "posted_bond_rate": 0.6548984995586937,
                 "CrimeRate": 3.459847257579264e-2,
+                "posted_bond_per_capita": 2.861991822880506e-2,
                 "yError": 1.1552093752890487e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.946419086939205e-2
             },
             {
-                "posted_bond_rate": 0.820018365472911,
                 "CrimeRate": 5.565595389274201e-2,
+                "posted_bond_per_capita": 2.1808146918042396e-2,
                 "yError": 1.1658413853941594e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.463019787805696e-2
             },
             {
-                "posted_bond_rate": 0.6038803556992725,
                 "CrimeRate": 4.037921348314607e-2,
+                "posted_bond_per_capita": 2.6228932584269664e-2,
                 "yError": 1.1907180447902508e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.1277500217838765e-2
             },
             {
-                "posted_bond_rate": 0.810368349249659,
                 "CrimeRate": 4.952855749431018e-2,
+                "posted_bond_per_capita": 3.218814349192587e-2,
                 "yError": 1.6382590720527771e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.6758069968261345e-2
             },
             {
-                "posted_bond_rate": 0.6985294117647058,
                 "CrimeRate": 8.530603540200469e-3,
+                "posted_bond_per_capita": 2.0260183407976116e-2,
                 "yError": 1.3488068501464618e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.580416423384535e-2
             },
             {
-                "posted_bond_rate": 0.735224586288416,
                 "CrimeRate": 1.3941312553269207e-2,
+                "posted_bond_per_capita": 1.8933398271033727e-2,
                 "yError": 9.212678649958332e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.681039022173298e-2
             },
             {
-                "posted_bond_rate": 0.6933333333333334,
                 "CrimeRate": 2.5487944890929967e-2,
+                "posted_bond_per_capita": 1.1940298507462687e-2,
                 "yError": 2.4192086688525232e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 6.211391565480512e-2
             },
             {
-                "posted_bond_rate": 0.6947368421052632,
                 "CrimeRate": 4.58323438613156e-2,
+                "posted_bond_per_capita": 1.1754927570648301e-2,
                 "yError": 1.6495421502552604e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 6.225449987513454e-2
             },
             {
-                "posted_bond_rate": 0.5168539325842697,
                 "CrimeRate": 1.3056578506863073e-2,
+                "posted_bond_per_capita": 3.850016739203214e-2,
                 "yError": 1.0453629056575825e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.197106843529906e-2
             },
             {
-                "posted_bond_rate": 0.6313957535676993,
                 "CrimeRate": 9.72016950503793e-2,
+                "posted_bond_per_capita": 2.224906937809313e-2,
                 "yError": 7.72074493417524e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.429580489641048e-2
             },
             {
-                "posted_bond_rate": 0.7194570135746606,
                 "CrimeRate": 1.8090154211150653e-2,
+                "posted_bond_per_capita": 2.3576512455516015e-2,
                 "yError": 1.6378056075307327e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.3289079930360125e-2
             },
             {
-                "posted_bond_rate": 0.6960352422907489,
                 "CrimeRate": 4.90299823633157e-2,
+                "posted_bond_per_capita": 2.7865961199294534e-2,
                 "yError": 2.0793344131484295e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.003598741407779e-2
             },
             {
-                "posted_bond_rate": 0.7658119658119659,
                 "CrimeRate": 4.159567837107833e-2,
+                "posted_bond_per_capita": 1.861624766258051e-2,
                 "yError": 1.314713652155111e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.7050915364361146e-2
             },
             {
-                "posted_bond_rate": 0.5888888888888889,
                 "CrimeRate": 3.708876474239603e-2,
+                "posted_bond_per_capita": 1.6449410304158908e-2,
                 "yError": 2.3990727550807426e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.869423198048954e-2
             },
             {
-                "posted_bond_rate": 0.8527397260273972,
                 "CrimeRate": 2.25140712945591e-2,
+                "posted_bond_per_capita": 3.1144465290806753e-2,
                 "yError": 1.678099795497028e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.7549589333166234e-2
             },
             {
-                "posted_bond_rate": 0.7300411522633745,
                 "CrimeRate": 6.413047118314859e-2,
+                "posted_bond_per_capita": 2.9704296574126786e-2,
                 "yError": 1.465480492082721e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 4.8641804756234454e-2
             },
             {
-                "posted_bond_rate": 0.6810344827586207,
                 "CrimeRate": 5.5473962485837774e-2,
+                "posted_bond_per_capita": 2.320506902773698e-2,
                 "yError": 1.5257151577942885e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.357078042553047e-2
             },
             {
-                "posted_bond_rate": 0.6129032258064516,
                 "CrimeRate": 5.509181969949917e-2,
+                "posted_bond_per_capita": 1.9824707846410685e-2,
                 "yError": 3.3906671137879634e-3,
                 "yFitError": 2.0e-2,
                 "yFit": 5.613442631994838e-2
             },
             {
-                "posted_bond_rate": 0.6804473485800452,
                 "CrimeRate": 4.81639550394353e-2,
+                "posted_bond_per_capita": 1.801283352017005e-2,
                 "yError": 4.002698313798965e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.7508541075296966e-2
             },
             {
-                "posted_bond_rate": 0.7391304347826086,
                 "CrimeRate": 6.707494896471274e-3,
+                "posted_bond_per_capita": 1.4873140857392825e-2,
                 "yError": 8.074874951801375e-4,
                 "yFitError": 2.0e-2,
                 "yFit": 5.988966539098468e-2
             }
         ]
     },
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
     "title": "test scatter with fit",
     "layer": [
         {
             "mark": "point",
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesS": {
                     "bind": "scales",
@@ -19114,7 +19204,7 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
             },
             "encoding": {
                 "x": {
-                    "field": "posted_bond_rate",
+                    "field": "posted_bond_per_capita",
                     "type": "quantitative"
                 },
                 "y": {
@@ -19125,7 +19215,6 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
         },
         {
             "mark": "rule",
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesSE": {
                     "bind": "scales",
@@ -19134,7 +19223,7 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
             },
             "encoding": {
                 "x": {
-                    "field": "posted_bond_rate",
+                    "field": "posted_bond_per_capita",
                     "type": "quantitative"
                 },
                 "y2": {
@@ -19149,7 +19238,6 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
         },
         {
             "mark": "line",
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesF": {
                     "bind": "scales",
@@ -19158,7 +19246,7 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
             },
             "encoding": {
                 "x": {
-                    "field": "posted_bond_rate",
+                    "field": "posted_bond_per_capita",
                     "type": "quantitative"
                 },
                 "y": {
@@ -19175,7 +19263,6 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
                 "opacity": 0.5,
                 "type": "area"
             },
-            "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
             "selection": {
                 "scalesFE": {
                     "bind": "scales",
@@ -19184,7 +19271,7 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
             },
             "encoding": {
                 "x": {
-                    "field": "posted_bond_rate",
+                    "field": "posted_bond_per_capita",
                     "type": "quantitative"
                 },
                 "y2": {
@@ -19199,4 +19286,4 @@ vegaEmbed('#reoffenseRateVsMoneyBondRate',vlSpec);</script></figure><section><p>
         }
     ]
 };
-vegaEmbed('#regresssionViz',vlSpec);</script></figure><section><h3>Some notes on weighted k-means</h3><ul><li><a href="https://en.wikipedia.org/wiki/K-means_clustering">k-means</a><span> works by choosing random starting locations for cluster centers, assigning each data-point to the nearest cluster center, moving the center of each cluster to the weighted average of the data-points assigned to the same cluster and then repeating until no data-points move to a new cluster.</span></li><li>How do you define distance between points?  Each axis has a different sort of data and it&#39;s not clear how to combine differences in each into a meanignful overall distance.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the data so that the set of points has mean 0 and std-deviation 1 in each variable.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original. This attempts to give the two variables equal weight in determining what &quot;nearby&quot; means for these data points.</li><li>This clustering happens for each combination plotted.</li><li><span>k-means is sensitive to the choice of starting points.  Here we use the &quot;k-means++&quot; method.  This chooses one of the data points as a starting point.  Then chooses among the remaining points in a way designed to make it likely that the initial centers are widely dispersed.  See </span><a href="https://en.wikipedia.org/wiki/K-means%2B%2B">here</a><span> for more information.  We repeat the k-means clustering with a few different starting centers chosen this way and choose the best clustering, in the sense of minimizing total weighted distance of all points from their cluster centers.</span></li></ul></section></article></body></html>
+vegaEmbed('#regresssionScatter',vlSpec);</script></figure><section><h3>Some notes on weighted k-means</h3><ul><li><a href="https://en.wikipedia.org/wiki/K-means_clustering">k-means</a><span> works by choosing random starting locations for cluster centers, assigning each data-point to the nearest cluster center, moving the center of each cluster to the weighted average of the data-points assigned to the same cluster and then repeating until no data-points move to a new cluster.</span></li><li>How do you define distance between points?  Each axis has a different sort of data and it&#39;s not clear how to combine differences in each into a meanignful overall distance.  Here, before we hand the data off to the k-means algorithm, we shift and rescale the data so that the set of points has mean 0 and std-deviation 1 in each variable.  Then we use ordinary Euclidean distance, that is the sum of the squares of the differences in each coordinate.  Before plotting, we reverse that scaling so that we can visualize the data in the original. This attempts to give the two variables equal weight in determining what &quot;nearby&quot; means for these data points.</li><li>This clustering happens for each combination plotted.</li><li><span>k-means is sensitive to the choice of starting points.  Here we use the &quot;k-means++&quot; method.  This chooses one of the data points as a starting point.  Then chooses among the remaining points in a way designed to make it likely that the initial centers are widely dispersed.  See </span><a href="https://en.wikipedia.org/wiki/K-means%2B%2B">here</a><span> for more information.  We repeat the k-means clustering with a few different starting centers chosen this way and choose the best clustering, in the sense of minimizing total weighted distance of all points from their cluster centers.</span></li></ul></section></article></body></html>
