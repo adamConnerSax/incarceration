@@ -17,6 +17,7 @@ import           DataSources
 import qualified Frames.Aggregations       as FA
 import qualified Frames.KMeans             as KM
 import qualified Frames.ScatterMerge       as SM
+import qualified Math.Rescale              as MR
 
 import qualified Control.Foldl             as FL
 import           Control.Lens              ((^.))
@@ -126,10 +127,10 @@ incomePovertyJoinData trendsData povertyData = do
   let trendsWithPovertyF = F.toFrame $ catMaybes $ fmap F.recMaybe $ F.leftJoin @'[Fips,Year] trendsForPovFrame povertyFrame
   F.writeCSV "data/trendsWithPoverty.csv" trendsWithPovertyF
   let dataProxy = Proxy @[MedianHI, IncarcerationRate, TotalPop]
-      sunXF :: FL.Fold (F.Record [MedianHI, IncarcerationRate, TotalPop]) (FA.ScaleAndUnscale Int)
-      sunXF = FL.premap (runcurryX (\x _ w -> (x,w))) $ FA.weightedScaleAndUnscale (FA.RescaleMedian 100) (FA.RescaleMedian 100) round
-      sunYF :: FL.Fold (F.Record [MedianHI, IncarcerationRate, TotalPop]) (FA.ScaleAndUnscale Double)
-      sunYF = FL.premap (runcurryX (\_ y w -> (y,w))) $ FA.weightedScaleAndUnscale (FA.RescaleGiven (0,0.01)) FA.RescaleNone id
+      sunXF :: FL.Fold (F.Record [MedianHI, IncarcerationRate, TotalPop]) (MR.ScaleAndUnscale Int)
+      sunXF = FL.premap (runcurryX (\x _ w -> (x,w))) $ MR.weightedScaleAndUnscale (MR.RescaleMedian 100) (MR.RescaleMedian 100) round
+      sunYF :: FL.Fold (F.Record [MedianHI, IncarcerationRate, TotalPop]) (MR.ScaleAndUnscale Double)
+      sunYF = FL.premap (runcurryX (\_ y w -> (y,w))) $ MR.weightedScaleAndUnscale (MR.RescaleGiven (0,0.01)) MR.RescaleNone id
       kmIncarcerationRatevsIncome proxy_ks = KM.kMeans proxy_ks dataProxy sunXF sunYF 10 KM.partitionCentroids KM.euclidSq
       (kmYrFrame, kmStateYrFrame, kmUrbYrFrame) =
         runIdentity {- $ flip evalStateT (pureMT 1)-} $ FL.foldM ((,,)
