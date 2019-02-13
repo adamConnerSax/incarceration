@@ -18,21 +18,21 @@ extra-source-files:  CHANGELOG.md
 Build-type: Simple
 
                      
-library incarceration-internal
-  exposed-modules: Html.Report
+--library incarceration-internal
+--  exposed-modules: Html.Report
 
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.11.1.0
-                     , aeson-pretty
-                     , bytestring
-                     , hvega
-                     , lucid
-                     , mtl
-                     , pandoc
-                     , text
-  hs-source-dirs:      src
-  default-language:    Haskell2010
+--  build-depends:       base >=4.11.1.0
+--                     , aeson-pretty
+--                     , bytestring
+--                     , hvega
+--                     , lucid
+--                     , mtl
+--                     , pandoc
+--                     , text
+--  hs-source-dirs:      src
+--  default-language:    Haskell2010
 
 --executable for-ihaskell
  -- ghc-options:
@@ -82,7 +82,6 @@ executable colorado-analysis
                      , Frames
                      , Frames-utils
                      , hvega
-                     , incarceration-internal
                      , lens
                      , lucid
                      , mtl
