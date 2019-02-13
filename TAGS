@@ -30,31 +30,31 @@ censusSAIPE_FP censusSAIPE_FP18,19
 
 ./explore-data/explore-data.hs,1023
 module Main Main13,14
-rates rates46,47
 rates rates47,48
-ratesByStateAndYear ratesByStateAndYear50,51
+rates rates48,49
 ratesByStateAndYear ratesByStateAndYear51,52
-ratesByUrbanicityAndYear ratesByUrbanicityAndYear56,57
+ratesByStateAndYear ratesByStateAndYear52,53
 ratesByUrbanicityAndYear ratesByUrbanicityAndYear57,58
-type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols62,63
---jailDataByStateAndYear --jailDataByStateAndYear64,65
-gRates gRates66,67
+ratesByUrbanicityAndYear ratesByUrbanicityAndYear58,59
+type CO_AnalysisVERA_Cols CO_AnalysisVERA_Cols63,64
+--jailDataByStateAndYear --jailDataByStateAndYear65,66
 gRates gRates67,68
-ratesByGenderAndYear ratesByGenderAndYear69,70
+gRates gRates68,69
 ratesByGenderAndYear ratesByGenderAndYear70,71
-type TrendsPovRow TrendsPovRow83,84
-trendsRowForPovertyAnalysis trendsRowForPovertyAnalysis86,87
+ratesByGenderAndYear ratesByGenderAndYear71,72
+type TrendsPovRow TrendsPovRow84,85
 trendsRowForPovertyAnalysis trendsRowForPovertyAnalysis87,88
-main main96,97
+trendsRowForPovertyAnalysis trendsRowForPovertyAnalysis88,89
 main main97,98
-aggregationAnalyses aggregationAnalyses110,111
+main main98,99
 aggregationAnalyses aggregationAnalyses111,112
-incomePovertyJoinData incomePovertyJoinData122,123
-maybeTest maybeTest148,149
+aggregationAnalyses aggregationAnalyses112,113
+incomePovertyJoinData incomePovertyJoinData123,124
 maybeTest maybeTest149,150
-fipsFilter fipsFilter151,152
-stateFilter stateFilter152,153
-yearFilter yearFilter153,154
+maybeTest maybeTest150,151
+fipsFilter fipsFilter152,153
+stateFilter stateFilter153,154
+yearFilter yearFilter154,155
 
 ./explore-data/colorado-analysis.hs,1568
 module Main Main18,19
@@ -84,20 +84,20 @@ reoffenseRate reoffenseRate149,150
 postedBondFreq postedBondFreq150,151
 bondVsCrimeAnalysis bondVsCrimeAnalysis153,154
 bondVsCrimeAnalysis bondVsCrimeAnalysis156,157
-cRVsMBRVL cRVsMBRVL316,317
-cRVsPBRVL cRVsPBRVL330,331
-rRVsMBRVL rRVsMBRVL344,345
---type --type360,361
-kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis361,362
-moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL404,405
-kMeansNotes kMeansNotes425,426
-transformF transformF439,440
-transformF transformF440,441
-type IndexCrimeRate IndexCrimeRate444,445
-type TotalBondRate TotalBondRate445,446
-indexCrimeRate indexCrimeRate446,447
-totalBondRate totalBondRate447,448
-kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis448,449
+cRVsMBRVL cRVsMBRVL309,310
+cRVsPBRVL cRVsPBRVL323,324
+rRVsMBRVL rRVsMBRVL337,338
+--type --type353,354
+kmMoneyBondPctAnalysis kmMoneyBondPctAnalysis354,355
+moneyBondPctVsPovertyRateVL moneyBondPctVsPovertyRateVL397,398
+kMeansNotes kMeansNotes418,419
+transformF transformF432,433
+transformF transformF433,434
+type IndexCrimeRate IndexCrimeRate437,438
+type TotalBondRate TotalBondRate438,439
+indexCrimeRate indexCrimeRate439,440
+totalBondRate totalBondRate440,441
+kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis441,442
 
 ./colorado-joins.hs,24
 module Main Main13,14
