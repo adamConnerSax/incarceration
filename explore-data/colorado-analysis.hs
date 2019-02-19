@@ -239,10 +239,10 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
     r4 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS2)) rData
     r5 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWTLS)) rData
 --    SL.log SL.Info $ "regression (by minimization) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r1)
-    SL.log SL.Info $ "regression (by OLS) results: " <> FR.prettyPrintRegressionResults (M.toList r2) 0.95
-    SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> FR.prettyPrintRegressionResults (M.toList r3) 0.95
-    SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> FR.prettyPrintRegressionResults (M.toList r4) 0.95
-    SL.log SL.Info $ "regression (counts by TLS) results: " <> FR.prettyPrintRegressionResults (M.toList r5) 0.95
+    SL.log SL.Info $ "regression (by OLS) results: " <> FR.prettyPrintRegressionResults FR.keyRecordText (M.toList r2) ST.cl95 FR.prettyPrintRegressionResult "\n"
+    SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> FR.prettyPrintRegressionResults FR.keyRecordText (M.toList r3) ST.cl95 FR.prettyPrintRegressionResult "\n"
+    SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> FR.prettyPrintRegressionResults FR.keyRecordText (M.toList r4) ST.cl95 FR.prettyPrintRegressionResult "\n"
+    SL.log SL.Info $ "regression (counts by TLS) results: " <> FR.prettyPrintRegressionResults FR.keyRecordText  (M.toList r5) ST.cl95 FR.prettyPrintRegressionResult "\n"
     let rData2016 = F.filterFrame ((== 2016) . F.rgetField @Year) $ F.toFrame rData
         regressionR = fromJust $ M.lookup (FT.recordSingleton @Year 2016) r4
     return $ (rData2016, regressionR, r4)    
@@ -299,11 +299,11 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
       HL.p_ "We can use linear regression to investigate the relationship between Crime Rate and the use of money and personal recognizance bonds. We begin by finding a best fit (using population-weighted least squares) to the model "
       H.latex_ "$c_i = cr (p_{i}) + A (pb_{i}) + e_{i}$" 
       HL.p_ "where, for each county (denoted by the subscipt i), c is the number of crimes, p is the population and pb is the number of posted bonds and e is an error term we seek to minimize. We look at the result for each of the years in the data:"
-    H.placeVisualization "regresssionCoeffs" $ FV.regressionCoefficientPlotMany (T.pack . show . F.rgetField @Year) "Regression Results (by year)" [" cr","A"] (M.toList (fmap FR.regressionResult regressionResMany)) 0.95
+    H.placeVisualization "regresssionCoeffs" $ FV.regressionCoefficientPlotMany (T.pack . show . F.rgetField @Year) "Regression Results (by year)" [" cr","A"] (M.toList (fmap FR.regressionResult regressionResMany)) ST.cl95
     HL.p_ "We look at these regressions directly by overlaying this model on the data itself:"
 --    H.placeVisualization "regresssionScatter"  $ FV.scatterWithFit @PostedBondPerCapita @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
 --    H.placeVisualization "regresssionScatter"  $ FV.scatterWithFit @PostedBondPerCapita @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
-    H.placeVisualization "regresssionScatter"  $ FV.scatterPlot "test scatter with fit" (Just "WLS") regressionRes 0.9999 rData
+    H.placeVisualization "regresssionScatter"  $ FV.frameScatterWithFit "test scatter with fit" (Just "WLS") regressionRes ST.cl95 rData
     kMeansNotes
   liftIO $ T.writeFile "analysis/moneyBondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
 

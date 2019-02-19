@@ -101,39 +101,3 @@ kmBondRatevsCrimeRateAnalysis kmBondRatevsCrimeRateAnalysis441,442
 
 ./colorado-joins.hs,24
 module Main Main13,14
-
-./src/Html/ReportTypeOfHtml.hs,441
-module Html.ReportHtml.Report5,6
-newtype HtmlT HtmlT25,26
-newtype HtmlT m i j a = HtmlT HtmlT25,26
-newtype HtmlT m i j a = HtmlT { unHtmlT unHtmlT25,26
-addSeqElement addSeqElement28,29
-addSeqElement addSeqElement29,30
-addChild addChild31,32
-addChild addChild32,33
---startReport --startReport34,35
---startReport --startReport35,36
-makeReportG makeReportG37,38
-makeReportG makeReportG38,39
-makeReport makeReport42,43
-
-./src/Html/Report.hs,669
-module Html.ReportHtml.Report3,4
-latexToHtml latexToHtml26,27
-latexToHtml latexToHtml27,28
-latex_ latex_35,36
-latex_ latex_36,37
-mathJaxScript mathJaxScript39,40
-mathJaxScript mathJaxScript40,41
-vegaScripts2 vegaScripts242,43
-vegaScripts2 vegaScripts243,44
-vegaScripts3 vegaScripts348,49
-vegaScripts3 vegaScripts349,50
-tufteSetup tufteSetup54,55
-tufteSetup tufteSetup55,56
-makeReportHtmlAsText makeReportHtmlAsText59,60
-makeReportHtmlAsText makeReportHtmlAsText60,61
-placeVisualization placeVisualization72,73
-placeVisualization placeVisualization73,74
-placeTextSection placeTextSection78,79
-placeTextSection placeTextSection79,80
