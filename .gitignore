@@ -18,3 +18,5 @@ notebooks/
 *.ipynb_checkpoints
 Rnotes/*.pdf
 .stack-work/
+TAGS
+.ghc.environment*

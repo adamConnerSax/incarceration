@@ -81,6 +81,7 @@ executable colorado-analysis
                      , foldl
                      , Frames
                      , Frames-utils
+                     , freer-simple
                      , hvega
                      , lens
                      , lucid
