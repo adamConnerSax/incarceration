@@ -94,10 +94,11 @@ type instance FI.VectorFor (Maybe a) = V.Vector
 main :: IO ()
 main = do
   -- create streams which are filtered to CO
-  let saveNamedDoc (NamedDoc n lt) = T.writeFile (T.unpack $ "analysis/" <> n <> ".html") $ TL.toStrict lt        
+  let writeNamedHtml (NamedDoc n lt) = T.writeFile (T.unpack $ "analysis/" <> n <> ".html") $ TL.toStrict lt
+      writeAllHtml = fmap (const ()) . join . fmap (traverse writeNamedHtml)
   startReal <- C.getTime C.Monotonic
   randomSrc <- newIORef (pureMT 1)
-  fmap (const ()) . join . fmap (traverse saveNamedDoc) $ FR.runM $ htmlToNamedText $ runRandomInBase randomSrc $ Log.logToStdout Log.nonDiagnostic $ do
+  writeAllHtml $ FR.runM $ htmlToNamedText $ runRandomInBase randomSrc $ Log.logToStdout Log.nonDiagnostic $ do
     Log.wrapPrefix "Main" $ do
       Log.log Log.Info "Creating data producers from CSV files"
       let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
@@ -187,21 +188,22 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length crimeStatsList) <> " rows in crimeStatsList (unmerged)."
   Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length mergedCrimeStatsFrame) <> " rows in crimeStatsFrame(merged)."
   let initialCentroidsF = KM.kMeansPPCentroids KM.euclidSq
-  let sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
+      sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       mbrAndCr r = moneyBondRate r F.<+> cRate r
+      fixClusters dp = fmap (KM.clusteredRows dp (F.rgetField @County))
   kmMergedCrimeRateVsMoneyBondRateByYear <- do
     let select = F.rcast @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
     Log.log Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (merged crime types)."    
-    flip FL.foldM kmData $ fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters @'[Year] dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   kmCrimeRateVsMoneyBondRateByYearAndType <- do
     let select = F.rcast @[Year,County,CrimeAgainst,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
         dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
     Log.log Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (separate crime types)."
-    flip FL.foldM kmData $ fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters @'[Year, CrimeAgainst] dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year, CrimeAgainst] dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   let sunPostedBondRateF = FL.premap (F.rgetField @PostedBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id      
       pbrAndCr r = postedBondRate r F.<+> cRate r
   kmMergedCrimeRateVsPostedBondRateByYear <- do
@@ -209,13 +211,13 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
     Log.log Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (merged)."
-    flip FL.foldM kmData $ fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters @'[Year] dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   kmCrimeRateVsPostedBondRateByYearAndType <- do      
     let select = F.rcast @[Year,County,CrimeAgainst,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
         dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
     Log.log Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (unmerged)."            
-    flip FL.foldM kmData $ fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters @'[Year,CrimeAgainst] dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year,CrimeAgainst] dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   let sunReoffenseRateF = FL.premap (F.rgetField @ReoffenseRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       rorAndMbr r = reoffenseRate r F.<+> moneyBondRate r
   kmReoffenseRateVsMergedMoneyBondRateByYear <- do
@@ -223,9 +225,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
         kmData = fmap (FT.mutate rorAndMbr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         dp = Proxy @[MoneyBondRate, ReoffenseRate, EstPopulation]
     Log.log Log.Info "Doing weighted-KMeans on re-offense rate vs. money-bond rate (merged)."            
-    flip FL.foldM kmData $ fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters @'[Year] dp sunMoneyBondRateF sunReoffenseRateF 10 10 initialCentroidsF KM.euclidSq
-
---      (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData 
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunMoneyBondRateF sunReoffenseRateF 10 10 initialCentroidsF KM.euclidSq
 
   -- regressions
   let rMut r = mbrAndCr r F.<+> postedBondFreq r F.<+> postedBondRate r F.<+> postedBondPerCapita r

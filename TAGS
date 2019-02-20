@@ -68,22 +68,22 @@ type instance instance91,92
 type instance FI.VectorFor FI.VectorFor91,92
 main main93,94
 main main94,95
-type MoneyBondRate MoneyBondRate144,145
-type PostedBondRate PostedBondRate145,146
-type PostedBondPerCapita PostedBondPerCapita146,147
-type ReoffenseRate ReoffenseRate147,148
-type PostedBondFreq PostedBondFreq148,149
-type CrimeRateError CrimeRateError149,150
-type CrimeRateFitted CrimeRateFitted150,151
-type CrimeRateFittedErr CrimeRateFittedErr151,152
-moneyBondRate moneyBondRate153,154
-postedBondRate postedBondRate154,155
-postedBondPerCapita postedBondPerCapita155,156
-cRate cRate156,157
-reoffenseRate reoffenseRate157,158
-postedBondFreq postedBondFreq158,159
-bondVsCrimeAnalysis bondVsCrimeAnalysis161,162
-bondVsCrimeAnalysis bondVsCrimeAnalysis167,168
+type MoneyBondRate MoneyBondRate145,146
+type PostedBondRate PostedBondRate146,147
+type PostedBondPerCapita PostedBondPerCapita147,148
+type ReoffenseRate ReoffenseRate148,149
+type PostedBondFreq PostedBondFreq149,150
+type CrimeRateError CrimeRateError150,151
+type CrimeRateFitted CrimeRateFitted151,152
+type CrimeRateFittedErr CrimeRateFittedErr152,153
+moneyBondRate moneyBondRate154,155
+postedBondRate postedBondRate155,156
+postedBondPerCapita postedBondPerCapita156,157
+cRate cRate157,158
+reoffenseRate reoffenseRate158,159
+postedBondFreq postedBondFreq159,160
+bondVsCrimeAnalysis bondVsCrimeAnalysis162,163
+bondVsCrimeAnalysis bondVsCrimeAnalysis168,169
 cRVsMBRVL cRVsMBRVL316,317
 cRVsPBRVL cRVsPBRVL330,331
 rRVsMBRVL rRVsMBRVL344,345
