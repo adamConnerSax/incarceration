@@ -2,19 +2,19 @@
 {-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE DeriveGeneric        #-}
 {-# LANGUAGE FlexibleContexts     #-}
-{-# LANGUAGE FlexibleInstances    #-}
-{-# LANGUAGE GADTs                #-}
-{-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE PolyKinds            #-}
-{-# LANGUAGE QuasiQuotes          #-}
-{-# LANGUAGE RankNTypes           #-}
-{-# LANGUAGE ScopedTypeVariables  #-}
-{-# LANGUAGE TemplateHaskell      #-}
-{-# LANGUAGE TypeApplications     #-}
-{-# LANGUAGE TypeFamilies         #-}
-{-# LANGUAGE TypeOperators        #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE GADTs                     #-}
+{-# LANGUAGE OverloadedStrings         #-}
+{-# LANGUAGE PolyKinds                 #-}
+{-# LANGUAGE QuasiQuotes               #-}
+{-# LANGUAGE RankNTypes                #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE TemplateHaskell           #-}
+{-# LANGUAGE TypeApplications          #-}
+{-# LANGUAGE TypeFamilies              #-}
+{-# LANGUAGE TypeOperators             #-}
+{-# LANGUAGE UndecidableInstances      #-}
+{-# LANGUAGE AllowAmbiguousTypes       #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 module Main where
 
@@ -30,12 +30,18 @@ import qualified Frames.Table               as Table
 import qualified Math.Rescale               as MR
 import qualified Math.Regression.LeastSquares as LS
 import qualified Math.Regression.Regression as RE
-import qualified System.PipesLogger         as SL
+
+import qualified Control.Monad.Freer        as FR
+import qualified Control.Monad.Freer.Logger as Log
+import           Control.Monad.Freer.Html   (Html, HtmlDocs, NamedDoc (..), html, newHtmlDoc, htmlToNamedText)
+import           Control.Monad.Freer.Random (Random, rvar, runRandomInBase)
+
 import qualified Html.Report                as H
 
 import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
-import           Control.Monad.IO.Class     (liftIO)
+import           Control.Monad              (join)
+import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.State (evalStateT, MonadState (..))
 import           Control.Lens ((%~),(^.))
 import           Data.Bool                  (bool)
@@ -57,6 +63,7 @@ import qualified Data.Vinyl.XRec            as V
 import           Data.Vinyl.Curry           (runcurryX)
 import qualified Data.Vinyl.Functor         as V
 import qualified Data.Vinyl.Class.Method    as V
+import qualified Data.Vinyl.TypeLevel       as V
 import           Data.Vinyl.Lens            (type (∈))
 import           Frames                     ((:.), (&:))
 import qualified Frames                     as F
@@ -87,11 +94,13 @@ type instance FI.VectorFor (Maybe a) = V.Vector
 main :: IO ()
 main = do
   -- create streams which are filtered to CO
+  let writeNamedHtml (NamedDoc n lt) = T.writeFile (T.unpack $ "analysis/" <> n <> ".html") $ TL.toStrict lt
+      writeAllHtml = fmap (const ()) . join . fmap (traverse writeNamedHtml)
   startReal <- C.getTime C.Monotonic
   randomSrc <- newIORef (pureMT 1)
-  flip (R.runRVarTWith id) randomSrc $ SL.runLoggerIO SL.nonDiagnostic $ do
-    SL.wrapPrefix "Main" $ do
-      SL.log SL.Info "Creating data producers from CSV files"
+  writeAllHtml $ FR.runM $ htmlToNamedText $ runRandomInBase randomSrc $ Log.logToStdout Log.nonDiagnostic $ do
+    Log.wrapPrefix "Main" $ do
+      Log.log Log.Info "Creating data producers from CSV files"
       let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
           veraData :: F.MonadSafe m => P.Producer (FM.MaybeRow IncarcerationTrends)  m ()
           veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (FA.filterMaybeField (Proxy @State) "CO")
@@ -108,29 +117,29 @@ main = do
           crimeStatsCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CrimeStatsCO) m ()
           crimeStatsCO_Data = F.readTableMaybeOpt parserOptions crimeStatsCO_FP
       -- load streams into memory for joins, subsetting as we go
-      SL.log SL.Info "loading producers into memory for joining"
+      Log.log Log.Info "loading producers into memory for joining"
       fipsByCountyFrame <- liftIO $ F.inCoreAoS $ fipsByCountyData P.>-> P.map (F.rcast @[Fips,County]) -- get rid of state col
       povertyFrame <- liftIO $ F.inCoreAoS $ povertyData P.>-> P.map (F.rcast @[Fips, Year, MedianHI,MedianHIMOE,PovertyR])
       countyBondFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeEffect $ P.toListM countyBondCO_Data
       veraFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeEffect $ P.toListM $ veraData P.>-> P.map (F.rcast @[Fips,Year,TotalPop,Urbanicity,IndexCrime])
       countyDistrictFrame <- liftIO $F.inCoreAoS countyDistrictCO_Data
-      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length fipsByCountyFrame) <> " rows in fipsByCountyFrame."
-      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length povertyFrame) <> " rows in povertyFrame."
-      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyBondFrameM) <> " rows in countyBondFrameM."
-      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length veraFrameM) <> " rows in veraFrameM."
-      SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyDistrictFrame) <> " rows in countyDistrictFrame."
+      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length fipsByCountyFrame) <> " rows in fipsByCountyFrame."
+      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length povertyFrame) <> " rows in povertyFrame."
+      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyBondFrameM) <> " rows in countyBondFrameM."
+      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length veraFrameM) <> " rows in veraFrameM."
+      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyDistrictFrame) <> " rows in countyDistrictFrame."
     -- do joins
-      SL.log SL.Info $ "Doing initial the joins..."
+      Log.log Log.Info $ "Doing initial the joins..."
       let countyBondPlusFIPS = FM.leftJoinMaybe (Proxy @'[County]) countyBondFrameM (justsFromRec <$> fipsByCountyFrame)
           countyBondPlusFIPSAndDistrict = FM.leftJoinMaybe (Proxy @'[County]) (F.boxedFrame countyBondPlusFIPS) (justsFromRec <$> countyDistrictFrame)
           countyBondPlusFIPSAndSAIPE = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndDistrict) (justsFromRec <$> povertyFrame)
           countyBondPlusFIPSAndSAIPEAndVera = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndSAIPE) veraFrameM      
-      kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
-      bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
+      newHtmlDoc "moneyBondRateAndPovertyRate" $ kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
+      newHtmlDoc "moneyBondRateAndCrimeRate" $ bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
       endReal <- liftIO $ C.getTime C.Monotonic
       let realTime = C.diffTimeSpec endReal startReal
           printTime (C.TimeSpec s ns) = (T.pack $ show $ realToFrac s + realToFrac ns/(10^9)) 
-      SL.log SL.Info $ "Time (real): " <> printTime realTime <> "s" 
+      Log.log Log.Info $ "Time (real): " <> printTime realTime <> "s" 
       return ()
 
 -- CrimeRate is defined in DataSources since we use it in more places
@@ -151,11 +160,14 @@ reoffenseRate r = FT.recordSingleton @ReoffenseRate $ (r ^. moneyNewYes + r ^. p
 postedBondFreq r = FT.recordSingleton @PostedBondFreq $ (r ^. moneyPosted + r ^. prPosted)
 
 
-bondVsCrimeAnalysis :: (P.MonadIO m, MonadRandom m)
+bondVsCrimeAnalysis :: forall effs. ( MonadIO (FR.Eff effs)
+                                    , MonadRandom (FR.Eff effs)
+                                    , FR.Members '[Log.Logger, Html, Random] effs)
                     => P.Producer (FM.MaybeRow CountyBondCO) (F.SafeT IO) ()
-                    -> P.Producer (FM.MaybeRow CrimeStatsCO) (F.SafeT IO) () -> SL.Logger m ()
-bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix "BondRateVsCrimeRate" $ do
-  SL.log SL.Info "Doing bond rate vs crime rate analysis..."
+                    -> P.Producer (FM.MaybeRow CrimeStatsCO) (F.SafeT IO) ()
+                    -> FR.Eff effs ()
+bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefix "BondRateVsCrimeRate" $ do
+  Log.log Log.Info "Doing bond rate vs crime rate analysis..."
   countyBondFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeT $ P.toListM bondDataMaybeProducer
   let blanksToZeroes :: F.Rec (Maybe :. F.ElField) '[Crimes,Offenses] -> F.Rec (Maybe :. F.ElField) '[Crimes,Offenses]
       blanksToZeroes = FM.fromMaybeMono 0
@@ -172,57 +184,52 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
       mergedBondDataFrame = FL.fold foldAllBonds countyBondFrameM
       countyBondAndCrimeMerged = F.leftJoin @[County,Year] mergedBondDataFrame mergedCrimeStatsFrame
       countyBondAndCrimeUnmerged = F.leftJoin @[County,Year] mergedBondDataFrame unmergedCrimeStatsFrame
-  SL.log SL.Info "Joined crime data and bond data"    
-  SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length crimeStatsList) <> " rows in crimeStatsList (unmerged)."
-  SL.log SL.Diagnostic $ (T.pack $ show $ FL.fold FL.length mergedCrimeStatsFrame) <> " rows in crimeStatsFrame(merged)."
+  Log.log Log.Info "Joined crime data and bond data"    
+  Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length crimeStatsList) <> " rows in crimeStatsList (unmerged)."
+  Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length mergedCrimeStatsFrame) <> " rows in crimeStatsFrame(merged)."
   let initialCentroidsF = KM.kMeansPPCentroids KM.euclidSq
-  let sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
+      sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
-      kmCrimeRateVsMoneyBondRate proxy_ks =
-        let dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
-        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
       mbrAndCr r = moneyBondRate r F.<+> cRate r
+      fixClusters dp = fmap (KM.clusteredRows dp (F.rgetField @County))
   kmMergedCrimeRateVsMoneyBondRateByYear <- do
     let select = F.rcast @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
-    SL.log SL.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (merged crime types)."    
-    FL.foldM (kmCrimeRateVsMoneyBondRate (Proxy @'[Year])) kmData       
+        dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
+    Log.log Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (merged crime types)."    
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   kmCrimeRateVsMoneyBondRateByYearAndType <- do
     let select = F.rcast @[Year,County,CrimeAgainst,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
-    SL.log SL.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (separate crime types)."        
-    FL.foldM (kmCrimeRateVsMoneyBondRate (Proxy @[Year,CrimeAgainst])) kmData 
+        dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
+    Log.log Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (separate crime types)."
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year, CrimeAgainst] dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   let sunPostedBondRateF = FL.premap (F.rgetField @PostedBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id      
       pbrAndCr r = postedBondRate r F.<+> cRate r
-      kmCrimeRateVsPostedBondRate proxy_ks =
-        let dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
-        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   kmMergedCrimeRateVsPostedBondRateByYear <- do
     let select = F.rcast @[Year,County,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
-    SL.log SL.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (merged)."    
-    FL.foldM (kmCrimeRateVsPostedBondRate (Proxy @'[Year])) kmData 
-        
+        dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
+    Log.log Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (merged)."
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   kmCrimeRateVsPostedBondRateByYearAndType <- do      
     let select = F.rcast @[Year,County,CrimeAgainst,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
-    SL.log SL.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (unmerged)."            
-    FL.foldM (kmCrimeRateVsPostedBondRate (Proxy @[Year,CrimeAgainst])) kmData
-    
+        dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
+    Log.log Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (unmerged)."            
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year,CrimeAgainst] dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   let sunReoffenseRateF = FL.premap (F.rgetField @ReoffenseRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
-      rorAndMbr r = reoffenseRate r F.<+> moneyBondRate r 
-      kmReoffenseRatevsMoneyBondRate proxy_ks =
-        let dp = Proxy @[MoneyBondRate, ReoffenseRate, EstPopulation]
-        in fmap (KM.clusteredRows dp (F.rgetField @County)) $ KM.kMeansWithClusters proxy_ks dp sunMoneyBondRateF sunReoffenseRateF 10 10 initialCentroidsF KM.euclidSq
+      rorAndMbr r = reoffenseRate r F.<+> moneyBondRate r
   kmReoffenseRateVsMergedMoneyBondRateByYear <- do
     let select = F.rcast @[Year, County, MoneyNewYes, PrNewYes, MoneyPosted, PrPosted, TotalBondFreq, MoneyBondFreq, EstPopulation]
         kmData = fmap (FT.mutate rorAndMbr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
-    SL.log SL.Info "Doing weighted-KMeans on re-offense rate vs. money-bond rate (merged)."            
-    FL.foldM (kmReoffenseRatevsMoneyBondRate (Proxy @'[Year])) kmData 
+        dp = Proxy @[MoneyBondRate, ReoffenseRate, EstPopulation]
+    Log.log Log.Info "Doing weighted-KMeans on re-offense rate vs. money-bond rate (merged)."            
+    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunMoneyBondRateF sunReoffenseRateF 10 10 initialCentroidsF KM.euclidSq
 
   -- regressions
   let rMut r = mbrAndCr r F.<+> postedBondFreq r F.<+> postedBondRate r F.<+> postedBondPerCapita r
-  (errF, fitF, rData, regressionRes, regressionResMany) <- do
+  (rData, regressionRes, regressionResMany) <- do
     let select = F.rcast @[Year,MoneyBondFreq,PrBondFreq,PrPosted,MoneyPosted,TotalBondFreq,Crimes,EstPopulation]
         rData = fmap (FT.mutate rMut) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
         guess = [0,0] -- guess has one extra dimension for constant
@@ -232,34 +239,25 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
         regressOneWLS2 = FR.varWeightedLeastSquares @Crimes @False @'[EstPopulation, PostedBondFreq] @EstPopulation
         regressOneWTLS = FR.varWeightedTLS @Crimes @False @'[EstPopulation, PostedBondFreq] @EstPopulation
         
-    SL.log SL.Info "Regressing Crime Rate on Money Bond Rate"
+    Log.log Log.Info "Regressing Crime Rate on Money Bond Rate"
     let r1 = FL.fold (FL.Fold (FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) []) M.empty (fmap regressOneBM)) rData
     r2 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneOLS)) rData
     r3 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS)) rData
     r4 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWLS2)) rData
     r5 <- FL.foldM (FL.FoldM (\m -> return . FA.aggregateGeneral V.Identity (F.rcast @'[Year]) (flip (:)) [] m) (return M.empty) (traverse regressOneWTLS)) rData
---    SL.log SL.Info $ "regression (by minimization) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r1)
-    SL.log SL.Info $ "regression (by OLS) results: " <> FR.prettyPrintRegressionResults (M.toList r2) 0.95
-    SL.log SL.Info $ "regression (rates by pop weighted LS) results: " <> FR.prettyPrintRegressionResults (M.toList r3) 0.95
-    SL.log SL.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> FR.prettyPrintRegressionResults (M.toList r4) 0.95
-    SL.log SL.Info $ "regression (counts by TLS) results: " <> FR.prettyPrintRegressionResults (M.toList r5) 0.95
+--    Log.log Log.Info $ "regression (by minimization) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r1)
+    Log.log Log.Info $ "regression (by OLS) results: " <> FR.prettyPrintRegressionResults FR.keyRecordText (M.toList r2) ST.cl95 FR.prettyPrintRegressionResult "\n"
+    Log.log Log.Info $ "regression (rates by pop weighted LS) results: " <> FR.prettyPrintRegressionResults FR.keyRecordText (M.toList r3) ST.cl95 FR.prettyPrintRegressionResult "\n"
+    Log.log Log.Info $ "regression (counts by inv sqrt pop weighted LS) results: " <> FR.prettyPrintRegressionResults FR.keyRecordText (M.toList r4) ST.cl95 FR.prettyPrintRegressionResult "\n"
+    Log.log Log.Info $ "regression (counts by TLS) results: " <> FR.prettyPrintRegressionResults FR.keyRecordText  (M.toList r5) ST.cl95 FR.prettyPrintRegressionResult "\n"
     let rData2016 = F.filterFrame ((== 2016) . F.rgetField @Year) $ F.toFrame rData
-        regressionR = fromJust $ M.lookup (FT.recordSingleton @Year 2016) r4 
-        fit = fmap (ST.estPoint) $ RE.parameterEstimates (FR.regressionResult regressionR)
-        crimeRateFitF r =
-          let pop = realToFrac $ F.rgetField @EstPopulation r
-              pbf = realToFrac $ F.rgetField @PostedBondFreq r
-          in ((fit List.!! 0) + pbf * (fit List.!! 1)/pop, 0.02)
-        crimeRateErrorF r =
-          let crs = realToFrac $ F.rgetField @Crimes r
-              pop = realToFrac $ F.rgetField @EstPopulation r
-          in (sqrt crs)/pop           
-    return $ (crimeRateErrorF, crimeRateFitF, rData2016, regressionR, r4)    
---    SL.log SL.Info $ "data=\n" <> Table.textTable rData
+        regressionR = fromJust $ M.lookup (FT.recordSingleton @Year 2016) r4
+    return $ (rData2016, regressionR, r4)    
+--    Log.log Log.Info $ "data=\n" <> Table.textTable rData
     
 
-  SL.log SL.Info "Creating Html"
-  htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bond Rate vs Crime rate" $ do
+  Log.log Log.Info "Creating Html"
+  html $ H.makeReportHtml "Colorado Money Bond Rate vs Crime rate" $ do
     H.placeTextSection $ do
       HL.h2_ "Colorado Bond Rates and Crime Rates (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
@@ -308,11 +306,13 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = SL.wrapPrefix
       HL.p_ "We can use linear regression to investigate the relationship between Crime Rate and the use of money and personal recognizance bonds. We begin by finding a best fit (using population-weighted least squares) to the model "
       H.latex_ "$c_i = cr (p_{i}) + A (pb_{i}) + e_{i}$" 
       HL.p_ "where, for each county (denoted by the subscipt i), c is the number of crimes, p is the population and pb is the number of posted bonds and e is an error term we seek to minimize. We look at the result for each of the years in the data:"
-    H.placeVisualization "regresssionCoeffs" $ FV.regressionCoefficientPlotMany (T.pack . show . F.rgetField @Year) "Regression Results (by year)" [" cr","A"] (M.toList (fmap FR.regressionResult regressionResMany)) 0.95
+    H.placeVisualization "regresssionCoeffs" $ FV.regressionCoefficientPlotMany (T.pack . show . F.rgetField @Year) "Regression Results (by year)" [" cr","A"] (M.toList (fmap FR.regressionResult regressionResMany)) ST.cl95
     HL.p_ "We look at these regressions directly by overlaying this model on the data itself:"
-    H.placeVisualization "regresssionScatter"  $ FV.scatterWithFit @PostedBondPerCapita @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
+--    H.placeVisualization "regresssionScatter"  $ FV.scatterWithFit @PostedBondPerCapita @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
+--    H.placeVisualization "regresssionScatter"  $ FV.scatterWithFit @PostedBondPerCapita @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
+    H.placeVisualization "regresssionScatter"  $ FV.frameScatterWithFit "test scatter with fit" (Just "WLS") regressionRes ST.cl95 rData
     kMeansNotes
-  liftIO $ T.writeFile "analysis/moneyBondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
+--  liftIO $ T.writeFile "analysis/moneyBondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
 
 cRVsMBRVL mergedOffenseAgainst dataRecords =
   let dat = FV.recordsToVLData (transformF @MoneyBondRate (*100) . transformF @CrimeRate (*100)) dataRecords
@@ -359,8 +359,8 @@ rRVsMBRVL mergedOffenseAgainst dataRecords =
         
 -- NB: The data has two rows for each county and year, one for misdemeanors and one for felonies.
 --type MoneyPct = "moneyPct" F.:-> Double --F.declareColumn "moneyPct" ''Double
-kmMoneyBondPctAnalysis joinedData = SL.wrapPrefix "MoneyBondVsPoverty" $ do
-  SL.log SL.Info "Doing money bond % vs poverty rate analysis..."
+kmMoneyBondPctAnalysis joinedData = Log.wrapPrefix "MoneyBondVsPoverty" $ do
+  Log.log Log.Info "Doing money bond % vs poverty rate analysis..."
   let select = F.rcast @[Year,County,OffType,Urbanicity,PovertyR, MoneyBondFreq,TotalBondFreq,TotalPop]
       mutation r = moneyBondRate r 
       kmData = fmap (FT.mutate mutation) . catMaybes $ fmap (F.recMaybe . select) joinedData
@@ -372,8 +372,8 @@ kmMoneyBondPctAnalysis joinedData = SL.wrapPrefix "MoneyBondVsPoverty" $ do
   (kmByYear, kmByYearUrb) <- FL.foldM ((,)
                                         <$> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType])
                                         <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType,Urbanicity])) kmData
-  SL.log SL.Info "Creating Html"
-  htmlAsText <- H.makeReportHtmlAsText "Colorado Money Bonds and Poverty" $ do    
+  Log.log Log.Info "Creating Html"
+  html $ H.makeReportHtml "Colorado Money Bonds and Poverty" $ do    
     H.placeTextSection $ do
       HL.h2_ "Colorado Money Bond Rate and Poverty (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
@@ -400,7 +400,7 @@ kmMoneyBondPctAnalysis joinedData = SL.wrapPrefix "MoneyBondVsPoverty" $ do
           HL.span_ " data. In the repo "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/county_bond_saipe_vera_data.csv"] "here."
     kMeansNotes
-  liftIO $ T.writeFile "analysis/moneyBondRateAndPovertyRate.html" $ TL.toStrict $ htmlAsText
+--  liftIO $ T.writeFile "analysis/moneyBondRateAndPovertyRate.html" $ TL.toStrict $ htmlAsText
 
 moneyBondPctVsPovertyRateVL facetByUrb dataRecords =
   let dat = FV.recordsToVLData (transformF @MoneyBondRate (*100)) dataRecords
