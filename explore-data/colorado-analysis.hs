@@ -33,7 +33,7 @@ import qualified Math.Regression.Regression as RE
 import qualified Control.Monad.Freer        as FR
 import qualified Control.Monad.Freer.Logger as Log
 --import           Control.Monad.Freer.Html   (Html, HtmlDocs, NamedDoc (..), html, newHtmlDoc, htmlToNamedText)
-import           Control.Monad.Freer.Random (Random, rvar, runRandomInBase)
+import           Control.Monad.Freer.Random (Random, runRandomInIO)
 import qualified Control.Monad.Freer.Pandoc as PD
 import qualified Control.Monad.Freer.PandocMonad as PD
 import           Control.Monad.Freer.Docs        (toNamedDocList)
@@ -110,7 +110,7 @@ main = do
       pandocToBlaze = fmap BH.renderHtml . PD.toBlazeDocument (Just "pandoc-templates/minWithVega-pandoc.html") templateVars PD.mindocOptionsF
   startReal <- C.getTime C.Monotonic
   randomSrc <- newIORef (pureMT 1)
-  let runAll = PD.runPandocAndLoggingToIO Log.logAll . Log.wrapPrefix "Main" . join. fmap (traverse (traverse pandocToBlaze)) . toNamedDocList 
+  let runAll = PD.runPandocAndLoggingToIO Log.logAll . Log.wrapPrefix "Main" . runRandomInIO . join . fmap (traverse (traverse pandocToBlaze)) . toNamedDocList 
 --  writeAllHtml $ FR.runM $ htmlToNamedText $ runRandomInBase randomSrc $ Log.logToStdout Log.nonDiagnostic $ do
   eitherDocs :: Either PD.PandocError [PD.NamedDoc TL.Text] <- runAll $ do
     Log.log Log.Info "Creating data producers from CSV files"
