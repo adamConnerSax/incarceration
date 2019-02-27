@@ -27,45 +27,32 @@ import qualified Frames.VegaLite            as FV
 import qualified Frames.Transform           as FT
 import qualified Frames.Table               as Table
 import qualified Math.Rescale               as MR
-import qualified Math.Regression.LeastSquares as LS
-import qualified Math.Regression.Regression as RE
 
 import qualified Control.Monad.Freer        as FR
 import qualified Control.Monad.Freer.Logger as Log
 --import           Control.Monad.Freer.Html   (Html, HtmlDocs, NamedDoc (..), html, newHtmlDoc, htmlToNamedText)
-import           Control.Monad.Freer.Random (Random, runRandomInIO)
+import           Control.Monad.Freer.Random (Random, runRandomIOPureMT)
 import qualified Control.Monad.Freer.Pandoc as PD
 import qualified Control.Monad.Freer.PandocMonad as PD
-import           Control.Monad.Freer.Docs        (toNamedDocList)
+import           Control.Monad.Freer.Docs        (toNamedDocListWithM)
 import qualified Text.Pandoc.Report              as PD
 import qualified Html.Lucid.Report                as H
 
-import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
-import           Control.Monad              (join)
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
-import           Control.Monad.State (evalStateT, MonadState (..))
 import           Control.Lens ((%~),(^.))
 import           Data.Bool                  (bool)
-import           Data.Functor.Identity      (runIdentity)
-import           Data.IORef                 (newIORef)
-import qualified Data.List                  as  List
 import qualified Data.Map                   as M
-import           Data.Maybe                 (catMaybes, fromMaybe, fromJust)
+import           Data.Maybe                 (catMaybes, fromJust)
 import           Data.Monoid                ((<>))
 import           Data.Proxy                 (Proxy (..))
-import           Data.Text                  (Text)
 import qualified Data.Text                  as T
 import qualified Data.Text.IO               as T
 import qualified Data.Text.Lazy             as TL
 import qualified Data.Vector                as V
-import qualified Data.Vector.Storable       as VS
 import qualified Data.Vinyl                 as V
-import qualified Data.Vinyl.XRec            as V
-import           Data.Vinyl.Curry           (runcurryX)
 import qualified Data.Vinyl.Functor         as V
 import qualified Data.Vinyl.Class.Method    as V
-import qualified Data.Vinyl.TypeLevel       as V
 import           Data.Vinyl.Lens            (type (∈))
 import           Frames                     ((:.), (&:))
 import qualified Frames                     as F
@@ -99,7 +86,7 @@ templateVars = M.fromList
     ("lang", "English")
   , ("author", "Adam Conner-Sax")
   , ("pagetitle", "Colorado Incarceration Data Analysis")
---  , ("tufte","True")
+  , ("tufte","True")
   ]
 
 main :: IO ()
@@ -109,9 +96,10 @@ main = do
       writeAllHtml = fmap (const ()) . traverse writeNamedHtml
       pandocToBlaze = fmap BH.renderHtml . PD.toBlazeDocument (Just "pandoc-templates/minWithVega-pandoc.html") templateVars PD.mindocOptionsF
   startReal <- C.getTime C.Monotonic
-  randomSrc <- newIORef (pureMT 1)
-  let runAll = PD.runPandocAndLoggingToIO Log.logAll . Log.wrapPrefix "Main" . runRandomInIO . join . fmap (traverse (traverse pandocToBlaze)) . toNamedDocList 
---  writeAllHtml $ FR.runM $ htmlToNamedText $ runRandomInBase randomSrc $ Log.logToStdout Log.nonDiagnostic $ do
+  let runAll = PD.runPandocAndLoggingToIO Log.logAll -- runs Logging, Error PandocError, and PandocMonad, all required for Pandoc
+               . runRandomIOPureMT (pureMT 1) -- runs Random
+               . toNamedDocListWithM pandocToBlaze -- runs (Docs Pandoc)
+               . Log.wrapPrefix "Main"
   eitherDocs :: Either PD.PandocError [PD.NamedDoc TL.Text] <- runAll $ do
     Log.log Log.Info "Creating data producers from CSV files"
     let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }

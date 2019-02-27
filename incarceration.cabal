@@ -50,7 +50,7 @@ executable explore-data
 
 
 executable colorado-analysis
-  ghc-options:         -O0 
+  ghc-options:         -O0 -Wall
   main-is:             colorado-analysis.hs
   other-modules:       DataSourcePaths
                      , DataSources
