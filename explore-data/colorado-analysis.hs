@@ -24,7 +24,6 @@ import qualified Frames.KMeans              as KM
 import qualified Frames.Regression          as FR
 import qualified Frames.MaybeUtils          as FM
 import qualified Frames.VegaLite            as FV
-import qualified Frames.VegaLiteTemplates   as FV
 import qualified Frames.Transform           as FT
 import qualified Frames.Table               as Table
 import qualified Math.Rescale               as MR
@@ -33,10 +32,13 @@ import qualified Math.Regression.Regression as RE
 
 import qualified Control.Monad.Freer        as FR
 import qualified Control.Monad.Freer.Logger as Log
-import           Control.Monad.Freer.Html   (Html, HtmlDocs, NamedDoc (..), html, newHtmlDoc, htmlToNamedText)
+--import           Control.Monad.Freer.Html   (Html, HtmlDocs, NamedDoc (..), html, newHtmlDoc, htmlToNamedText)
 import           Control.Monad.Freer.Random (Random, rvar, runRandomInBase)
-
-import qualified Html.Report                as H
+import qualified Control.Monad.Freer.Pandoc as PD
+import qualified Control.Monad.Freer.PandocMonad as PD
+import           Control.Monad.Freer.Docs        (toNamedDocList)
+import qualified Text.Pandoc.Report              as PD
+import qualified Html.Lucid.Report                as H
 
 import           Control.Arrow              ((&&&))
 import qualified Control.Foldl              as FL
@@ -74,6 +76,7 @@ import qualified Graphics.Vega.VegaLite     as GV
 import qualified Pipes                      as P
 import qualified Pipes.Prelude              as P
 import qualified Lucid                      as HL
+import qualified Text.Blaze.Html.Renderer.Text as BH
 import           Data.Random.Source.PureMT as R
 import           Data.Random as R
 import qualified System.Clock as C
@@ -91,56 +94,69 @@ rDiv a b = realToFrac a/realToFrac b
 
 type instance FI.VectorFor (Maybe a) = V.Vector
 
+templateVars = M.fromList
+  [
+    ("lang", "English")
+  , ("author", "Adam Conner-Sax")
+  , ("pagetitle", "Colorado Incarceration Data Analysis")
+--  , ("tufte","True")
+  ]
+
 main :: IO ()
 main = do
   -- create streams which are filtered to CO
-  let writeNamedHtml (NamedDoc n lt) = T.writeFile (T.unpack $ "analysis/" <> n <> ".html") $ TL.toStrict lt
-      writeAllHtml = fmap (const ()) . join . fmap (traverse writeNamedHtml)
+  let writeNamedHtml (PD.NamedDoc n lt) = T.writeFile (T.unpack $ "analysis/" <> n <> ".html") $ TL.toStrict lt
+      writeAllHtml = fmap (const ()) . traverse writeNamedHtml
+      pandocToBlaze = fmap BH.renderHtml . PD.toBlazeDocument (Just "pandoc-templates/minWithVega-pandoc.html") templateVars PD.mindocOptionsF
   startReal <- C.getTime C.Monotonic
   randomSrc <- newIORef (pureMT 1)
-  writeAllHtml $ FR.runM $ htmlToNamedText $ runRandomInBase randomSrc $ Log.logToStdout Log.nonDiagnostic $ do
-    Log.wrapPrefix "Main" $ do
-      Log.log Log.Info "Creating data producers from CSV files"
-      let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
-          veraData :: F.MonadSafe m => P.Producer (FM.MaybeRow IncarcerationTrends)  m ()
-          veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (FA.filterMaybeField (Proxy @State) "CO")
-          povertyData :: F.MonadSafe m => P.Producer SAIPE m ()
-          povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (FA.filterField (Proxy @Abbreviation) "CO")
-          fipsByCountyData :: F.MonadSafe m => P.Producer FIPSByCountyRenamed m ()
-          fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (FA.filterField (Proxy @State) "CO")
-          -- NB: This data has 2 rows per county, one for misdemeanors, one for felonies
-          countyBondCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CountyBondCO) m ()
-          countyBondCO_Data = F.readTableMaybeOpt parserOptions countyBondCO_FP
-          countyDistrictCO_Data :: F.MonadSafe m => P.Producer CountyDistrictCO m ()
-          countyDistrictCO_Data = F.readTableOpt parserOptions countyDistrictCrosswalkCO_FP
-          -- This data has 3 rows per county and year, one for each type of crime (against persons, against property, against society)
-          crimeStatsCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CrimeStatsCO) m ()
-          crimeStatsCO_Data = F.readTableMaybeOpt parserOptions crimeStatsCO_FP
-      -- load streams into memory for joins, subsetting as we go
-      Log.log Log.Info "loading producers into memory for joining"
-      fipsByCountyFrame <- liftIO $ F.inCoreAoS $ fipsByCountyData P.>-> P.map (F.rcast @[Fips,County]) -- get rid of state col
-      povertyFrame <- liftIO $ F.inCoreAoS $ povertyData P.>-> P.map (F.rcast @[Fips, Year, MedianHI,MedianHIMOE,PovertyR])
-      countyBondFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeEffect $ P.toListM countyBondCO_Data
-      veraFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeEffect $ P.toListM $ veraData P.>-> P.map (F.rcast @[Fips,Year,TotalPop,Urbanicity,IndexCrime])
-      countyDistrictFrame <- liftIO $F.inCoreAoS countyDistrictCO_Data
-      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length fipsByCountyFrame) <> " rows in fipsByCountyFrame."
-      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length povertyFrame) <> " rows in povertyFrame."
-      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyBondFrameM) <> " rows in countyBondFrameM."
-      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length veraFrameM) <> " rows in veraFrameM."
-      Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyDistrictFrame) <> " rows in countyDistrictFrame."
+  let runAll = PD.runPandocAndLoggingToIO Log.logAll . Log.wrapPrefix "Main" . join. fmap (traverse (traverse pandocToBlaze)) . toNamedDocList 
+--  writeAllHtml $ FR.runM $ htmlToNamedText $ runRandomInBase randomSrc $ Log.logToStdout Log.nonDiagnostic $ do
+  eitherDocs :: Either PD.PandocError [PD.NamedDoc TL.Text] <- runAll $ do
+    Log.log Log.Info "Creating data producers from CSV files"
+    let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
+        veraData :: F.MonadSafe m => P.Producer (FM.MaybeRow IncarcerationTrends)  m ()
+        veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (FA.filterMaybeField (Proxy @State) "CO")
+        povertyData :: F.MonadSafe m => P.Producer SAIPE m ()
+        povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (FA.filterField (Proxy @Abbreviation) "CO")
+        fipsByCountyData :: F.MonadSafe m => P.Producer FIPSByCountyRenamed m ()
+        fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (FA.filterField (Proxy @State) "CO")
+        -- NB: This data has 2 rows per county, one for misdemeanors, one for felonies
+        countyBondCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CountyBondCO) m ()
+        countyBondCO_Data = F.readTableMaybeOpt parserOptions countyBondCO_FP
+        countyDistrictCO_Data :: F.MonadSafe m => P.Producer CountyDistrictCO m ()
+        countyDistrictCO_Data = F.readTableOpt parserOptions countyDistrictCrosswalkCO_FP
+        -- This data has 3 rows per county and year, one for each type of crime (against persons, against property, against society)
+        crimeStatsCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CrimeStatsCO) m ()
+        crimeStatsCO_Data = F.readTableMaybeOpt parserOptions crimeStatsCO_FP
+    -- load streams into memory for joins, subsetting as we go
+    Log.log Log.Info "loading producers into memory for joining"
+    fipsByCountyFrame <- liftIO $ F.inCoreAoS $ fipsByCountyData P.>-> P.map (F.rcast @[Fips,County]) -- get rid of state col
+    povertyFrame <- liftIO $ F.inCoreAoS $ povertyData P.>-> P.map (F.rcast @[Fips, Year, MedianHI,MedianHIMOE,PovertyR])
+    countyBondFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeEffect $ P.toListM countyBondCO_Data
+    veraFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeEffect $ P.toListM $ veraData P.>-> P.map (F.rcast @[Fips,Year,TotalPop,Urbanicity,IndexCrime])
+    countyDistrictFrame <- liftIO $F.inCoreAoS countyDistrictCO_Data
+    Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length fipsByCountyFrame) <> " rows in fipsByCountyFrame."
+    Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length povertyFrame) <> " rows in povertyFrame."
+    Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyBondFrameM) <> " rows in countyBondFrameM."
+    Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length veraFrameM) <> " rows in veraFrameM."
+    Log.log Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length countyDistrictFrame) <> " rows in countyDistrictFrame."
     -- do joins
-      Log.log Log.Info $ "Doing initial the joins..."
-      let countyBondPlusFIPS = FM.leftJoinMaybe (Proxy @'[County]) countyBondFrameM (justsFromRec <$> fipsByCountyFrame)
-          countyBondPlusFIPSAndDistrict = FM.leftJoinMaybe (Proxy @'[County]) (F.boxedFrame countyBondPlusFIPS) (justsFromRec <$> countyDistrictFrame)
-          countyBondPlusFIPSAndSAIPE = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndDistrict) (justsFromRec <$> povertyFrame)
-          countyBondPlusFIPSAndSAIPEAndVera = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndSAIPE) veraFrameM      
-      newHtmlDoc "moneyBondRateAndPovertyRate" $ kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
-      newHtmlDoc "moneyBondRateAndCrimeRate" $ bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
-      endReal <- liftIO $ C.getTime C.Monotonic
-      let realTime = C.diffTimeSpec endReal startReal
-          printTime (C.TimeSpec s ns) = (T.pack $ show $ realToFrac s + realToFrac ns/(10^9)) 
-      Log.log Log.Info $ "Time (real): " <> printTime realTime <> "s" 
-      return ()
+    Log.log Log.Info $ "Doing initial the joins..."
+    let countyBondPlusFIPS = FM.leftJoinMaybe (Proxy @'[County]) countyBondFrameM (justsFromRec <$> fipsByCountyFrame)
+        countyBondPlusFIPSAndDistrict = FM.leftJoinMaybe (Proxy @'[County]) (F.boxedFrame countyBondPlusFIPS) (justsFromRec <$> countyDistrictFrame)
+        countyBondPlusFIPSAndSAIPE = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndDistrict) (justsFromRec <$> povertyFrame)
+        countyBondPlusFIPSAndSAIPEAndVera = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndSAIPE) veraFrameM      
+    PD.newPandoc "moneyBondRateAndPovertyRate" $ kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
+    PD.newPandoc "moneyBondRateAndCrimeRate" $ bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
+    endReal <- liftIO $ C.getTime C.Monotonic
+    let realTime = C.diffTimeSpec endReal startReal
+        printTime (C.TimeSpec s ns) = (T.pack $ show $ realToFrac s + realToFrac ns/(10^9)) 
+    Log.log Log.Info $ "Time (real): " <> printTime realTime <> "s" 
+    return ()
+  case eitherDocs of
+    Right namedDocs -> writeAllHtml namedDocs
+    Left err -> putStrLn $ "pandoc error: " ++ show err
 
 -- CrimeRate is defined in DataSources since we use it in more places
 type MoneyBondRate = "money_bond_rate" F.:-> Double
@@ -162,7 +178,8 @@ postedBondFreq r = FT.recordSingleton @PostedBondFreq $ (r ^. moneyPosted + r ^.
 
 bondVsCrimeAnalysis :: forall effs. ( MonadIO (FR.Eff effs)
                                     , MonadRandom (FR.Eff effs)
-                                    , FR.Members '[Log.Logger, Html, Random] effs)
+                                    , PD.PandocEffects effs
+                                    , FR.Members '[Log.Logger, PD.ToPandoc] effs)
                     => P.Producer (FM.MaybeRow CountyBondCO) (F.SafeT IO) ()
                     -> P.Producer (FM.MaybeRow CrimeStatsCO) (F.SafeT IO) ()
                     -> FR.Eff effs ()
@@ -256,8 +273,9 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
 --    Log.log Log.Info $ "data=\n" <> Table.textTable rData
     
 
-  Log.log Log.Info "Creating Html"
-  html $ H.makeReportHtml "Colorado Money Bond Rate vs Crime rate" $ do
+  Log.log Log.Info "Creating Doc"
+  PD.addLucid $ do
+    HL.h1_ "Colorado Money Bond Rate vs Crime rate" 
     H.placeTextSection $ do
       HL.h2_ "Colorado Bond Rates and Crime Rates (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
@@ -372,8 +390,9 @@ kmMoneyBondPctAnalysis joinedData = Log.wrapPrefix "MoneyBondVsPoverty" $ do
   (kmByYear, kmByYearUrb) <- FL.foldM ((,)
                                         <$> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType])
                                         <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType,Urbanicity])) kmData
-  Log.log Log.Info "Creating Html"
-  html $ H.makeReportHtml "Colorado Money Bonds and Poverty" $ do    
+  Log.log Log.Info "Creating Doc"
+  PD.addLucid $ do
+    HL.h1_ "Colorado Money Bonds and Poverty" 
     H.placeTextSection $ do
       HL.h2_ "Colorado Money Bond Rate and Poverty (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
