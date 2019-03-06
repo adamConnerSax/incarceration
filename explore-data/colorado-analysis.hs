@@ -43,7 +43,7 @@ import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Lens ((%~),(^.))
 import           Data.Bool                  (bool)
 import qualified Data.Map                   as M
-import           Data.Maybe                 (catMaybes, fromJust)
+import           Data.Maybe                 (catMaybes, fromJust, fromMaybe)
 import           Data.Monoid                ((<>))
 import           Data.Proxy                 (Proxy (..))
 import qualified Data.Text                  as T
@@ -104,11 +104,11 @@ main = do
     Log.logLE Log.Info "Creating data producers from CSV files"
     let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
         veraData :: F.MonadSafe m => P.Producer (FM.MaybeRow IncarcerationTrends)  m ()
-        veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (FA.filterMaybeField (Proxy @State) "CO")
+        veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (FA.filterMaybeField @State (=="CO"))
         povertyData :: F.MonadSafe m => P.Producer SAIPE m ()
-        povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (FA.filterField (Proxy @Abbreviation) "CO")
+        povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (FA.filterField @Abbreviation (== "CO"))
         fipsByCountyData :: F.MonadSafe m => P.Producer FIPSByCountyRenamed m ()
-        fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (FA.filterField (Proxy @State) "CO")
+        fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (FA.filterField @State (== "CO"))
         -- NB: This data has 2 rows per county, one for misdemeanors, one for felonies
         countyBondCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CountyBondCO) m ()
         countyBondCO_Data = F.readTableMaybeOpt parserOptions countyBondCO_FP
@@ -180,12 +180,12 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   -- turn Nothing into 0, sequence the Maybes out, use concat to "fold" over those maybes, removing any nothings
   crimeStatsList <- liftIO $ F.runSafeT $ P.toListM $ crimeDataMaybeProducer P.>-> P.map (F.recMaybe . (F.rsubset %~ blanksToZeroes)) P.>-> P.concat
   let foldAllCrimes :: FL.Fold (F.Record (F.RecordColumns CrimeStatsCO)) (F.FrameRec [County,Year,Crimes,Offenses,EstPopulation])
-      foldAllCrimes = FA.aggregateFs (Proxy @[County,Year]) V.Identity mergeCrimeTypes (0 &: 0 &: 0 &: V.RNil) V.Identity where
+      foldAllCrimes = FA.aggregateFs @[County,Year] V.Identity mergeCrimeTypes (0 &: 0 &: 0 &: V.RNil) V.Identity where
         mergeCrimeTypes soFar = FT.bfApply (FT.bfPlus V.:& FT.bfPlus V.:& FT.bfRHS V.:& V.RNil) soFar . F.rcast @[Crimes,Offenses,EstPopulation]  
       mergedCrimeStatsFrame = FL.fold foldAllCrimes crimeStatsList
       unmergedCrimeStatsFrame = F.boxedFrame crimeStatsList
       foldAllBonds :: FL.Fold (FM.MaybeRow CountyBondCO) (F.FrameRec [County,Year,MoneyBondFreq,PrBondFreq,TotalBondFreq,MoneyPosted,PrPosted,MoneyNewYes,PrNewYes])
-      foldAllBonds = FA.aggregateFs (Proxy @[County,Year]) F.recMaybe addBonds (0 &: 0 &: 0 &: 0 &: 0 &: 0 &: 0 &: V.RNil) V.Identity where
+      foldAllBonds = FA.aggregateFs @[County,Year] F.recMaybe addBonds (0 &: 0 &: 0 &: 0 &: 0 &: 0 &: 0 &: V.RNil) V.Identity where
         addBonds = flip $ V.recAdd . F.rcast @[MoneyBondFreq,PrBondFreq,TotalBondFreq,MoneyPosted,PrPosted,MoneyNewYes,PrNewYes]
       mergedBondDataFrame = FL.fold foldAllBonds countyBondFrameM
       countyBondAndCrimeMerged = F.leftJoin @[County,Year] mergedBondDataFrame mergedCrimeStatsFrame
@@ -197,41 +197,47 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
       sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       mbrAndCr r = moneyBondRate r F.<+> cRate r
-      fixClusters dp = fmap (KM.clusteredRows dp (F.rgetField @County))
+--      fixClusters :: forall x y w ks. M.Map (F.Record ks) (
+--      fixClusters = fmap (KM.clusteredRows @x @y @z (F.rgetField @County))
   kmMergedCrimeRateVsMoneyBondRateByYear <- do
     let select = F.rcast @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
-        dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (merged crime types)."    
-    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
+    flip FL.foldM kmData $
+      fmap (KM.clusteredRows @MoneyBondRate @CrimeRate @EstPopulation (F.rgetField @County)) $
+      KM.kMeansWithClusters @'[Year] @MoneyBondRate @CrimeRate @EstPopulation sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   kmCrimeRateVsMoneyBondRateByYearAndType <- do
     let select = F.rcast @[Year,County,CrimeAgainst,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate mbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
-        dp = Proxy @[MoneyBondRate, CrimeRate, EstPopulation]
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (separate crime types)."
-    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year, CrimeAgainst] dp sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
+    flip FL.foldM kmData $
+      fmap (KM.clusteredRows @MoneyBondRate @CrimeRate @EstPopulation (F.rgetField @County)) $
+      KM.kMeansWithClusters @'[Year, CrimeAgainst] @MoneyBondRate @CrimeRate @EstPopulation sunMoneyBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   let sunPostedBondRateF = FL.premap (F.rgetField @PostedBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id      
       pbrAndCr r = postedBondRate r F.<+> cRate r
   kmMergedCrimeRateVsPostedBondRateByYear <- do
     let select = F.rcast @[Year,County,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
-        dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (merged)."
-    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
+    flip FL.foldM kmData $
+      fmap (KM.clusteredRows @PostedBondRate @CrimeRate @EstPopulation (F.rgetField @County)) $
+      KM.kMeansWithClusters @'[Year] @PostedBondRate @CrimeRate @EstPopulation sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   kmCrimeRateVsPostedBondRateByYearAndType <- do      
     let select = F.rcast @[Year,County,CrimeAgainst,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation]
         kmData = fmap (FT.mutate pbrAndCr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeUnmerged
-        dp = Proxy @[PostedBondRate, CrimeRate, EstPopulation]
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (unmerged)."            
-    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year,CrimeAgainst] dp sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
+    flip FL.foldM kmData $
+      fmap (KM.clusteredRows @PostedBondRate @CrimeRate @EstPopulation (F.rgetField @County)) $
+      KM.kMeansWithClusters @'[Year,CrimeAgainst] @PostedBondRate @CrimeRate @EstPopulation sunPostedBondRateF sunCrimeRateF 10 10 initialCentroidsF KM.euclidSq 
   let sunReoffenseRateF = FL.premap (F.rgetField @ReoffenseRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       rorAndMbr r = reoffenseRate r F.<+> moneyBondRate r
   kmReoffenseRateVsMergedMoneyBondRateByYear <- do
     let select = F.rcast @[Year, County, MoneyNewYes, PrNewYes, MoneyPosted, PrPosted, TotalBondFreq, MoneyBondFreq, EstPopulation]
         kmData = fmap (FT.mutate rorAndMbr) . catMaybes $ fmap (F.recMaybe . select) countyBondAndCrimeMerged
-        dp = Proxy @[MoneyBondRate, ReoffenseRate, EstPopulation]
     Log.logLE Log.Info "Doing weighted-KMeans on re-offense rate vs. money-bond rate (merged)."            
-    flip FL.foldM kmData $ fixClusters dp $ KM.kMeansWithClusters @'[Year] dp sunMoneyBondRateF sunReoffenseRateF 10 10 initialCentroidsF KM.euclidSq
+    flip FL.foldM kmData $
+      fmap (KM.clusteredRows @MoneyBondRate @ReoffenseRate @EstPopulation (F.rgetField @County)) $
+      KM.kMeansWithClusters @'[Year] @MoneyBondRate @ReoffenseRate @EstPopulation sunMoneyBondRateF sunReoffenseRateF 10 10 initialCentroidsF KM.euclidSq
 
   -- regressions
   let rMut r = mbrAndCr r F.<+> postedBondFreq r F.<+> postedBondRate r F.<+> postedBondPerCapita r
@@ -374,11 +380,9 @@ kmMoneyBondPctAnalysis joinedData = Log.wrapPrefix "MoneyBondVsPoverty" $ do
       dataProxy = Proxy @[PovertyR,MoneyBondRate,TotalPop]
       sunPovertyRF = FL.premap (F.rgetField @PovertyR) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
-      kmMoneyBondRatevsPovertyRate proxy_ks =
-        KM.kMeans proxy_ks dataProxy sunPovertyRF sunMoneyBondRateF 5 (KM.kMeansPPCentroids KM.euclidSq) KM.euclidSq        
   (kmByYear, kmByYearUrb) <- FL.foldM ((,)
-                                        <$> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType])
-                                        <*> kmMoneyBondRatevsPovertyRate (Proxy @[Year,OffType,Urbanicity])) kmData
+                                        <$> KM.kMeans @[Year, OffType] @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 (KM.kMeansPPCentroids KM.euclidSq) KM.euclidSq
+                                        <*> KM.kMeans @[Year, OffType, Urbanicity] @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 (KM.kMeansPPCentroids KM.euclidSq) KM.euclidSq) kmData
   Log.logLE Log.Info "Creating Doc"
   PD.addLucid $ do
     HL.h1_ "Colorado Money Bonds and Poverty" 
