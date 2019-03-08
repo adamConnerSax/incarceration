@@ -180,9 +180,11 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
       blanksToZeroes = FM.fromMaybeMono 0
   -- turn Nothing into 0, sequence the Maybes out, use concat to "fold" over those maybes, removing any nothings
   crimeStatsList <- liftIO $ F.runSafeT $ P.toListM $ crimeDataMaybeProducer P.>-> P.map (F.recMaybe . (F.rsubset %~ blanksToZeroes)) P.>-> P.concat
-  let foldAllCrimes :: FL.Fold (F.Record (F.RecordColumns CrimeStatsCO)) (F.FrameRec [County,Year,Crimes,Offenses,EstPopulation])
-      foldAllCrimes = FA.aggregateFs @[County,Year] V.Identity mergeCrimeTypes (0 &: 0 &: 0 &: V.RNil) V.Identity where
-        mergeCrimeTypes soFar = FT.bfApply (FT.bfPlus V.:& FT.bfPlus V.:& FT.bfRHS V.:& V.RNil) soFar . F.rcast @[Crimes,Offenses,EstPopulation]  
+  let sumCrimesFold = FA.recordFold $ FA.liftFold FL.sum V.:& FA.liftFold FL.sum V.:& FA.liftFold (fmap (fromMaybe 0) FL.last) V.:& V.RNil
+      foldAllCrimes = FA.aggregateAndFoldSubsetF @'[County,Year] @'[Crimes,Offenses,EstPopulation] sumCrimesFold
+--      foldAllCrimes :: FL.Fold (F.Record (F.RecordColumns CrimeStatsCO)) (F.FrameRec [County,Year,Crimes,Offenses,EstPopulation])
+--      foldAllCrimes = FA.aggregateFs @[County,Year] V.Identity mergeCrimeTypes (0 &: 0 &: 0 &: V.RNil) V.Identity where
+--        mergeCrimeTypes soFar = FT.bfApply (FT.bfPlus V.:& FT.bfPlus V.:& FT.bfRHS V.:& V.RNil) soFar . F.rcast @[Crimes,Offenses,EstPopulation]  
       mergedCrimeStatsFrame = FL.fold foldAllCrimes crimeStatsList
       unmergedCrimeStatsFrame = F.boxedFrame crimeStatsList
       foldAllBonds :: FL.Fold (FM.MaybeRow CountyBondCO) (F.FrameRec [County,Year,MoneyBondFreq,PrBondFreq,TotalBondFreq,MoneyPosted,PrPosted,MoneyNewYes,PrNewYes])
