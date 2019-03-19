@@ -5,9 +5,9 @@
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE DeriveGeneric #-}
 module DataSources
-  (
-    module DataSourcePaths
+  ( module DataSourcePaths
   , module DataSources
   )
 where
@@ -15,16 +15,18 @@ where
 -- NB: required for TH stage restriction
 import           DataSourcePaths
 
-import           Frames.MaybeUtils (MaybeRow)
+import           Frames.MaybeUtils              ( MaybeRow )
 
-import qualified Frames            as F
+import qualified Frames                        as F
 --import qualified Frames.CSV        as F
-import qualified Frames.InCore     as FI
-import qualified Frames.ShowCSV    as F
+import qualified Frames.InCore                 as FI
+import qualified Frames.ShowCSV                as F
 -- we may need some of the inferred types
-import           Data.Text         (Text)
-import qualified Data.Text         as T
-import qualified Data.Vector       as V
+import           Data.Text                      ( Text )
+import qualified Data.Text                     as T
+import           Data.Hashable                  ( Hashable )
+import qualified Data.Vector                   as V
+import           GHC.Generics                   ( Generic )
 
 F.tableTypes "IncarcerationTrends" veraTrendsFP
 F.tableTypes "SAIPE" censusSAIPE_FP
@@ -36,10 +38,13 @@ F.tableTypes "CountyBondCO" countyBondCO_FP
 --type Row = IncarcerationTrends
 type MaybeITrends = MaybeRow IncarcerationTrends
 
-data GenderT = Male | Female deriving (Show,Enum,Bounded,Ord, Eq) -- we ought to have NonBinary here as well, but the data doesn't.
+data GenderT = Male | Female deriving (Show,Enum,Bounded,Ord, Eq, Generic) -- we ought to have NonBinary here as well, but the data doesn't.
+
 type instance FI.VectorFor GenderT = V.Vector
 instance F.ShowCSV GenderT where
   showCSV = T.pack . show
+
+instance Hashable GenderT
 
 F.declareColumn "ImprisonedPerCrimeRate" ''Double
 F.declareColumn "CrimeRate" ''Double

@@ -36,6 +36,8 @@ executable explore-data
                      , foldl
                      , Frames
                      , Frames-utils
+                     , freer-simple
+                     , hashable
                      , hvega
                      , lens
                      , mtl
