@@ -87,6 +87,9 @@ rDiv a b = realToFrac a/realToFrac b
 
 type instance FI.VectorFor (Maybe a) = V.Vector
 
+type DblX = "X" F.:-> Double
+type DblY = "Y" F.:-> Double
+
 templateVars = M.fromList
   [
     ("lang", "English")
@@ -110,11 +113,11 @@ main = do
     Log.logLE Log.Info "Creating data producers from CSV files"
     let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
         veraData :: F.MonadSafe m => P.Producer (FM.MaybeRow IncarcerationTrends)  m ()
-        veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (FU.filterMaybeField @State (=="CO"))
+        veraData = F.readTableMaybeOpt F.defaultParser veraTrendsFP  P.>-> P.filter (FU.filterOnMaybeField @State (=="CO"))
         povertyData :: F.MonadSafe m => P.Producer SAIPE m ()
-        povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (FU.filterField @Abbreviation (== "CO"))
+        povertyData = F.readTableOpt parserOptions censusSAIPE_FP P.>-> P.filter (FU.filterOnField @Abbreviation (== "CO"))
         fipsByCountyData :: F.MonadSafe m => P.Producer FIPSByCountyRenamed m ()
-        fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (FU.filterField @State (== "CO"))
+        fipsByCountyData = F.readTableOpt parserOptions fipsByCountyFP  P.>-> P.filter (FU.filterOnField @State (== "CO"))
         -- NB: This data has 2 rows per county, one for misdemeanors, one for felonies
         countyBondCO_Data :: F.MonadSafe m => P.Producer (FM.MaybeRow CountyBondCO) m ()
         countyBondCO_Data = F.readTableMaybeOpt parserOptions countyBondCO_FP
@@ -201,8 +204,8 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   Log.logLE Log.Info "Joined crime data and bond data"    
   Log.logLE Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length crimeStatsList) <> " rows in crimeStatsList (unmerged)."
   Log.logLE Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length mergedCrimeStatsFrame) <> " rows in crimeStatsFrame(merged)."
-  let initialCentroidsF = KM.kMeansPPCentroids @FU.DblX @FU.DblY @EstPopulation KM.euclidSq
-      kmReduce f = MR.ReduceM $ \k rows -> sequence $ M.singleton k $ f 10 10 initialCentroidsF (KM.weighted2DRecord @FU.DblX @FU.DblY @EstPopulation) KM.euclidSq rows
+  let initialCentroidsF = KM.kMeansPPCentroids @DblX @DblY @EstPopulation KM.euclidSq
+      kmReduce f = MR.ReduceM $ \k rows -> sequence $ M.singleton k $ f 10 10 initialCentroidsF (KM.weighted2DRecord @DblX @DblY @EstPopulation) KM.euclidSq rows
       sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       sunPostedBondRateF = FL.premap (F.rgetField @PostedBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id      
@@ -384,9 +387,9 @@ kmMoneyBondPctAnalysis joinedData = Log.wrapPrefix "MoneyBondVsPoverty" $ do
   Log.logLE Log.Info "Doing money bond % vs poverty rate analysis..."
   let sunPovertyRF = FL.premap (F.rgetField @PovertyR) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
-      initialCentroids = KM.kMeansPPCentroids @FU.DblX @FU.DblY @TotalPop KM.euclidSq
+      initialCentroids = KM.kMeansPPCentroids @DblX @DblY @TotalPop KM.euclidSq
       unpack = fmap (FT.mutate moneyBondRate) $ MR.unpackGoodRows @[Year,County,OffType,Urbanicity,PovertyR, MoneyBondFreq,TotalBondFreq,TotalPop]
-      reduce = MR.ReduceM $ \_ -> KM.kMeansOne @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 initialCentroids (KM.weighted2DRecord @FU.DblX @FU.DblY @TotalPop) KM.euclidSq
+      reduce = MR.ReduceM $ \_ -> KM.kMeansOne @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 initialCentroids (KM.weighted2DRecord @DblX @DblY @TotalPop) KM.euclidSq
       toRec (x, y, z) = (x F.&: y F.&: z F.&: V.RNil) :: F.Record [PovertyR, MoneyBondRate, TotalPop]
       kmByYearF = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeysAndData @[Year, OffType] @[PovertyR, MoneyBondRate, TotalPop]) (MR.makeRecsWithKey toRec reduce)
       kmByYearUrbF = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeysAndData @'[Year, OffType, Urbanicity] @[PovertyR, MoneyBondRate, TotalPop]) (MR.makeRecsWithKey toRec reduce)
@@ -460,7 +463,7 @@ kMeansNotes =  H.placeTextSection $ do
       HL.span_ " for more information.  We repeat the k-means clustering with a few different starting centers chosen this way and choose the best clustering, in the sense of minimizing total weighted distance of all points from their cluster centers."
 
 
-transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (FU.FType x -> FU.FType x) -> F.Record rs -> F.Record rs
+transformF :: forall x rs. (V.KnownField x, x ∈ rs) => (V.Snd x -> V.Snd x) -> F.Record rs -> F.Record rs
 transformF f r = F.rputField @x (f $ F.rgetField @x r) r
 
 

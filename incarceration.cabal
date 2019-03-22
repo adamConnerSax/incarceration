@@ -35,6 +35,7 @@ executable explore-data
                      , dhall
                      , foldl
                      , Frames
+                     , Frames-map-reduce
                      , Frames-utils
                      , freer-simple
                      , hashable
@@ -68,6 +69,7 @@ executable colorado-analysis
                      , containers
                      , foldl
                      , Frames
+                     , Frames-map-reduce
                      , Frames-utils
                      , freer-simple
                      , hashable
