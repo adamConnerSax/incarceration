@@ -20,7 +20,7 @@ module Main where
 
 import           DataSources
 import qualified Frames.Utils               as FU
-import qualified Frames.Aggregations.Folds  as FF
+import qualified Frames.Folds               as FF
 import qualified Frames.KMeans              as KM
 import qualified Frames.Regression          as FR
 import qualified Frames.MaybeUtils          as FM
@@ -201,7 +201,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   Log.logLE Log.Info "Joined crime data and bond data"    
   Log.logLE Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length crimeStatsList) <> " rows in crimeStatsList (unmerged)."
   Log.logLE Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length mergedCrimeStatsFrame) <> " rows in crimeStatsFrame(merged)."
-  let initialCentroidsF = KM.kMeansPPCentroids KM.euclidSq
+  let initialCentroidsF = KM.kMeansPPCentroids @FU.DblX @FU.DblY @EstPopulation KM.euclidSq
       kmReduce f = MR.ReduceM $ \k rows -> sequence $ M.singleton k $ f 10 10 initialCentroidsF (KM.weighted2DRecord @FU.DblX @FU.DblY @EstPopulation) KM.euclidSq rows
       sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
@@ -384,8 +384,9 @@ kmMoneyBondPctAnalysis joinedData = Log.wrapPrefix "MoneyBondVsPoverty" $ do
   Log.logLE Log.Info "Doing money bond % vs poverty rate analysis..."
   let sunPovertyRF = FL.premap (F.rgetField @PovertyR) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
+      initialCentroids = KM.kMeansPPCentroids @FU.DblX @FU.DblY @TotalPop KM.euclidSq
       unpack = fmap (FT.mutate moneyBondRate) $ MR.unpackGoodRows @[Year,County,OffType,Urbanicity,PovertyR, MoneyBondFreq,TotalBondFreq,TotalPop]
-      reduce = MR.ReduceM $ \_ -> KM.kMeansOne @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 (KM.kMeansPPCentroids KM.euclidSq) (KM.weighted2DRecord @FU.DblX @FU.DblY @TotalPop) KM.euclidSq
+      reduce = MR.ReduceM $ \_ -> KM.kMeansOne @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 initialCentroids (KM.weighted2DRecord @FU.DblX @FU.DblY @TotalPop) KM.euclidSq
       toRec (x, y, z) = (x F.&: y F.&: z F.&: V.RNil) :: F.Record [PovertyR, MoneyBondRate, TotalPop]
       kmByYearF = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeysAndData @[Year, OffType] @[PovertyR, MoneyBondRate, TotalPop]) (MR.makeRecsWithKey toRec reduce)
       kmByYearUrbF = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeysAndData @'[Year, OffType, Urbanicity] @[PovertyR, MoneyBondRate, TotalPop]) (MR.makeRecsWithKey toRec reduce)

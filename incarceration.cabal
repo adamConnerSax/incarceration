@@ -39,7 +39,9 @@ executable explore-data
                      , freer-simple
                      , hashable
                      , hvega
+                     , knit-haskell
                      , lens
+                     , map-reduce-folds
                      , mtl
                      , pipes
                      , random-fu
@@ -68,10 +70,13 @@ executable colorado-analysis
                      , Frames
                      , Frames-utils
                      , freer-simple
+                     , hashable
                      , hvega
+                     , knit-haskell
                      , lens
                      , lucid
                      , mtl
+                     , map-reduce-folds
                      , pandoc
                      , pipes
                      , prettyprinter

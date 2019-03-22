@@ -1,4 +1,4 @@
-packages: . ../Frames-utils ../hvega/hvega
+packages: . ../Frames-utils ../Frames-utils/knit-haskell ../Frames-utils/map-reduce-folds ../hvega/hvega
 jobs: 4
 with-compiler: /usr/local/bin/ghc
 

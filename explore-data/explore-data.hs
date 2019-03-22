@@ -15,12 +15,12 @@
 module Main where
 
 import           DataSources
-import qualified Frames.Aggregations.Folds     as FF
+import qualified Frames.Folds                  as FF
 import qualified Frames.Utils                  as FU
 import qualified Frames.Transform              as FT
 import qualified Frames.MapReduce              as MR
 import qualified Frames.KMeans                 as KM
-import qualified Frames.ScatterMerge           as SM
+--import qualified Frames.ScatterMerge           as SM
 import qualified Math.Rescale                  as MR
 import qualified Control.Monad.Freer.Logger    as FR
 
@@ -28,25 +28,12 @@ import qualified Control.Monad.Freer           as FR
 
 import qualified Control.Foldl                 as FL
 import           Control.Lens                   ( (^.) )
-import           Control.Monad.IO.Class         ( MonadIO
-                                                , liftIO
-                                                )
-import           Control.Monad.State            ( evalStateT )
-import           Data.Functor.Identity          ( runIdentity )
-import qualified Data.List                     as List
-import qualified Data.Map                      as M
+import           Control.Monad.IO.Class         ( liftIO )
 import           Data.Maybe                     ( catMaybes
                                                 , fromMaybe
-                                                , isJust
                                                 )
-import           Data.Proxy                     ( Proxy(..) )
-import           Data.Random                   as R
-import           Data.Random.Source.PureMT      ( pureMT )
-import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
-import qualified Data.Vector                   as V
 import qualified Data.Vinyl                    as V
-import qualified Data.Vinyl.Class.Method       as V
 import           Data.Vinyl.Curry               ( runcurryX )
 import           Data.Vinyl.XRec               as V
 import           Frames                         ( (:.)
@@ -54,8 +41,6 @@ import           Frames                         ( (:.)
                                                 )
 import qualified Frames                        as F
 import qualified Frames.CSV                    as F
-import qualified Frames.InCore                 as FI
-import qualified Frames.ShowCSV                as F
 import qualified Pipes                         as P
 import qualified Pipes.Prelude                 as P
 
@@ -79,11 +64,6 @@ ratesByStateAndYear = MR.mapRListF
   )
   (MR.splitOnKeys @'[Year, State])
   (MR.foldAndAddKey $ fmap rates $ FF.foldAllConstrained @Num FL.sum)
-{-  
-  let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
-      emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FA.aggregateF (Proxy @[Year, State]) selectMaybe (flip $ V.recAdd . F.rcast) emptyRow rates
--}
 
 ratesByUrbanicityAndYear
   :: FL.Fold
@@ -95,15 +75,9 @@ ratesByUrbanicityAndYear = MR.mapRListF
   )
   (MR.splitOnKeys @'[Urbanicity, Year])
   (MR.foldAndAddKey $ fmap rates $ FF.foldAllConstrained @Num FL.sum)
-{-  
-  let selectMaybe :: MaybeITrends -> Maybe (F.Record '[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm]) = F.recMaybe . F.rcast
-      emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FA.aggregateF (Proxy @[Urbanicity, Year]) selectMaybe (flip $ V.recAdd . F.rcast) emptyRow rates
--}
 
 type CO_AnalysisVERA_Cols = [Year, State, TotalPop, TotalJailAdm, TotalJailPop, TotalPrisonAdm, TotalPrisonPop]
 
---jailDataByStateAndYear :: FL.Fold MaybeITrends (F.Record '[Year, State, TotalPop, TotalJailAdm, TotalJailPop, TotalPrisonAdm, TotalPrisonPop])
 
 gRates
   :: F.Record '["pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double]
@@ -147,22 +121,9 @@ ratesByGenderAndYear = MR.mapRListF
       . F.recMaybe
       . F.rcast
         @'[Year, FemalePop15to64, MalePop15to64, FemalePrisonAdm, MalePrisonAdm, FemaleJailPop, MaleJailPop]
-{-  
-  let genders = [Female F.&: V.RNil, Male F.&: V.RNil]
-      processRow g r = case (g ^. gender) of
-                         Female -> (r ^. femalePop15to64) F.&: (r ^. femalePrisonAdm) F.&: (r ^. femaleJailPop) F.&: V.RNil
-                         Male ->  (r ^. malePop15to64) F.&: (r ^. malePrisonAdm) F.&: (r ^. maleJailPop) F.&: V.RNil
-      newRows = FA.reshapeRowSimple proxyYear genders processRow
-      selectMaybe :: MaybeITrends -> Maybe (F.Record '[Year, FemalePop15to64, MalePop15to64, FemalePrisonAdm, MalePrisonAdm, FemaleJailPop, MaleJailPop])
-      selectMaybe = F.recMaybe . F.rcast
-      unpack :: MaybeITrends -> [F.Record '[Year, Gender, "pop" F.:-> Int, "adm" F.:-> Int, "inJail" F.:-> Double]]
-      unpack = fromMaybe [] . fmap newRows . selectMaybe
-      emptyRow = 0 &: 0 &: 0 &: V.RNil
-  in FA.aggregateF (Proxy @[Year, Gender]) unpack (flip $ V.recAdd . F.rcast) emptyRow gRates
--}
 
 type TrendsPovRow = '[Year, Fips, State, CountyName, Urbanicity, TotalPop, CrimeRate, IncarcerationRate, ImprisonedPerCrimeRate]
---TotalPop, TotalPop15To64, TotalPrisonPop, TotalPrisonAdm, IndexCrime]
+
 
 trendsRowForPovertyAnalysis
   :: Monad m => P.Pipe MaybeITrends (F.Record TrendsPovRow) m ()
@@ -293,10 +254,6 @@ incomePovertyJoinData trendsData povertyData = do
       "data/kMeansIncarcerationRate_vs_MedianHIByUrbanicityAndYear.csv"
       kmUrbYrFrame
 
-{-
-pFilterMaybe :: Monad m => (a -> Maybe b) -> P.Pipe a b m ()
-pFilterMaybe f =  P.map f P.>-> P.filter isJust P.>-> P.map fromJust
--}
 
 maybeTest :: (a -> Bool) -> Maybe a -> Bool
 maybeTest t = maybe False t
