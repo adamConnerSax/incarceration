@@ -191,10 +191,10 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   -- turn Nothing into 0, sequence the Maybes out, use concat to "fold" over those maybes, removing any nothings
   crimeStatsList <- liftIO $ F.runSafeT $ P.toListM $ crimeDataMaybeProducer P.>-> P.map (F.recMaybe . (F.rsubset %~ blanksToZeroes)) P.>-> P.concat
   let sumCrimesFold = FF.sequenceEndoFolds $ FF.FoldEndo FL.sum V.:& FF.FoldEndo FL.sum V.:& FF.FoldEndo (fmap (fromMaybe 0) FL.last) V.:& V.RNil
-      foldAllCrimes = MR.mapRListF MR.noUnpack (MR.assignKeysAndData @[County, Year] @[Crimes, Offenses, EstPopulation]) (MR.foldAndAddKey sumCrimesFold)
+      foldAllCrimes = MR.mapReduceHashableFrameListFold MR.noUnpack (MR.assignKeysAndData @[County, Year] @[Crimes, Offenses, EstPopulation]) (MR.foldAndAddKey sumCrimesFold)
       mergedCrimeStatsFrame = FL.fold foldAllCrimes crimeStatsList
       unmergedCrimeStatsFrame = F.boxedFrame crimeStatsList
-      foldAllBonds = MR.mapRListF
+      foldAllBonds = MR.mapReduceHashableFrameListFold
         (MR.unpackGoodRows @[County,Year,MoneyBondFreq,PrBondFreq,TotalBondFreq,MoneyPosted,PrPosted,MoneyNewYes,PrNewYes])
         (MR.splitOnKeys @[County,Year])
         (MR.foldAndAddKey $ FF.foldAllMonoid @MO.Sum)
@@ -217,35 +217,35 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (merged crime types)."
     let unpack = fmap (FT.mutate mbrAndCr) (MR.unpackGoodRows @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation])
         reduce = kmReduce (KM.kMeansOneWithClusters @MoneyBondRate @CrimeRate @EstPopulation sunMoneyBondRateF sunCrimeRateF)
-        kmFoldM = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeys @'[Year]) reduce
+        kmFoldM = MR.mapReduceHashableFrameListFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year]) reduce
     flip FL.foldM countyBondAndCrimeMerged $
       fmap (KM.clusteredRows @MoneyBondRate @CrimeRate @EstPopulation (F.rgetField @County)) $ kmFoldM
   kmCrimeRateVsMoneyBondRateByYearAndType <- do
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (separate crime types)."
     let unpack = fmap (FT.mutate mbrAndCr) (MR.unpackGoodRows @[Year,County,CrimeAgainst,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation])
         reduce =  kmReduce (KM.kMeansOneWithClusters @MoneyBondRate @CrimeRate @EstPopulation sunMoneyBondRateF sunCrimeRateF)
-        kmFoldM = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeys @'[Year, CrimeAgainst]) reduce   
+        kmFoldM = MR.mapReduceHashableFrameListFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year, CrimeAgainst]) reduce   
     flip FL.foldM countyBondAndCrimeUnmerged $
       fmap (KM.clusteredRows @MoneyBondRate @CrimeRate @EstPopulation (F.rgetField @County)) $ kmFoldM
   kmMergedCrimeRateVsPostedBondRateByYear <- do
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (merged)."
     let unpack = fmap (FT.mutate pbrAndCr) (MR.unpackGoodRows @[Year,County,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation])
         reduce =  kmReduce (KM.kMeansOneWithClusters @PostedBondRate @CrimeRate @EstPopulation sunPostedBondRateF sunCrimeRateF)
-        kmFoldM = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeys @'[Year]) reduce   
+        kmFoldM = MR.mapReduceHashableFrameListFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year]) reduce   
     flip FL.foldM countyBondAndCrimeMerged $
       fmap (KM.clusteredRows @PostedBondRate @CrimeRate @EstPopulation (F.rgetField @County)) $ kmFoldM
   kmCrimeRateVsPostedBondRateByYearAndType <- do      
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (unmerged)."            
     let unpack = fmap (FT.mutate pbrAndCr) (MR.unpackGoodRows @[Year,County,CrimeAgainst,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation])
         reduce = kmReduce (KM.kMeansOneWithClusters @PostedBondRate @CrimeRate @EstPopulation sunPostedBondRateF sunCrimeRateF)
-        kmFoldM = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeys @'[Year,CrimeAgainst]) reduce   
+        kmFoldM = MR.mapReduceHashableFrameListFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year,CrimeAgainst]) reduce   
     flip FL.foldM countyBondAndCrimeUnmerged $
       fmap (KM.clusteredRows @PostedBondRate @CrimeRate @EstPopulation (F.rgetField @County)) $ kmFoldM
   kmReoffenseRateVsMergedMoneyBondRateByYear <- do
     Log.logLE Log.Info "Doing weighted-KMeans on re-offense rate vs. money-bond rate (merged)."            
     let unpack = fmap (FT.mutate rorAndMbr) (MR.unpackGoodRows @[Year, County, MoneyNewYes, PrNewYes, MoneyPosted, PrPosted, TotalBondFreq, MoneyBondFreq, EstPopulation])
         reduce = kmReduce (KM.kMeansOneWithClusters @MoneyBondRate @ReoffenseRate @EstPopulation sunMoneyBondRateF sunReoffenseRateF)
-        kmFoldM = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeys @'[Year]) reduce             
+        kmFoldM = MR.mapReduceHashableFrameListFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year]) reduce             
     flip FL.foldM countyBondAndCrimeMerged $
       fmap (KM.clusteredRows @MoneyBondRate @ReoffenseRate @EstPopulation (F.rgetField @County)) $ kmFoldM
   -- regressions
@@ -253,8 +253,8 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   (rData, regressionRes, regressionResMany) <- do
     let regUnpack = fmap (FT.mutate rMut) $ (MR.unpackGoodRows @[Year,MoneyBondFreq,PrBondFreq,PrPosted,MoneyPosted,TotalBondFreq,Crimes,EstPopulation])
         regReduce r = MR.ReduceM $ \k rows -> sequence $ M.singleton k $ r rows
-        regMR r = MR.mapRListF (MR.generalizeUnpack regUnpack) (MR.assignKeys @'[Year]) (regReduce r)
-        dataMR = MR.unpackOnlyFold @[] (MR.generalizeUnpack regUnpack) --MR.mapGatherReduceFold (MR.uagMapAllGatherEachFold (MR.defaultOrdGatherer (pure @[])) regUnpack (MR.Assign $ \x -> ((),x))) (MR.Reduce $ \_ rows -> rows)
+        regMR r = MR.mapReduceHashableFrameListFoldM (MR.generalizeUnpack regUnpack) (MR.generalizeAssign $ MR.assignKeys @'[Year]) (regReduce r)
+        dataMR = MR.unpackOnlyFoldM @[] (MR.generalizeUnpack regUnpack) --MR.mapGatherReduceFold (MR.uagMapAllGatherEachFold (MR.defaultOrdGatherer (pure @[])) regUnpack (MR.Assign $ \x -> ((),x))) (MR.Reduce $ \_ rows -> rows)
         guess = [0,0] -- guess has one extra dimension for constant
         regressOneBM = FR.leastSquaresByMinimization @Crimes @'[EstPopulation, MoneyBondFreq] False guess
         regressOneOLS = FR.ordinaryLeastSquares @Crimes @False @'[EstPopulation]
@@ -391,8 +391,14 @@ kmMoneyBondPctAnalysis joinedData = Log.wrapPrefix "MoneyBondVsPoverty" $ do
       unpack = fmap (FT.mutate moneyBondRate) $ MR.unpackGoodRows @[Year,County,OffType,Urbanicity,PovertyR, MoneyBondFreq,TotalBondFreq,TotalPop]
       reduce = MR.ReduceM $ \_ -> KM.kMeansOne @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 initialCentroids (KM.weighted2DRecord @DblX @DblY @TotalPop) KM.euclidSq
       toRec (x, y, z) = (x F.&: y F.&: z F.&: V.RNil) :: F.Record [PovertyR, MoneyBondRate, TotalPop]
-      kmByYearF = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeysAndData @[Year, OffType] @[PovertyR, MoneyBondRate, TotalPop]) (MR.makeRecsWithKey toRec reduce)
-      kmByYearUrbF = MR.mapRListF (MR.generalizeUnpack unpack) (MR.assignKeysAndData @'[Year, OffType, Urbanicity] @[PovertyR, MoneyBondRate, TotalPop]) (MR.makeRecsWithKey toRec reduce)
+      kmByYearF = MR.mapReduceHashableFrameListFoldM
+        (MR.generalizeUnpack unpack)
+        (MR.generalizeAssign $ MR.assignKeysAndData @[Year, OffType] @[PovertyR, MoneyBondRate, TotalPop])
+        (MR.makeRecsWithKeyM toRec reduce)
+      kmByYearUrbF = MR.mapReduceHashableFrameListFoldM
+        (MR.generalizeUnpack unpack)
+        (MR.generalizeAssign $ MR.assignKeysAndData @'[Year, OffType, Urbanicity] @[PovertyR, MoneyBondRate, TotalPop])
+        (MR.makeRecsWithKeyM toRec reduce)
   (kmByYear, kmByYearUrb) <- FL.foldM ((,) <$> kmByYearF <*> kmByYearUrbF) joinedData
 {-  (kmByYear, kmByYearUrb) <- FL.foldM ((,)
                                         <$> KM.kMeans @[Year, OffType] @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 (KM.kMeansPPCentroids KM.euclidSq) KM.euclidSq

@@ -59,7 +59,7 @@ ratesByStateAndYear
   :: FL.Fold
        MaybeITrends
        (F.FrameRec '[Year, State, CrimeRate, ImprisonedPerCrimeRate])
-ratesByStateAndYear = MR.mapRListF
+ratesByStateAndYear = MR.mapReduceHashableFrameListFold
   (MR.unpackGoodRows @'[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm]
   )
   (MR.splitOnKeys @'[Year, State])
@@ -69,7 +69,7 @@ ratesByUrbanicityAndYear
   :: FL.Fold
        MaybeITrends
        (F.FrameRec '[Urbanicity, Year, CrimeRate, ImprisonedPerCrimeRate])
-ratesByUrbanicityAndYear = MR.mapRListF
+ratesByUrbanicityAndYear = MR.mapReduceHashableFrameListFold
   (MR.unpackGoodRows
     @'[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm]
   )
@@ -91,7 +91,7 @@ ratesByGenderAndYear
   :: FL.Fold
        MaybeITrends
        (F.FrameRec '[Year, Gender, IncarcerationRate, PrisonAdmRate])
-ratesByGenderAndYear = MR.mapRListF
+ratesByGenderAndYear = MR.mapReduceHashableFrameListFold
   unpack
   (MR.splitOnKeys @'[Year, Gender])
   (MR.foldAndAddKey $ fmap gRates $ FF.foldAllConstrained @Num FL.sum)
@@ -185,6 +185,8 @@ aggregationAnalyses trendsData = do
   liftIO $ F.writeCSV "data/ratesByUrbanicityAndYear.csv" rByU
   liftIO $ F.writeCSV "data/ratesByGenderAndYear.csv" rByG
 
+type X = "X" F.:-> Double
+type Y = "Y" F.:-> Double
 
 incomePovertyJoinData trendsData povertyData = do
   trendsForPovFrame <-
@@ -217,19 +219,19 @@ incomePovertyJoinData trendsData povertyData = do
         sunXF
         sunYF
         10
-        (\x y -> return $ KM.partitionCentroids x y)
-        (KM.weighted2DRecord @FU.DblX @FU.DblY @TotalPop)
+        (\n -> return . KM.partitionCentroids @X @Y n)
+        (KM.weighted2DRecord @X @Y @TotalPop)
         KM.euclidSq
     toRec (x, y, z) =
       (x F.&: y F.&: z F.&: V.RNil) :: F.Record
           '[MedianHI, IncarcerationRate, TotalPop]
-    kmFold assign = MR.mapRListF
+    kmFold assign = MR.mapReduceHashableFrameListFoldM
       ( MR.generalizeUnpack
       $ MR.unpackGoodRows
         @'[Year, State, Urbanicity, MedianHI, IncarcerationRate, TotalPop]
       )
-      assign
-      (MR.makeRecsWithKey toRec kmReduce)
+      (MR.generalizeAssign assign)
+      (MR.makeRecsWithKeyM toRec kmReduce)
   (kmYrFrame, kmStateYrFrame, kmUrbYrFrame) <- FL.foldM
     (   (,,)
     <$> kmFold
