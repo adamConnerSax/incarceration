@@ -32,8 +32,7 @@ import qualified Frames.MapReduce           as MR
 
 import qualified Control.Monad.Freer        as FR
 import qualified Control.Monad.Freer.Logger as Log
---import           Control.Monad.Freer.Html   (Html, HtmlDocs, NamedDoc (..), html, newHtmlDoc, htmlToNamedText)
-import           Control.Monad.Freer.Random (Random, runRandomIOPureMT)
+import           Control.Monad.Freer.RandomFu (Random, runRandomIOPureMT)
 import qualified Control.Monad.Freer.Pandoc as PD
 import qualified Control.Monad.Freer.PandocMonad as PD
 import           Control.Monad.Freer.Docs        (toNamedDocListWithM)
@@ -204,8 +203,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   Log.logLE Log.Info "Joined crime data and bond data"    
   Log.logLE Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length crimeStatsList) <> " rows in crimeStatsList (unmerged)."
   Log.logLE Log.Diagnostic $ (T.pack $ show $ FL.fold FL.length mergedCrimeStatsFrame) <> " rows in crimeStatsFrame(merged)."
-  let initialCentroidsF n = MR.postMapM (KM.kMeansPPCentroids @DblX @DblY @EstPopulation KM.euclidSq n) (FL.generalize FL.list)
---      kmReduce :: () => (Int -> Int -> (Int -> f (F.Record '[DblX, DblY, EstPopulation] -> FR.Eff effs [Vector Double]) -> KM.Weighted (F.Record 
+  let initialCentroidsF n = MR.functionToFoldM (KM.kMeansPPCentroids @DblX @DblY @EstPopulation KM.euclidSq n) 
       kmReduce f k rows = sequence $ M.singleton k $ f 10 10 initialCentroidsF (KM.weighted2DRecord @DblX @DblY @EstPopulation) KM.euclidSq rows
       sunCrimeRateF = FL.premap (F.rgetField @CrimeRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) (MR.RescaleNone) id
