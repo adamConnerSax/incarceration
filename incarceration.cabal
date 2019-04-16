@@ -37,7 +37,7 @@ executable explore-data
                      , Frames
                      , Frames-map-reduce
                      , Frames-utils
-                     , freer-simple
+                     , polysemy >= 0.1.1.0 && < 0.2.0.0
                      , hashable
                      , hvega
                      , knit-haskell
@@ -71,7 +71,6 @@ executable colorado-analysis
                      , Frames
                      , Frames-map-reduce
                      , Frames-utils
-                     , freer-simple
                      , hashable
                      , hvega
                      , knit-haskell
@@ -81,6 +80,7 @@ executable colorado-analysis
                      , map-reduce-folds
                      , pandoc
                      , pipes
+                     , polysemy >= 0.1.1.0 && < 0.2.0.0
                      , prettyprinter
                      , random-fu
                      , random-source

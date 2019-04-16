@@ -16,6 +16,8 @@
 {-# LANGUAGE UndecidableInstances      #-}
 {-# LANGUAGE AllowAmbiguousTypes       #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
+{-# LANGUAGE PartialTypeSignatures     #-}
+--{-# LANGUAGE MonomorphismRestriction #-}
 module Main where
 
 import           DataSources
@@ -30,14 +32,15 @@ import qualified Frames.Table               as Table
 import qualified Math.Rescale               as MR
 import qualified Frames.MapReduce           as MR
 
-import qualified Control.Monad.Freer        as FR
-import qualified Control.Monad.Freer.Logger as Log
-import           Control.Monad.Freer.RandomFu (Random, runRandomIOPureMT)
-import qualified Control.Monad.Freer.Pandoc as PD
-import qualified Control.Monad.Freer.PandocMonad as PD
-import           Control.Monad.Freer.Docs        (toNamedDocListWithM)
-import qualified Text.Pandoc.Report              as PD
-import qualified Html.Lucid.Report                as H
+import qualified Polysemy             as PS
+import qualified Knit.Effects.Logger      as Log
+import qualified Knit.Effects.PandocMonad as PM
+import qualified Knit.Effects.Pandoc      as PE
+import           Knit.Effects.RandomFu      (Random, runRandomIOPureMT)
+import           Knit.Effects.Docs        (toNamedDocListWithM)
+--import qualified Knit.Report.Blaze            as RB
+import qualified Knit.Report.Pandoc              as RP
+import qualified Knit.Report.Lucid            as RL
 
 import qualified Control.Foldl              as FL
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
@@ -100,15 +103,17 @@ templateVars = M.fromList
 main :: IO ()
 main = do
   -- create streams which are filtered to CO
-  let writeNamedHtml (PD.NamedDoc n lt) = T.writeFile (T.unpack $ "analysis/" <> n <> ".html") $ TL.toStrict lt
+  let writeNamedHtml (PE.NamedDoc n lt) = T.writeFile (T.unpack $ "analysis/" <> n <> ".html") $ TL.toStrict lt
       writeAllHtml = fmap (const ()) . traverse writeNamedHtml
-      pandocToBlaze = fmap BH.renderHtml . PD.toBlazeDocument (Just "pandoc-templates/minWithVega-pandoc.html") templateVars PD.mindocOptionsF
+      pandocToBlaze :: _
+      pandocToBlaze = fmap BH.renderHtml . RP.toBlazeDocument (Just "pandoc-templates/minWithVega-pandoc.html") templateVars RP.mindocOptionsF
   startReal <- C.getTime C.Monotonic
-  let runAll = PD.runPandocAndLoggingToIO Log.logAll -- runs Logging, Error PandocError, and PandocMonad, all required for Pandoc
+  let runAll :: _
+      runAll = PM.runPandocAndLoggingToIO Log.logAll -- runs Logging, Error PandocError, and PandocMonad, all required for Pandoc
                . runRandomIOPureMT (pureMT 1) -- runs Random
                . toNamedDocListWithM pandocToBlaze -- runs (Docs Pandoc)
                . Log.wrapPrefix "Main"
-  eitherDocs :: Either PD.PandocError [PD.NamedDoc TL.Text] <- runAll $ do
+  eitherDocs :: Either PM.PandocError [PE.NamedDoc TL.Text] <- runAll $ do
     Log.logLE Log.Info "Creating data producers from CSV files"
     let parserOptions = F.defaultParser { F.quotingMode =  F.RFC4180Quoting ' ' }
         veraData :: F.MonadSafe m => P.Producer (FM.MaybeRow IncarcerationTrends)  m ()
@@ -143,8 +148,8 @@ main = do
         countyBondPlusFIPSAndDistrict = FM.leftJoinMaybe (Proxy @'[County]) (F.boxedFrame countyBondPlusFIPS) (justsFromRec <$> countyDistrictFrame)
         countyBondPlusFIPSAndSAIPE = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndDistrict) (justsFromRec <$> povertyFrame)
         countyBondPlusFIPSAndSAIPEAndVera = FM.leftJoinMaybe (Proxy @[Fips, Year]) (F.boxedFrame countyBondPlusFIPSAndSAIPE) veraFrameM      
-    PD.newPandoc "moneyBondRateAndPovertyRate" $ kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
-    PD.newPandoc "moneyBondRateAndCrimeRate" $ bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
+    PE.newPandoc "moneyBondRateAndPovertyRate" $ kmMoneyBondPctAnalysis countyBondPlusFIPSAndSAIPEAndVera
+    PE.newPandoc "moneyBondRateAndCrimeRate" $ bondVsCrimeAnalysis countyBondCO_Data crimeStatsCO_Data
     endReal <- liftIO $ C.getTime C.Monotonic
     let realTime = C.diffTimeSpec endReal startReal
         printTime (C.TimeSpec s ns) = (T.pack $ show $ realToFrac s + realToFrac ns/(10^9)) 
@@ -174,14 +179,15 @@ cRate r = FT.recordSingleton @CrimeRate $ (r ^. crimes) `rDiv` (r ^. estPopulati
 reoffenseRate r = FT.recordSingleton @ReoffenseRate $ (r ^. moneyNewYes + r ^. prNewYes) `rDiv` (r ^. moneyPosted + r ^. prPosted) 
 postedBondFreq r = FT.recordSingleton @PostedBondFreq $ (r ^. moneyPosted + r ^. prPosted)
 
-bondVsCrimeAnalysis :: forall effs. ( MonadIO (FR.Eff effs)
-                                    , PD.PandocEffects effs
-                                    , Log.LogWithPrefixes effs
-                                    , FR.Member PD.ToPandoc effs
-                                    , FR.Member Random effs)
+
+bondVsCrimeAnalysis :: forall effs. ( MonadIO (PS.Semantic effs)
+                                    , PM.PandocEffects effs
+                                    , Log.LogWithPrefixesLE effs
+                                    , PS.Member PE.ToPandoc effs
+                                    , PS.Member Random effs)
                     => P.Producer (FM.MaybeRow CountyBondCO) (F.SafeT IO) ()
                     -> P.Producer (FM.MaybeRow CrimeStatsCO) (F.SafeT IO) ()
-                    -> FR.Eff effs ()
+                    -> PS.Semantic effs ()
 bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefix "BondRateVsCrimeRate" $ do
   Log.logLE Log.Info "Doing bond rate vs crime rate analysis..."
   countyBondFrameM <- liftIO $ fmap F.boxedFrame $ F.runSafeT $ P.toListM bondDataMaybeProducer
@@ -215,6 +221,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   kmMergedCrimeRateVsMoneyBondRateByYear  <- do
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (merged crime types)."
     let unpack = fmap (FT.mutate mbrAndCr) (MR.unpackGoodRows @[Year,County,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation])
+        reduce :: _
         reduce = MR.ReduceM $ kmReduce (KM.kMeansOneWithClusters @MoneyBondRate @CrimeRate @EstPopulation sunMoneyBondRateF sunCrimeRateF)
         kmFoldM = MR.concatFoldM $ MR.hashableMapReduceFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year]) reduce
     flip FL.foldM countyBondAndCrimeMerged $
@@ -222,6 +229,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   kmCrimeRateVsMoneyBondRateByYearAndType <- do
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. money-bond rate (separate crime types)."
     let unpack = fmap (FT.mutate mbrAndCr) (MR.unpackGoodRows @[Year,County,CrimeAgainst,MoneyBondFreq,TotalBondFreq,Crimes,Offenses,EstPopulation])
+        reduce :: _
         reduce =  MR.ReduceM $ kmReduce (KM.kMeansOneWithClusters @MoneyBondRate @CrimeRate @EstPopulation sunMoneyBondRateF sunCrimeRateF)
         kmFoldM = MR.concatFoldM $ MR.hashableMapReduceFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year, CrimeAgainst]) reduce   
     flip FL.foldM countyBondAndCrimeUnmerged $
@@ -229,6 +237,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   kmMergedCrimeRateVsPostedBondRateByYear <- do
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (merged)."
     let unpack = fmap (FT.mutate pbrAndCr) (MR.unpackGoodRows @[Year,County,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation])
+        reduce :: _ 
         reduce =  MR.ReduceM $ kmReduce (KM.kMeansOneWithClusters @PostedBondRate @CrimeRate @EstPopulation sunPostedBondRateF sunCrimeRateF)
         kmFoldM = MR.concatFoldM $ MR.hashableMapReduceFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year]) reduce   
     flip FL.foldM countyBondAndCrimeMerged $
@@ -236,6 +245,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   kmCrimeRateVsPostedBondRateByYearAndType <- do      
     Log.logLE Log.Info "Doing weighted-KMeans on crime rate vs. posted-bond rate (unmerged)."            
     let unpack = fmap (FT.mutate pbrAndCr) (MR.unpackGoodRows @[Year,County,CrimeAgainst,TotalBondFreq,MoneyPosted,PrPosted,Crimes,Offenses,EstPopulation])
+        reduce :: _
         reduce = MR.ReduceM $ kmReduce (KM.kMeansOneWithClusters @PostedBondRate @CrimeRate @EstPopulation sunPostedBondRateF sunCrimeRateF)
         kmFoldM = MR.concatFoldM $ MR.hashableMapReduceFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year,CrimeAgainst]) reduce   
     flip FL.foldM countyBondAndCrimeUnmerged $
@@ -243,6 +253,7 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   kmReoffenseRateVsMergedMoneyBondRateByYear <- do
     Log.logLE Log.Info "Doing weighted-KMeans on re-offense rate vs. money-bond rate (merged)."            
     let unpack = fmap (FT.mutate rorAndMbr) (MR.unpackGoodRows @[Year, County, MoneyNewYes, PrNewYes, MoneyPosted, PrPosted, TotalBondFreq, MoneyBondFreq, EstPopulation])
+        reduce :: _
         reduce = MR.ReduceM $ kmReduce (KM.kMeansOneWithClusters @MoneyBondRate @ReoffenseRate @EstPopulation sunMoneyBondRateF sunReoffenseRateF)
         kmFoldM = MR.concatFoldM $ MR.hashableMapReduceFoldM (MR.generalizeUnpack unpack) (MR.generalizeAssign $ MR.assignKeys @'[Year]) reduce             
     flip FL.foldM countyBondAndCrimeMerged $
@@ -251,21 +262,23 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
   let rMut r = mbrAndCr r F.<+> postedBondFreq r F.<+> postedBondRate r F.<+> postedBondPerCapita r
   (rData, regressionRes, regressionResMany) <- do
     let regUnpack = fmap (FT.mutate rMut) $ (MR.unpackGoodRows @[Year,MoneyBondFreq,PrBondFreq,PrPosted,MoneyPosted,TotalBondFreq,Crimes,EstPopulation])
-        regReduce r k rows = sequence $ M.singleton k (r rows)
+--        regReduce :: Foldable f => (forall g. Foldable g => g (F.Record rs) -> PS.Semantic effs b) -> k -> f (F.Record rs) -> PS.Semantic effs (M.Map k b)
+
         regMR r = MR.concatFoldM $ MR.hashableMapReduceFoldM (MR.generalizeUnpack regUnpack) (MR.generalizeAssign $ MR.assignKeys @'[Year]) r --(MR.ReduceM $ regReduce r)
         dataMR = MR.unpackOnlyFoldM (MR.generalizeUnpack regUnpack)
         guess = [0,0] -- guess has one extra dimension for constant
-        regressOneBM = FR.leastSquaresByMinimization @Crimes @'[EstPopulation, MoneyBondFreq] False guess
-        regressOneOLS = FR.ordinaryLeastSquares @Crimes @False @'[EstPopulation]
-        regressOneWLS = FR.popWeightedLeastSquares @CrimeRate @True @'[] @EstPopulation
-        regressOneWLS2 = FR.varWeightedLeastSquares @Crimes @False @'[EstPopulation, PostedBondFreq] @EstPopulation
-        regressOneWTLS = FR.varWeightedTLS @Crimes @False @'[EstPopulation, PostedBondFreq] @EstPopulation
+        regressOneBM = MR.functionToFoldM $ return . FR.leastSquaresByMinimization @Crimes @'[EstPopulation, MoneyBondFreq] False guess
+        regressOneOLS = MR.functionToFoldM $ FR.ordinaryLeastSquares @effs @Crimes @False @'[EstPopulation]
+        regressOneWLS = MR.functionToFoldM $ FR.popWeightedLeastSquares @effs @CrimeRate @True @'[] @EstPopulation 
+        regressOneWLS2 = MR.functionToFoldM $ FR.varWeightedLeastSquares @effs @Crimes @False @'[EstPopulation, PostedBondFreq] @EstPopulation 
+        regressOneWTLS = MR.functionToFoldM $ FR.varWeightedTLS @effs @Crimes @False @'[EstPopulation, PostedBondFreq] @EstPopulation
+        regReduceF r k = fmap (M.singleton k) r
         allMR  = (,,,,,) <$> dataMR
-                 <*> (regMR $ MR.ReduceM $ regReduce (return . regressOneBM))
-                 <*> (regMR $ MR.ReduceM $ regReduce regressOneOLS)
-                 <*> (regMR $ MR.ReduceM $ regReduce regressOneWLS)
-                 <*> (regMR $ MR.ReduceM $ regReduce regressOneWLS2)
-                 <*> (regMR $ MR.ReduceM $ regReduce regressOneWTLS) 
+                 <*> (regMR $ MR.ReduceFoldM $ regReduceF regressOneBM)
+                 <*> (regMR $ MR.ReduceFoldM $ regReduceF regressOneOLS)
+                 <*> (regMR $ MR.ReduceFoldM $ regReduceF regressOneWLS)
+                 <*> (regMR $ MR.ReduceFoldM $ regReduceF regressOneWLS2)
+                 <*> (regMR $ MR.ReduceFoldM $ regReduceF regressOneWTLS) 
     Log.logLE Log.Info "Regressing Crime Rate on Money Bond Rate"
     (rData, r1, r2,r3,r4,r5) <- FL.foldM allMR countyBondAndCrimeMerged
 --    Log.logLE Log.Info $ "regression (by minimization) results: " <> (T.pack $ show $ fmap (flip FR.prettyPrintRegressionResult 0.95) r1)
@@ -279,16 +292,16 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
 --    Log.log Log.Info $ "data=\n" <> Table.textTable rData
     
   Log.logLE Log.Info "Creating Doc"
-  PD.addLucid $ do
+  RP.addLucid $ do
     HL.h1_ "Colorado Money Bond Rate vs Crime rate" 
-    H.placeTextSection $ do
+    RL.placeTextSection $ do
       HL.h2_ "Colorado Bond Rates and Crime Rates (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
       HL.p_ "Each county in Colorado issues money bonds and personal recognizance bonds.  For each county I look at the % of money bonds out of all bonds issued and the crime rate.  We have 3 years of data and there are 64 counties in Colorado (each with vastly different populations).  So I've used a population-weighted k-means clustering technique (see notes below) to reduce the number of points to at most 10 per year. Each circle in the plot below represents one cluster of counties with similar money bond and poverty rates.  The size of the circle represents the total population in the cluster."
-    H.placeVisualization "crimeRateVsMoneyBondRateMerged" $ cRVsMBRVL True kmMergedCrimeRateVsMoneyBondRateByYear    
+    RL.placeVisualization "crimeRateVsMoneyBondRateMerged" $ cRVsMBRVL True kmMergedCrimeRateVsMoneyBondRateByYear    
     HL.p_ "Broken down by Colorado's crime categories:"
-    H.placeVisualization "crimeRateVsMoneyBondRateUnMerged" $ cRVsMBRVL False kmCrimeRateVsMoneyBondRateByYearAndType
-    H.placeTextSection $ do
+    RL.placeVisualization "crimeRateVsMoneyBondRateUnMerged" $ cRVsMBRVL False kmCrimeRateVsMoneyBondRateByYearAndType
+    RL.placeTextSection $ do
       HL.p_ "Notes:"
       HL.ul_ $ do
         HL.li_ $ do
@@ -301,12 +314,12 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
           HL.span_ ".  We also have some of that data in the "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/crime-rate-bycounty.csv"] "repo"
           HL.span_ ", but only for 2016, so I re-downloaded it for this. Also, there are some crimes in that data that don't roll up to a particular county but instead are attributed to the Colorado Bureau of Investigation or the Colorado State Patrol.  I've ignored those."
-    H.placeTextSection $ do
+    RL.placeTextSection $ do
       HL.p_ "Below I look at the percentage of all bonds which are \"posted\" (posting bond means paying the money bond or agreeing to the terms of the personal recognizance bond ?) rather than the % of money bonds. I use the same clustering technique."
-    H.placeVisualization "crimeRateVsPostedBondRate" $ cRVsPBRVL True kmMergedCrimeRateVsPostedBondRateByYear
+    RL.placeVisualization "crimeRateVsPostedBondRate" $ cRVsPBRVL True kmMergedCrimeRateVsPostedBondRateByYear
     HL.p_ "Broken down by Colorado's crime categories:"
-    H.placeVisualization "crimeRateVsPostedBondRateUnMerged" $ cRVsPBRVL False kmCrimeRateVsPostedBondRateByYearAndType
-    H.placeTextSection $ do
+    RL.placeVisualization "crimeRateVsPostedBondRateUnMerged" $ cRVsPBRVL False kmCrimeRateVsPostedBondRateByYearAndType
+    RL.placeTextSection $ do
       HL.p_ "Notes:"
       HL.ul_ $ do
         HL.li_ $ do
@@ -316,24 +329,24 @@ bondVsCrimeAnalysis bondDataMaybeProducer crimeDataMaybeProducer = Log.wrapPrefi
           HL.span_ "Crime Rate, as above, is crimes/estimated_population where those numbers come from the Colorado crime statistics "
           HL.a_ [HL.href_ "https://coloradocrimestats.state.co.us/"] "web-site."
     HL.p_ "Below I look at the rate of re-offending among people out on bond, here considered in each county along with money-bond rate and clustered as above."       
-    H.placeVisualization "reoffenseRateVsMoneyBondRate" $ rRVsMBRVL True kmReoffenseRateVsMergedMoneyBondRateByYear
-    H.placeTextSection $ do
+    RL.placeVisualization "reoffenseRateVsMoneyBondRate" $ rRVsMBRVL True kmReoffenseRateVsMergedMoneyBondRateByYear
+    RL.placeTextSection $ do
       HL.p_ "Notes:"
       HL.ul_ $ do
         HL.li_ $ do
           HL.span_ "Reoffense Rate is (number of new offenses for all bonds/total number of posted bonds) where that data comes from "
           HL.a_ [HL.href_ "https://github.com/Data4Democracy/incarceration-trends/blob/master/Colorado_ACLU/4-money-bail-analysis/complete-county-bond.csv"] "complete-county-bond.csv."
 
-    H.placeTextSection $ do
+    RL.placeTextSection $ do
       HL.h2_ "Regressions"
       HL.p_ "We can use linear regression to investigate the relationship between Crime Rate and the use of money and personal recognizance bonds. We begin by finding a best fit (using population-weighted least squares) to the model "
-      H.latex_ "$c_i = cr (p_{i}) + A (pb_{i}) + e_{i}$" 
+      RL.latex_ "$c_i = cr (p_{i}) + A (pb_{i}) + e_{i}$" 
       HL.p_ "where, for each county (denoted by the subscipt i), c is the number of crimes, p is the population and pb is the number of posted bonds and e is an error term we seek to minimize. We look at the result for each of the years in the data:"
-    H.placeVisualization "regresssionCoeffs" $ FV.regressionCoefficientPlotMany (T.pack . show . F.rgetField @Year) "Regression Results (by year)" [" cr","A"] (M.toList (fmap FR.regressionResult regressionResMany)) ST.cl95
+    RL.placeVisualization "regresssionCoeffs" $ FV.regressionCoefficientPlotMany (T.pack . show . F.rgetField @Year) "Regression Results (by year)" [" cr","A"] (M.toList (fmap FR.regressionResult regressionResMany)) ST.cl95
     HL.p_ "We look at these regressions directly by overlaying this model on the data itself:"
 --    H.placeVisualization "regresssionScatter"  $ FV.scatterWithFit @PostedBondPerCapita @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
 --    H.placeVisualization "regresssionScatter"  $ FV.scatterWithFit @PostedBondPerCapita @CrimeRate errF (FV.FitToPlot "WLS regression" fitF) "test scatter with fit" rData
-    H.placeVisualization "regresssionScatter"  $ FV.frameScatterWithFit "test scatter with fit" (Just "WLS") regressionRes ST.cl95 rData
+    RL.placeVisualization "regresssionScatter"  $ FV.frameScatterWithFit "test scatter with fit" (Just "WLS") regressionRes ST.cl95 rData
     kMeansNotes
 --  liftIO $ T.writeFile "analysis/moneyBondRateAndCrimeRate.html" $ TL.toStrict $ htmlAsText
 
@@ -382,12 +395,14 @@ rRVsMBRVL mergedOffenseAgainst dataRecords =
         
 -- NB: The data has two rows for each county and year, one for misdemeanors and one for felonies.
 --type MoneyPct = "moneyPct" F.:-> Double --F.declareColumn "moneyPct" ''Double
+kmMoneyBondPctAnalysis :: _
 kmMoneyBondPctAnalysis joinedData = Log.wrapPrefix "MoneyBondVsPoverty" $ do
   Log.logLE Log.Info "Doing money bond % vs poverty rate analysis..."
   let sunPovertyRF = FL.premap (F.rgetField @PovertyR) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       sunMoneyBondRateF = FL.premap (F.rgetField @MoneyBondRate) $ MR.scaleAndUnscale (MR.RescaleNormalize 1) MR.RescaleNone id
       initialCentroids = KM.kMeansPPCentroids @DblX @DblY @TotalPop KM.euclidSq
       unpack = fmap (FT.mutate moneyBondRate) $ MR.unpackGoodRows @[Year,County,OffType,Urbanicity,PovertyR, MoneyBondFreq,TotalBondFreq,TotalPop]
+      reduce :: _
       reduce = MR.ReduceM $ \_ -> KM.kMeansOne @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 initialCentroids (KM.weighted2DRecord @DblX @DblY @TotalPop) KM.euclidSq
       toRec (x, y, z) = (x F.&: y F.&: z F.&: V.RNil) :: F.Record [PovertyR, MoneyBondRate, TotalPop]
       kmByYearF = MR.concatFoldM $ MR.hashableMapReduceFoldM
@@ -403,16 +418,16 @@ kmMoneyBondPctAnalysis joinedData = Log.wrapPrefix "MoneyBondVsPoverty" $ do
                                         <$> KM.kMeans @[Year, OffType] @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 (KM.kMeansPPCentroids KM.euclidSq) KM.euclidSq
                                         <*> KM.kMeans @[Year, OffType, Urbanicity] @PovertyR @MoneyBondRate @TotalPop sunPovertyRF sunMoneyBondRateF 5 (KM.kMeansPPCentroids KM.euclidSq) KM.euclidSq) kmData -}
   Log.logLE Log.Info "Creating Doc"
-  PD.addLucid $ do
+  RP.addLucid $ do
     HL.h1_ "Colorado Money Bonds and Poverty" 
-    H.placeTextSection $ do
+    RL.placeTextSection $ do
       HL.h2_ "Colorado Money Bond Rate and Poverty (preliminary)"
       HL.p_ [HL.class_ "subtitle"] "Adam Conner-Sax"
       HL.p_ "Colorado issues two types of bonds when releasing people from jail before trial. Sometimes people are released on a \"money bond\" and sometimes on a personal recognizance bond. We have county-level data of all bonds (?) issued in 2014, 2015 and 2016.  Plotting it all is very noisy (since there are 64 counties in CO) so we use a population-weighted k-means clustering technique to combine similar counties into clusters. In the plots below, each circle represents one cluster of counties and the circle's size represents the total population of all the counties included in the cluster.  We consider felonies and misdemeanors separately."
-    H.placeVisualization "mBondsVspRateByYrFelonies" $ moneyBondPctVsPovertyRateVL False kmByYear
-    H.placeTextSection $ HL.h3_ "Broken down by \"urbanicity\":"
-    H.placeVisualization "mBondsVspRateByYrUrbFelonies" $ moneyBondPctVsPovertyRateVL True kmByYearUrb
-    H.placeTextSection $ do
+    RL.placeVisualization "mBondsVspRateByYrFelonies" $ moneyBondPctVsPovertyRateVL False kmByYear
+    RL.placeTextSection $ HL.h3_ "Broken down by \"urbanicity\":"
+    RL.placeVisualization "mBondsVspRateByYrUrbFelonies" $ moneyBondPctVsPovertyRateVL True kmByYearUrb
+    RL.placeTextSection $ do
       HL.p_ "Notes:"
       HL.ul_ $ do
         HL.li_ "Denver, the only urban county in CO, didn't report misdemeanors in this data, so the last plot is blank."
@@ -454,7 +469,7 @@ moneyBondPctVsPovertyRateVL facetByUrb dataRecords =
         , dat] <> sizing
   in vl
 
-kMeansNotes =  H.placeTextSection $ do
+kMeansNotes =  RL.placeTextSection $ do
   HL.h3_ "Some notes on weighted k-means"
   HL.ul_ $ do
     HL.li_ $ do
