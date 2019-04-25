@@ -11,6 +11,7 @@
 {-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE TypeOperators       #-}
+--{-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 module Main where
 
@@ -20,11 +21,14 @@ import qualified Frames.Utils                  as FU
 import qualified Frames.Transform              as FT
 import qualified Frames.MapReduce              as MR
 import qualified Frames.KMeans                 as KM
---import qualified Frames.ScatterMerge           as SM
 import qualified Math.Rescale                  as MR
-import qualified Control.Monad.Freer.Logger    as FR
 
-import qualified Control.Monad.Freer           as FR
+import qualified Knit.Effect.Logger            as KL
+import           Polysemy                       ( runM
+                                                , Semantic
+                                                , Lift
+                                                )
+--import qualified Control.Monad.Freer           as FR
 
 import qualified Control.Foldl                 as FL
 import           Control.Lens                   ( (^.) )
@@ -59,7 +63,7 @@ ratesByStateAndYear
   :: FL.Fold
        MaybeITrends
        (F.FrameRec '[Year, State, CrimeRate, ImprisonedPerCrimeRate])
-ratesByStateAndYear = MR.mapReduceHashableFrameListFold
+ratesByStateAndYear = MR.concatFold $ MR.mapReduceFold
   (MR.unpackGoodRows @'[Year, State, TotalPop15to64, IndexCrime, TotalPrisonAdm]
   )
   (MR.splitOnKeys @'[Year, State])
@@ -69,7 +73,7 @@ ratesByUrbanicityAndYear
   :: FL.Fold
        MaybeITrends
        (F.FrameRec '[Urbanicity, Year, CrimeRate, ImprisonedPerCrimeRate])
-ratesByUrbanicityAndYear = MR.mapReduceHashableFrameListFold
+ratesByUrbanicityAndYear = MR.concatFold $ MR.mapReduceFold
   (MR.unpackGoodRows
     @'[Urbanicity, Year, TotalPop15to64, IndexCrime, TotalPrisonAdm]
   )
@@ -91,7 +95,7 @@ ratesByGenderAndYear
   :: FL.Fold
        MaybeITrends
        (F.FrameRec '[Year, Gender, IncarcerationRate, PrisonAdmRate])
-ratesByGenderAndYear = MR.mapReduceHashableFrameListFold
+ratesByGenderAndYear = MR.concatFold $ MR.mapReduceFold
   unpack
   (MR.splitOnKeys @'[Year, Gender])
   (MR.foldAndAddKey $ fmap gRates $ FF.foldAllConstrained @Num FL.sum)
@@ -164,7 +168,7 @@ main = do
   let trendsData :: F.MonadSafe m => P.Producer MaybeITrends m ()
       trendsData = F.readTableMaybe veraTrendsFP -- some data is missing so we use the Maybe form
   let povertyData = F.readTable censusSAIPE_FP
-  FR.runM $ FR.filteredLogEntriesToIO FR.logAll $ do
+  runM $ KL.filteredLogEntriesToIO KL.logAll $ do
     incomePovertyJoinData trendsData povertyData
 
 aggregationAnalyses
@@ -188,9 +192,11 @@ aggregationAnalyses trendsData = do
 type X = "X" F.:-> Double
 type Y = "Y" F.:-> Double
 
+type M = Semantic '[KL.Logger KL.LogEntry, KL.PrefixLog, Lift IO]
+
 incomePovertyJoinData trendsData povertyData = do
   trendsForPovFrame <-
-    liftIO $ F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
+    liftIO @M $ F.inCoreAoS $ trendsData P.>-> trendsRowForPovertyAnalysis
   povertyFrame :: F.Frame SAIPE <- liftIO $ F.inCoreAoS povertyData
   let trendsWithPovertyF =
         F.leftJoin @'[Fips, Year] trendsForPovFrame povertyFrame
@@ -214,6 +220,12 @@ incomePovertyJoinData trendsData povertyData = do
       (MR.RescaleGiven (0, 0.01))
       MR.RescaleNone
       id
+    kmReduce
+      :: MR.ReduceM
+           M
+           k
+           (F.Record '[MedianHI, IncarcerationRate, TotalPop])
+           [(Int, Double, Int)]
     kmReduce =
       MR.ReduceM $ \_ -> KM.kMeansOne @MedianHI @IncarcerationRate @TotalPop
         sunXF
@@ -225,7 +237,7 @@ incomePovertyJoinData trendsData povertyData = do
     toRec (x, y, z) =
       (x F.&: y F.&: z F.&: V.RNil) :: F.Record
           '[MedianHI, IncarcerationRate, TotalPop]
-    kmFold assign = MR.mapReduceHashableFrameListFoldM
+    kmFold assign = MR.concatFoldM $ MR.mapReduceFoldM
       ( MR.generalizeUnpack
       $ MR.unpackGoodRows
         @'[Year, State, Urbanicity, MedianHI, IncarcerationRate, TotalPop]
